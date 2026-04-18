@@ -59,11 +59,13 @@ async def handle_admin(text: str, provider: Provider, messaging_client, db: Sess
         return
 
     # Parse intent normally
+    history = conv_store.get_history(provider.phone_number)
     intent_result = await parse_intent(
         message=text,
         role="admin",
         context=state.context,
         last_donna_message=state.last_donna_message or "",
+        history=history,
     )
 
     client_store = ClientStore(db)
@@ -353,10 +355,18 @@ async def _handle_admin_confirm(intent_result, provider, state, messaging_client
             old_sessions = session_store.get_upcoming_for_client(blocking_client.id)
             if old_sessions:
                 session_store.reschedule(old_sessions[0].id, new_slot)
-            await messaging_client.send_to_phone(
-                blocking_client.phone_number,
-                f"Hey {blocking_client.name}! Any chance you could shift to {new_slot.strftime('%A at %I:%M %p')} instead? Something came up on our end."
+            # Privacy: do NOT mention the requesting client's name to blocking client
+            blocking_history = conv_store.get_history(blocking_client.phone_number)
+            from utils.profile import build_client_profile
+            swap_msg = await generate_response(
+                situation=f"Ask {blocking_client.name} if they can shift their session to {new_slot.strftime('%A at %I:%M %p')} instead. Say something came up on our end. Do not mention any other client's name.",
+                recipient=blocking_client.name,
+                provider_name=provider.name,
+                business_type=provider.business_type,
+                history=blocking_history,
+                client_profile=build_client_profile(blocking_client),
             )
+            await messaging_client.send_to_phone(blocking_client.phone_number, swap_msg)
             conv_store.clear_context(provider.phone_number)
             await messaging_client.send_to_admin(f"Asked {blocking_client.name} to move to {new_slot.strftime('%I:%M %p')}.")
         return

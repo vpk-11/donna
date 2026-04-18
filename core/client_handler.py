@@ -7,6 +7,7 @@ from store.session_store import SessionStore
 from store.provider_store import ProviderStore
 from intelligence.intent_parser import parse_intent
 from intelligence.response_generator import generate_response
+from utils.profile import build_client_profile
 
 logger = logging.getLogger(__name__)
 
@@ -34,11 +35,15 @@ async def handle_client(text: str, client: Client, messaging_client, db: Session
         await trigger_dynamic_handoff(client, provider, messaging_client, db, conv_store)
         return
 
+    history = conv_store.get_history(client.phone_number)
+    client_profile = build_client_profile(client)
+
     intent_result = await parse_intent(
         message=text,
         role="client",
         context=state.context,
         last_donna_message=state.last_donna_message or "",
+        history=history,
     )
 
     state = conv_store.get_by_phone(client.phone_number)
@@ -54,14 +59,21 @@ async def handle_client(text: str, client: Client, messaging_client, db: Session
 
     intent = intent_result.intent
 
+    def _gen_kwargs():
+        return dict(
+            recipient=client.name,
+            provider_name=provider.name,
+            business_type=provider.business_type,
+            history=history,
+            client_profile=client_profile,
+        )
+
     if intent == "INQUIRY_SERVICES":
         config = provider.business_config or {}
         services_desc = config.get("services", f"1-on-1 {provider.business_type} sessions")
         response = await generate_response(
             situation=f"Client asked what services are offered. Services: {services_desc}.",
-            recipient=client.name,
-            provider_name=provider.name,
-            business_type=provider.business_type,
+            **_gen_kwargs(),
         )
         await messaging_client.send_to_phone(client.phone_number, response)
 
@@ -70,20 +82,16 @@ async def handle_client(text: str, client: Client, messaging_client, db: Session
         pricing = config.get("pricing", "Please contact us for pricing details.")
         response = await generate_response(
             situation=f"Client asked about pricing. Pricing info: {pricing}.",
-            recipient=client.name,
-            provider_name=provider.name,
-            business_type=provider.business_type,
+            **_gen_kwargs(),
         )
         await messaging_client.send_to_phone(client.phone_number, response)
 
     elif intent == "INQUIRY_AVAILABILITY":
-        # Check if client is asking about their own booked sessions first
         upcoming = session_store.get_upcoming_for_client(client.id)
         date_str = intent_result.entities.get("date", "")
         if upcoming and not date_str:
-            # Client asking "when is my session" — show their booked sessions
             session_strs = [s.scheduled_at.strftime("%A %b %d at %I:%M %p") for s in upcoming[:3]]
-            situation = f"Client asked about their sessions. Their upcoming booked sessions are: {', '.join(session_strs)}. Tell them their schedule."
+            situation = f"Client asked about their sessions. Their upcoming booked sessions: {', '.join(session_strs)}. Tell them their schedule."
         else:
             from utils.time_utils import parse_date
             target_date = parse_date(date_str or "today")
@@ -93,34 +101,27 @@ async def handle_client(text: str, client: Client, messaging_client, db: Session
                 situation = f"Client asked about availability on {target_date.strftime('%A %b %d')}. Available slots: {', '.join(slot_strs)}."
             else:
                 situation = f"Client asked about availability on {target_date.strftime('%A %b %d')}. No open slots that day."
-        response = await generate_response(
-            situation=situation,
-            recipient=client.name,
-            provider_name=provider.name,
-            business_type=provider.business_type,
-        )
+        response = await generate_response(situation=situation, **_gen_kwargs())
         await messaging_client.send_to_phone(client.phone_number, response)
 
     elif intent == "BOOK_REQUEST":
-        await _handle_client_book_request(client, intent_result.entities, provider, messaging_client, db, session_store, conv_store)
+        await _handle_client_book_request(client, intent_result.entities, provider, messaging_client, db, session_store, conv_store, history, client_profile)
 
     elif intent == "RESCHEDULE_REQUEST":
-        await _handle_client_reschedule(client, intent_result, provider, state, messaging_client, db, session_store, conv_store)
+        await _handle_client_reschedule(client, intent_result, provider, state, messaging_client, db, session_store, conv_store, history, client_profile)
 
     elif intent == "CANCEL_REQUEST":
-        await _handle_client_cancel(client, intent_result, provider, messaging_client, db, session_store, conv_store)
+        await _handle_client_cancel(client, intent_result, provider, messaging_client, db, session_store, conv_store, history, client_profile)
 
     elif intent == "CONFIRM":
         state = conv_store.get_by_phone(client.phone_number)
-        await _handle_confirm(client, intent_result, state, provider, messaging_client, db, session_store, conv_store)
+        await _handle_confirm(client, intent_result, state, provider, messaging_client, db, session_store, conv_store, history, client_profile)
 
     elif intent == "DECLINE":
         conv_store.clear_context(client.phone_number)
         response = await generate_response(
             situation="Client declined. Ask if there's anything else you can help with.",
-            recipient=client.name,
-            provider_name=provider.name,
-            business_type=provider.business_type,
+            **_gen_kwargs(),
         )
         await messaging_client.send_to_phone(client.phone_number, response)
 
@@ -131,9 +132,7 @@ async def handle_client(text: str, client: Client, messaging_client, db: Session
     else:
         response = await generate_response(
             situation=f"Client sent an unclear message: '{text}'. Ask one clarifying question.",
-            recipient=client.name,
-            provider_name=provider.name,
-            business_type=provider.business_type,
+            **_gen_kwargs(),
         )
         await messaging_client.send_to_phone(client.phone_number, response)
 
@@ -240,119 +239,72 @@ async def handle_cold_inbound(text: str, phone: str, messaging_client, db: Sessi
     await messaging_client.send_to_phone(phone, response)
 
 
-async def _handle_client_book_request(client, entities, provider, messaging_client, db, session_store, conv_store):
+async def _handle_client_book_request(client, entities, provider, messaging_client, db, session_store, conv_store, history=None, client_profile=None):
     from scheduling.conflict_resolver import resolve_slot
     from utils.time_utils import parse_datetime
+
+    def gkw(**extra):
+        return dict(recipient=client.name, provider_name=provider.name,
+                    business_type=provider.business_type, history=history, client_profile=client_profile, **extra)
+
     date_str = entities.get("date", "")
     time_str = entities.get("time", "")
 
     if not date_str or not time_str:
-        response = await generate_response(
-            situation="Client wants to book but didn't specify date/time. Ask what date and time works for them.",
-            recipient=client.name,
-            provider_name=provider.name,
-            business_type=provider.business_type,
-        )
+        response = await generate_response(situation="Client wants to book but didn't specify date/time. Ask what date and time works for them.", **gkw())
         await messaging_client.send_to_phone(client.phone_number, response)
         return
 
     try:
         slot = parse_datetime(date_str, time_str)
     except ValueError:
-        response = await generate_response(
-            situation="Client gave an unclear time for booking. Ask them to clarify the date and time.",
-            recipient=client.name,
-            provider_name=provider.name,
-            business_type=provider.business_type,
-        )
+        response = await generate_response(situation="Client gave an unclear time for booking. Ask them to clarify the date and time.", **gkw())
         await messaging_client.send_to_phone(client.phone_number, response)
         return
 
     result = await resolve_slot(
-        provider_id=provider.id,
-        requested_at=slot,
-        duration_mins=60,
-        requesting_client_id=client.id,
-        db=db,
-        session_store=session_store,
-        client_store=None,
-        provider=provider,
+        provider_id=provider.id, requested_at=slot, duration_mins=60,
+        requesting_client_id=client.id, db=db, session_store=session_store,
+        client_store=None, provider=provider,
     )
 
     if result.status == "FREE":
         if provider.auto_book:
             try:
                 session_store.create({
-                    "provider_id": provider.id,
-                    "client_id": client.id,
-                    "scheduled_at": slot,
-                    "duration_mins": 60,
-                    "status": "scheduled",
-                    "is_recurring": False,
+                    "provider_id": provider.id, "client_id": client.id,
+                    "scheduled_at": slot, "duration_mins": 60,
+                    "status": "scheduled", "is_recurring": False,
                 })
             except ValueError:
-                response = await generate_response(
-                    situation=f"That slot just got taken. Apologize and ask what other time works.",
-                    recipient=client.name,
-                    provider_name=provider.name,
-                    business_type=provider.business_type,
-                )
+                response = await generate_response(situation="That slot just got taken. Apologize and ask what other time works.", **gkw())
                 await messaging_client.send_to_phone(client.phone_number, response)
                 return
-            response = await generate_response(
-                situation=f"Client booked {slot.strftime('%A %b %d at %I:%M %p')}. Confirm the booking.",
-                recipient=client.name,
-                provider_name=provider.name,
-                business_type=provider.business_type,
-            )
+            response = await generate_response(situation=f"Client booked {slot.strftime('%A %b %d at %I:%M %p')}. Confirm the booking.", **gkw())
             await messaging_client.send_to_phone(client.phone_number, response)
-            await messaging_client.send_to_admin(
-                f"{client.name} booked {slot.strftime('%A %b %d at %I:%M %p')}. Added to your schedule."
-            )
+            await messaging_client.send_to_admin(f"{client.name} booked {slot.strftime('%A %b %d at %I:%M %p')}. Added to your schedule.")
         else:
-            conv_store.update_context(client.phone_number, {
-                "pending_booking": {
-                    "slot": slot.isoformat(),
-                    "client_id": client.id,
-                    "alternatives": [],
-                }
-            })
-            response = await generate_response(
-                situation=f"{slot.strftime('%A at %I:%M %p')} is available. Ask client to confirm.",
-                recipient=client.name,
-                provider_name=provider.name,
-                business_type=provider.business_type,
-            )
+            conv_store.update_context(client.phone_number, {"pending_booking": {"slot": slot.isoformat(), "client_id": client.id, "alternatives": []}})
+            response = await generate_response(situation=f"{slot.strftime('%A at %I:%M %p')} is available. Ask client to confirm.", **gkw())
             await messaging_client.send_to_phone(client.phone_number, response)
     elif result.status in ("ALTERNATIVES", "SWAP_POSSIBLE"):
         slots = result.slots or result.blocking_alternatives or []
         alt_strs = [s.strftime("%A at %I:%M %p") for s in slots[:3]]
-        response = await generate_response(
-            situation=f"{slot.strftime('%A at %I:%M %p')} is not available. Offer these alternatives: {', '.join(alt_strs)}.",
-            recipient=client.name,
-            provider_name=provider.name,
-            business_type=provider.business_type,
-        )
+        response = await generate_response(situation=f"{slot.strftime('%A at %I:%M %p')} is not available. Offer these alternatives: {', '.join(alt_strs)}.", **gkw())
         await messaging_client.send_to_phone(client.phone_number, response)
     else:
-        response = await generate_response(
-            situation=f"No availability on {slot.strftime('%A %b %d')}. Apologize and ask about other days.",
-            recipient=client.name,
-            provider_name=provider.name,
-            business_type=provider.business_type,
-        )
+        response = await generate_response(situation=f"No availability on {slot.strftime('%A %b %d')}. Apologize and ask about other days.", **gkw())
         await messaging_client.send_to_phone(client.phone_number, response)
 
 
-async def _handle_client_reschedule(client, intent_result, provider, state, messaging_client, db, session_store, conv_store):
+async def _handle_client_reschedule(client, intent_result, provider, state, messaging_client, db, session_store, conv_store, history=None, client_profile=None):
+    def gkw(**extra):
+        return dict(recipient=client.name, provider_name=provider.name,
+                    business_type=provider.business_type, history=history, client_profile=client_profile, **extra)
+
     upcoming = session_store.get_upcoming_for_client(client.id)
     if not upcoming:
-        response = await generate_response(
-            situation="Client wants to reschedule but has no upcoming sessions.",
-            recipient=client.name,
-            provider_name=provider.name,
-            business_type=provider.business_type,
-        )
+        response = await generate_response(situation="Client wants to reschedule but has no upcoming sessions.", **gkw())
         await messaging_client.send_to_phone(client.phone_number, response)
         return
 
@@ -364,11 +316,7 @@ async def _handle_client_reschedule(client, intent_result, provider, state, mess
         session = upcoming[0]
         conv_store.update_context(client.phone_number, {"pending_reschedule": {"session_id": session.id}})
         response = await generate_response(
-            situation=f"Client wants to reschedule their session on {session.scheduled_at.strftime('%A %b %d at %I:%M %p')}. Ask what new time works.",
-            recipient=client.name,
-            provider_name=provider.name,
-            business_type=provider.business_type,
-        )
+            situation=f"Client wants to reschedule their session on {session.scheduled_at.strftime('%A %b %d at %I:%M %p')}. Ask what new time works.", **gkw())
         await messaging_client.send_to_phone(client.phone_number, response)
         return
 
@@ -376,39 +324,26 @@ async def _handle_client_reschedule(client, intent_result, provider, state, mess
     try:
         new_slot = parse_datetime(date_str, time_str)
     except ValueError:
-        response = await generate_response(
-            situation="Client gave unclear reschedule time. Ask to clarify.",
-            recipient=client.name,
-            provider_name=provider.name,
-            business_type=provider.business_type,
-        )
+        response = await generate_response(situation="Client gave unclear reschedule time. Ask to clarify.", **gkw())
         await messaging_client.send_to_phone(client.phone_number, response)
         return
 
     session_id = state.context.get("pending_reschedule", {}).get("session_id", upcoming[0].id)
     session_store.reschedule(session_id, new_slot)
     conv_store.clear_context(client.phone_number)
-    response = await generate_response(
-        situation=f"Rescheduled client to {new_slot.strftime('%A %b %d at %I:%M %p')}. Confirm.",
-        recipient=client.name,
-        provider_name=provider.name,
-        business_type=provider.business_type,
-    )
+    response = await generate_response(situation=f"Rescheduled client to {new_slot.strftime('%A %b %d at %I:%M %p')}. Confirm.", **gkw())
     await messaging_client.send_to_phone(client.phone_number, response)
-    await messaging_client.send_to_admin(
-        f"{client.name} rescheduled to {new_slot.strftime('%A %b %d at %I:%M %p')}."
-    )
+    await messaging_client.send_to_admin(f"{client.name} rescheduled to {new_slot.strftime('%A %b %d at %I:%M %p')}.")
 
 
-async def _handle_client_cancel(client, intent_result, provider, messaging_client, db, session_store, conv_store):
+async def _handle_client_cancel(client, intent_result, provider, messaging_client, db, session_store, conv_store, history=None, client_profile=None):
+    def gkw(**extra):
+        return dict(recipient=client.name, provider_name=provider.name,
+                    business_type=provider.business_type, history=history, client_profile=client_profile, **extra)
+
     upcoming = session_store.get_upcoming_for_client(client.id)
     if not upcoming:
-        response = await generate_response(
-            situation="Client wants to cancel but has no upcoming sessions.",
-            recipient=client.name,
-            provider_name=provider.name,
-            business_type=provider.business_type,
-        )
+        response = await generate_response(situation="Client wants to cancel but has no upcoming sessions.", **gkw())
         await messaging_client.send_to_phone(client.phone_number, response)
         return
 
@@ -416,19 +351,16 @@ async def _handle_client_cancel(client, intent_result, provider, messaging_clien
     session_store.cancel(session.id)
     session_store.archive(session.id, reason="cancelled_by_client")
     conv_store.clear_context(client.phone_number)
-    response = await generate_response(
-        situation=f"Cancelled client's session on {session.scheduled_at.strftime('%A %b %d at %I:%M %p')}. Confirm cancellation.",
-        recipient=client.name,
-        provider_name=provider.name,
-        business_type=provider.business_type,
-    )
+    response = await generate_response(situation=f"Cancelled client's session on {session.scheduled_at.strftime('%A %b %d at %I:%M %p')}. Confirm cancellation.", **gkw())
     await messaging_client.send_to_phone(client.phone_number, response)
-    await messaging_client.send_to_admin(
-        f"{client.name} cancelled their {session.scheduled_at.strftime('%A %b %d at %I:%M %p')} session."
-    )
+    await messaging_client.send_to_admin(f"{client.name} cancelled their {session.scheduled_at.strftime('%A %b %d at %I:%M %p')} session.")
 
 
-async def _handle_confirm(client, intent_result, state, provider, messaging_client, db, session_store, conv_store):
+async def _handle_confirm(client, intent_result, state, provider, messaging_client, db, session_store, conv_store, history=None, client_profile=None):
+    def gkw(**extra):
+        return dict(recipient=client.name, provider_name=provider.name,
+                    business_type=provider.business_type, history=history, client_profile=client_profile, **extra)
+
     context = state.context
     pending = context.get("pending_booking")
 
@@ -436,46 +368,26 @@ async def _handle_confirm(client, intent_result, state, provider, messaging_clie
         slot = datetime.fromisoformat(pending["slot"])
         try:
             session_store.create({
-                "provider_id": provider.id,
-                "client_id": client.id,
-                "scheduled_at": slot,
-                "duration_mins": 60,
-                "status": "scheduled",
-                "is_recurring": False,
+                "provider_id": provider.id, "client_id": client.id,
+                "scheduled_at": slot, "duration_mins": 60,
+                "status": "scheduled", "is_recurring": False,
             })
         except ValueError:
             conv_store.clear_context(client.phone_number)
-            response = await generate_response(
-                situation=f"That slot just got taken by someone else. Apologize and offer to find a new time.",
-                recipient=client.name,
-                provider_name=provider.name,
-                business_type=provider.business_type,
-            )
+            response = await generate_response(situation="That slot just got taken by someone else. Apologize and offer to find a new time.", **gkw())
             await messaging_client.send_to_phone(client.phone_number, response)
             return
         conv_store.clear_context(client.phone_number)
-        response = await generate_response(
-            situation=f"Client confirmed booking for {slot.strftime('%A %b %d at %I:%M %p')}. Confirm and say see you then.",
-            recipient=client.name,
-            provider_name=provider.name,
-            business_type=provider.business_type,
-        )
+        response = await generate_response(situation=f"Client confirmed booking for {slot.strftime('%A %b %d at %I:%M %p')}. Confirm and say see you then.", **gkw())
         await messaging_client.send_to_phone(client.phone_number, response)
-        await messaging_client.send_to_admin(
-            f"{client.name} confirmed {slot.strftime('%A %b %d at %I:%M %p')}. Added to your schedule."
-        )
+        await messaging_client.send_to_admin(f"{client.name} confirmed {slot.strftime('%A %b %d at %I:%M %p')}. Added to your schedule.")
         return
 
     date_ent = intent_result.entities.get("date", "")
     time_ent = intent_result.entities.get("time", "")
     if date_ent or time_ent:
-        await _handle_client_book_request(client, intent_result.entities, provider, messaging_client, db, session_store, conv_store)
+        await _handle_client_book_request(client, intent_result.entities, provider, messaging_client, db, session_store, conv_store, history, client_profile)
         return
 
-    response = await generate_response(
-        situation=f"Client {client.name} said yes but Donna has no pending action. Ask what they meant.",
-        recipient=client.name,
-        provider_name=provider.name,
-        business_type=provider.business_type,
-    )
+    response = await generate_response(situation=f"Client {client.name} said yes but Donna has no pending action. Ask what they meant.", **gkw())
     await messaging_client.send_to_phone(client.phone_number, response)

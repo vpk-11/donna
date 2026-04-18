@@ -14,6 +14,16 @@ FALLBACK_RESULT = IntentResult(
 )
 
 
+def _format_history(history: list[dict]) -> str:
+    if not history:
+        return "(no prior conversation)"
+    lines = []
+    for turn in history[-6:]:  # last 6 turns for intent context
+        label = "User" if turn["role"] == "user" else "Donna"
+        lines.append(f"{label}: {turn['content']}")
+    return "\n".join(lines)
+
+
 async def _call_llm(system: str, user: str) -> str:
     import litellm
     response = await litellm.acompletion(
@@ -45,10 +55,15 @@ async def parse_intent(
     role: str,
     context: dict,
     last_donna_message: str,
+    history: list[dict] | None = None,
 ) -> IntentResult:
+    # Strip internal keys (_history etc) from context shown to LLM
+    clean_context = {k: v for k, v in context.items() if not k.startswith("_")}
+
     user_prompt = INTENT_PARSER_USER_TEMPLATE.format(
+        history=_format_history(history or []),
         last_donna_message=last_donna_message or "",
-        context_json=json.dumps(context),
+        context_json=json.dumps(clean_context),
         role=role,
         message=message,
     )
