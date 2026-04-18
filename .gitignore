@@ -1,0 +1,11 @@
+donna.db
+__pycache__/
+*.pyc
+*.pyo
+.conda/
+*.egg-info/
+dist/
+build/
+.DS_Store
+logs/
+*.log
