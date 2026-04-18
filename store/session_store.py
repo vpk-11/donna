@@ -18,15 +18,18 @@ class SessionStore:
         duration_mins: int,
         buffer_mins: int,
     ) -> SessionModel | None:
-        window_start = requested_at - timedelta(minutes=buffer_mins)
+        # Two sessions [a, a+d] and [r, r+d] conflict (with buffer b) when:
+        #   a < r + d + b  AND  a > r - d - b
+        # Rearranged to pure Python boundaries — no column arithmetic (SQLite can't eval it).
+        window_start = requested_at - timedelta(minutes=duration_mins + buffer_mins)
         window_end = requested_at + timedelta(minutes=duration_mins + buffer_mins)
         return (
             self.db.query(SessionModel)
             .filter(
                 SessionModel.provider_id == provider_id,
                 SessionModel.status == "scheduled",
+                SessionModel.scheduled_at > window_start,
                 SessionModel.scheduled_at < window_end,
-                SessionModel.scheduled_at + timedelta(minutes=duration_mins) > window_start,
             )
             .first()
         )
@@ -88,6 +91,17 @@ class SessionStore:
         )
 
     def create(self, data: dict) -> SessionModel:
+        # Hard conflict guard — prevent double-booking regardless of caller logic
+        conflict = self.get_conflict(
+            data["provider_id"],
+            data["scheduled_at"],
+            data.get("duration_mins", 60),
+            15,  # default buffer — safe minimum
+        )
+        if conflict and conflict.client_id != data.get("client_id"):
+            raise ValueError(
+                f"Slot {data['scheduled_at']} already taken by client_id={conflict.client_id}"
+            )
         session = SessionModel(**data)
         self.db.add(session)
         self.db.commit()

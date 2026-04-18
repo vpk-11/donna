@@ -226,14 +226,18 @@ async def _handle_book_session(intent_result, provider, state, messaging_client,
     )
 
     if result.status == "FREE":
-        session_store.create({
-            "provider_id": provider.id,
-            "client_id": client.id,
-            "scheduled_at": slot,
-            "duration_mins": 60,
-            "status": "scheduled",
-            "is_recurring": False,
-        })
+        try:
+            session_store.create({
+                "provider_id": provider.id,
+                "client_id": client.id,
+                "scheduled_at": slot,
+                "duration_mins": 60,
+                "status": "scheduled",
+                "is_recurring": False,
+            })
+        except ValueError as e:
+            await messaging_client.send_to_admin(f"Can't book that slot - {e}")
+            return
         await messaging_client.send_to_admin(
             f"Done - {client.name} is booked for {slot.strftime('%A %b %d at %I:%M %p')}."
         )
@@ -363,14 +367,19 @@ async def _handle_admin_confirm(intent_result, provider, state, messaging_client
         slot = datetime.fromisoformat(booking["slot"])
         client = client_store.get(booking["client_id"])
         if client:
-            session_store.create({
-                "provider_id": provider.id,
-                "client_id": client.id,
-                "scheduled_at": slot,
-                "duration_mins": 60,
-                "status": "scheduled",
-                "is_recurring": False,
-            })
+            try:
+                session_store.create({
+                    "provider_id": provider.id,
+                    "client_id": client.id,
+                    "scheduled_at": slot,
+                    "duration_mins": 60,
+                    "status": "scheduled",
+                    "is_recurring": False,
+                })
+            except ValueError as e:
+                conv_store.clear_context(provider.phone_number)
+                await messaging_client.send_to_admin(f"Can't book that slot - {e}")
+                return
             conv_store.clear_context(provider.phone_number)
             await messaging_client.send_to_admin(
                 f"Done - {client.name} booked for {slot.strftime('%A %b %d at %I:%M %p')}."

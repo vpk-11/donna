@@ -77,15 +77,22 @@ async def handle_client(text: str, client: Client, messaging_client, db: Session
         await messaging_client.send_to_phone(client.phone_number, response)
 
     elif intent == "INQUIRY_AVAILABILITY":
-        from utils.time_utils import parse_date
-        date_str = intent_result.entities.get("date", "today")
-        target_date = parse_date(date_str)
-        slots = session_store.get_free_slots(provider.id, target_date, 60, provider)
-        if slots:
-            slot_strs = [s.strftime("%I:%M %p") for s in slots[:5]]
-            situation = f"Client asked about availability on {target_date.strftime('%A %b %d')}. Available slots: {', '.join(slot_strs)}."
+        # Check if client is asking about their own booked sessions first
+        upcoming = session_store.get_upcoming_for_client(client.id)
+        date_str = intent_result.entities.get("date", "")
+        if upcoming and not date_str:
+            # Client asking "when is my session" — show their booked sessions
+            session_strs = [s.scheduled_at.strftime("%A %b %d at %I:%M %p") for s in upcoming[:3]]
+            situation = f"Client asked about their sessions. Their upcoming booked sessions are: {', '.join(session_strs)}. Tell them their schedule."
         else:
-            situation = f"Client asked about availability on {target_date.strftime('%A %b %d')}. No slots available that day."
+            from utils.time_utils import parse_date
+            target_date = parse_date(date_str or "today")
+            slots = session_store.get_free_slots(provider.id, target_date, 60, provider)
+            if slots:
+                slot_strs = [s.strftime("%I:%M %p") for s in slots[:5]]
+                situation = f"Client asked about availability on {target_date.strftime('%A %b %d')}. Available slots: {', '.join(slot_strs)}."
+            else:
+                situation = f"Client asked about availability on {target_date.strftime('%A %b %d')}. No open slots that day."
         response = await generate_response(
             situation=situation,
             recipient=client.name,
@@ -274,14 +281,24 @@ async def _handle_client_book_request(client, entities, provider, messaging_clie
 
     if result.status == "FREE":
         if provider.auto_book:
-            session_store.create({
-                "provider_id": provider.id,
-                "client_id": client.id,
-                "scheduled_at": slot,
-                "duration_mins": 60,
-                "status": "scheduled",
-                "is_recurring": False,
-            })
+            try:
+                session_store.create({
+                    "provider_id": provider.id,
+                    "client_id": client.id,
+                    "scheduled_at": slot,
+                    "duration_mins": 60,
+                    "status": "scheduled",
+                    "is_recurring": False,
+                })
+            except ValueError:
+                response = await generate_response(
+                    situation=f"That slot just got taken. Apologize and ask what other time works.",
+                    recipient=client.name,
+                    provider_name=provider.name,
+                    business_type=provider.business_type,
+                )
+                await messaging_client.send_to_phone(client.phone_number, response)
+                return
             response = await generate_response(
                 situation=f"Client booked {slot.strftime('%A %b %d at %I:%M %p')}. Confirm the booking.",
                 recipient=client.name,
@@ -289,7 +306,6 @@ async def _handle_client_book_request(client, entities, provider, messaging_clie
                 business_type=provider.business_type,
             )
             await messaging_client.send_to_phone(client.phone_number, response)
-            from messaging.websocket_client import WebSocketMessagingClient
             await messaging_client.send_to_admin(
                 f"{client.name} booked {slot.strftime('%A %b %d at %I:%M %p')}. Added to your schedule."
             )
@@ -418,14 +434,25 @@ async def _handle_confirm(client, intent_result, state, provider, messaging_clie
 
     if pending:
         slot = datetime.fromisoformat(pending["slot"])
-        session_store.create({
-            "provider_id": provider.id,
-            "client_id": client.id,
-            "scheduled_at": slot,
-            "duration_mins": 60,
-            "status": "scheduled",
-            "is_recurring": False,
-        })
+        try:
+            session_store.create({
+                "provider_id": provider.id,
+                "client_id": client.id,
+                "scheduled_at": slot,
+                "duration_mins": 60,
+                "status": "scheduled",
+                "is_recurring": False,
+            })
+        except ValueError:
+            conv_store.clear_context(client.phone_number)
+            response = await generate_response(
+                situation=f"That slot just got taken by someone else. Apologize and offer to find a new time.",
+                recipient=client.name,
+                provider_name=provider.name,
+                business_type=provider.business_type,
+            )
+            await messaging_client.send_to_phone(client.phone_number, response)
+            return
         conv_store.clear_context(client.phone_number)
         response = await generate_response(
             situation=f"Client confirmed booking for {slot.strftime('%A %b %d at %I:%M %p')}. Confirm and say see you then.",
