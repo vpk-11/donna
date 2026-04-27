@@ -19,14 +19,16 @@ async def handle_admin(text: str, provider: Provider, messaging_client, db: Sess
     if state.handoff_active and state.handoff_target_phone:
         lower = text.lower().strip()
         if lower in ("done", "donna take over", "donna, take over"):
+            target_phone = state.handoff_target_phone  # capture before update clears it
             conv_store.update(provider.phone_number, {
                 "handoff_active": False,
                 "handoff_target_phone": None,
             })
-            target_state = conv_store.get_by_phone(state.handoff_target_phone)
-            if target_state:
-                conv_store.update(state.handoff_target_phone, {"handoff_active": False})
+            if target_phone:
+                conv_store.update(target_phone, {"handoff_active": False})
             await messaging_client.send_to_admin("Got it - I'm back in control.")
+            if target_phone:
+                await _summarize_handoff(target_phone, provider, messaging_client, db, conv_store, client_store=ClientStore(db))
         else:
             relay_msg = f"[{provider.name}] {text}"
             await messaging_client.send_to_phone(state.handoff_target_phone, relay_msg)
@@ -94,6 +96,8 @@ async def handle_admin(text: str, provider: Provider, messaging_client, db: Sess
         await _handle_cancel_session(intent_result, provider, messaging_client, db, client_store, session_store)
     elif intent == "RESCHEDULE_SESSION":
         await _handle_reschedule_session(intent_result, provider, state, messaging_client, db, client_store, session_store, conv_store)
+    elif intent == "PROACTIVE_MESSAGE":
+        await _handle_proactive_message(intent_result, provider, messaging_client, db, client_store, conv_store)
     elif intent == "HANDOFF_REQUEST":
         from core.handoff import start_handoff_from_admin
         target_name = intent_result.entities.get("client_name", "")
@@ -155,7 +159,9 @@ async def _check_client_status(intent_result, provider, messaging_client, db, cl
     client_name = intent_result.entities.get("client_name", "")
     client = client_store.get_by_name(client_name, provider.id) if client_name else None
     if not client:
-        await messaging_client.send_to_admin(f"Couldn't find a client named '{client_name}'.")
+        await messaging_client.send_to_admin(
+            f"I don't see a '{client_name}' in my contacts. New client? Introduce them with their phone number."
+        )
         return
 
     client_state = conv_store.get_by_phone(client.phone_number)
@@ -397,3 +403,100 @@ async def _handle_admin_confirm(intent_result, provider, state, messaging_client
         return
 
     await messaging_client.send_to_admin("Got it.")
+
+
+async def _summarize_handoff(
+    target_phone: str,
+    provider,
+    messaging_client,
+    db,
+    conv_store,
+    client_store,
+) -> None:
+    client = client_store.get_by_phone(target_phone)
+    client_name = client.name if client else target_phone
+    history = conv_store.get_history(target_phone)
+
+    if not history:
+        return
+
+    history_text = "\n".join(
+        f"{'You' if t['role'] == 'donna' else client_name}: {t['content']}"
+        for t in history[-20:]
+    )
+
+    situation = (
+        f"You (the AI assistant Donna) just finished relaying a live conversation between "
+        f"{provider.name} and their client {client_name}. "
+        f"Here is the conversation:\n{history_text}\n\n"
+        f"Summarize in 2-3 sentences what was discussed and what {client_name} wants. "
+        f"Then list any clear action items (e.g. book a session, follow up, send info). "
+        f"If booking was discussed, ask {provider.name} if they want you to go ahead and book it. "
+        f"Be direct and brief."
+    )
+    summary = await generate_response(
+        situation=situation,
+        recipient=provider.name,
+        provider_name=provider.name,
+        business_type=provider.business_type,
+    )
+    await messaging_client.send_to_admin(summary)
+
+
+async def _handle_proactive_message(intent_result, provider, messaging_client, db, client_store, conv_store):
+    entities = intent_result.entities
+    client_name = entities.get("client_name") or ""
+    message_to_send = entities.get("message_to_send") or ""
+    phone = (entities.get("phone_number") or "").strip()
+
+    client = client_store.get_by_name(client_name, provider.id) if client_name else None
+
+    if not client:
+        if phone:
+            existing = client_store.get_by_phone(phone)
+            if existing:
+                client = existing
+            else:
+                # Unknown name + phone provided → offer to create and ping
+                await messaging_client.send_to_admin(
+                    f"I don't see a '{client_name}' in my contacts. "
+                    f"Looks like they might be new — want me to add them at {phone} and reach out? "
+                    f"Reply with what I should say, or say 'add {client_name} {phone}' to introduce them first."
+                )
+                return
+        else:
+            await messaging_client.send_to_admin(
+                f"I don't see a '{client_name}' in my contacts. "
+                f"New client? Give me their phone number and I'll add them."
+            )
+            return
+
+    if not message_to_send:
+        await messaging_client.send_to_admin(f"What should I tell {client.name}?")
+        return
+
+    outbound = await generate_response(
+        situation=f"Send this message to {client.name} on behalf of {provider.name}: {message_to_send}",
+        recipient=client.name,
+        provider_name=provider.name,
+        business_type=provider.business_type,
+    )
+    await messaging_client.send_to_phone(client.phone_number, outbound)
+
+    # If message references a specific date/time slot, set pending_booking so client's
+    # "perfect"/"yes" can complete the booking without another round-trip.
+    from utils.time_utils import parse_date, parse_time
+    _date_hint = entities.get("date") or ""
+    _time_hint = entities.get("time") or ""
+    if _date_hint and _time_hint:
+        try:
+            from utils.time_utils import parse_datetime
+            slot = parse_datetime(_date_hint, _time_hint)
+            client_state = conv_store.get_or_create(client.phone_number, "client")
+            conv_store.update_context(client.phone_number, {
+                "pending_booking": {"slot": slot.isoformat(), "client_id": client.id, "alternatives": []}
+            })
+        except Exception:
+            pass
+
+    await messaging_client.send_to_admin(f"Sent to {client.name}.")

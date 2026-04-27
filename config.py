@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     # LLM
-    llm_model: str = "groq/llama-3.3-70b-versatile"
+    llm_model: str = "openrouter/deepseek/deepseek-chat-v3-0324:free"
     llm_api_base: str = ""
     llm_api_key: str = ""
     llm_temperature: float = 0.2
@@ -27,7 +27,9 @@ class Settings(BaseSettings):
     port: int = 8000
 
     class Config:
-        env_file = None
+        env_file = ".env"
+        env_file_encoding = "utf-8"
+        extra = "ignore"
 
 
 settings = Settings()

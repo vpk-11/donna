@@ -9,3 +9,9 @@ build/
 .DS_Store
 logs/
 *.log
+
+.claude/
+.vscode/
+.idea/
+
+.env

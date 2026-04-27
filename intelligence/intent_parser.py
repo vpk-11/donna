@@ -45,6 +45,9 @@ def _parse_json_response(raw: str) -> IntentResult | None:
         start = raw.index("{")
         end = raw.rindex("}") + 1
         data = json.loads(raw[start:end])
+        # Normalize null entity values to "" so callers can safely use them as strings
+        if isinstance(data.get("entities"), dict):
+            data["entities"] = {k: (v if v is not None else "") for k, v in data["entities"].items()}
         return IntentResult(**data)
     except Exception:
         return None

@@ -32,6 +32,7 @@ Admin intents:
   CLIENT_INFO           - admin adding notes or info about an existing client
   HANDOFF_REQUEST       - admin wanting to personally join a client conversation
   HANDOFF_DELEGATE      - admin telling Donna to keep handling it
+  PROACTIVE_MESSAGE     - admin asking Donna to send a specific message to a client on their behalf (e.g. "message James and ask him X", "ping Sarah about Y", "text Marcus to confirm Z", "can u ping James +15550000111"). Entities: client_name, message_to_send, phone_number (if provided)
   CONFIRM               - admin confirming something Donna asked
   DECLINE               - admin declining something Donna suggested
   UNKNOWN               - cannot determine intent
@@ -41,10 +42,10 @@ Client intents:
   INQUIRY_PRICING       - asking about cost or rates
   INQUIRY_AVAILABILITY  - asking about open time slots or their own booked sessions
   BOOK_REQUEST          - requesting to book a session
-  RESCHEDULE_REQUEST    - wanting to change an existing session
+  RESCHEDULE_REQUEST    - wanting to change an existing session to a NEW time (different from current)
   CANCEL_REQUEST        - wanting to cancel a session
   CONFIRM               - confirming something Donna asked
-  DECLINE               - declining something Donna offered
+  DECLINE               - declining or rejecting something Donna offered or asked. Also use this when client says their current time is fine, they don't want to change, or reaffirms the same slot (e.g. "keep it at 8am", "8 AM is fine", "not needed", "no change needed", "same time is ok")
   HUMAN_REQUEST         - explicitly wants to speak to the actual person
   UNKNOWN               - cannot determine intent\
 """

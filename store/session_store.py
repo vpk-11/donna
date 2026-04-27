@@ -118,7 +118,7 @@ class SessionStore:
         session = self.get(session_id)
         if session:
             session.scheduled_at = new_time
-            session.status = "rescheduled"
+            session.status = "scheduled"
             self.db.commit()
 
     def archive(self, session_id: int, reason: str) -> None:

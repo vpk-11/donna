@@ -55,4 +55,4 @@ async def generate_response(
         return raw.strip()
     except Exception as e:
         logger.error(f"Response generation failed: {e}")
-        return "Got it - I'll take care of that."
+        return "Sorry, I'm having a technical issue right now. Please try again in a moment."
