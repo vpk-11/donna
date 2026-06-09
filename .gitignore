@@ -15,3 +15,6 @@ logs/
 .idea/
 
 .env
+
+graphify-out/manifest.json
+graphify-out/cost.json
