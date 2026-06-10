@@ -1,9 +1,12 @@
+import json
 import logging
+import os
 from contextlib import asynccontextmanager
 from urllib.parse import unquote
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from db.database import SessionLocal
 from db.migrations import init_db
+from db.redis_client import ping_redis
 from store.bootstrap import bootstrap_provider
 from messaging.websocket_client import WebSocketConnectionManager, WebSocketMessagingClient
 from core.router import route_message
@@ -13,12 +16,27 @@ logger = logging.getLogger(__name__)
 
 ws_manager = WebSocketConnectionManager()
 messaging_client: WebSocketMessagingClient | None = None
+business_config: dict = {}
+
+_BUSINESS_CONFIG_PATH = os.path.join(os.path.dirname(__file__), "config", "business.json")
+
+
+def get_business_config() -> dict:
+    return business_config
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global messaging_client
+    global messaging_client, business_config
     init_db()
+
+    if not ping_redis():
+        raise RuntimeError("Redis is not reachable. Start Redis before Donna.")
+
+    with open(_BUSINESS_CONFIG_PATH) as f:
+        business_config = json.load(f)
+    logger.info(f"Loaded business config: {business_config.get('business_type')}")
+
     db = SessionLocal()
     try:
         bootstrap_provider(db)
