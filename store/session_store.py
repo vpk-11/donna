@@ -108,11 +108,14 @@ class SessionStore:
         self.db.refresh(session)
         return session
 
-    def cancel(self, session_id: int) -> None:
+    def cancel(self, session_id: int) -> str | None:
         session = self.get(session_id)
         if session:
+            pre_cancel_status = session.status
             session.status = "cancelled"
             self.db.commit()
+            return pre_cancel_status
+        return None
 
     def reschedule(self, session_id: int, new_time: datetime) -> None:
         session = self.get(session_id)
@@ -121,7 +124,7 @@ class SessionStore:
             session.status = "scheduled"
             self.db.commit()
 
-    def archive(self, session_id: int, reason: str) -> None:
+    def archive(self, session_id: int, reason: str, pre_cancel_status: str | None = None) -> None:
         session = self.get(session_id)
         if not session:
             return
@@ -132,7 +135,7 @@ class SessionStore:
             scheduled_at=session.scheduled_at,
             duration_mins=session.duration_mins,
             location=session.location,
-            status=session.status,
+            status=pre_cancel_status if pre_cancel_status is not None else session.status,
             is_recurring=session.is_recurring,
             recurrence_type=session.recurrence_type,
             archive_reason=reason,

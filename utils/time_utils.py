@@ -27,7 +27,7 @@ def parse_date(date_str: str) -> date:
             return parsed.date()
         except ValueError:
             continue
-    return today
+    raise ValueError(f"Cannot parse date from input: {repr(date_str)}")
 
 
 def parse_time(time_str: str) -> time:

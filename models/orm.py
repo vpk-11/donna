@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, JSON, String
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Index, Integer, JSON, String, Text
 from db.database import Base
 
 
@@ -33,6 +33,8 @@ class Client(Base):
     preferred_time = Column(String, nullable=True)
     notes = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+    __table_args__ = (Index("ix_clients_phone", "phone_number"),)
 
 
 class Session(Base):
@@ -84,3 +86,17 @@ class ConversationState(Base):
     handoff_target_phone = Column(String, nullable=True)
     last_message_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow)
+
+    __table_args__ = (Index("ix_conv_state_phone", "phone_number"),)
+
+
+class ConversationSummary(Base):
+    __tablename__ = "conversation_summaries"
+
+    id = Column(Integer, primary_key=True)
+    phone_number = Column(String, nullable=False, index=True)
+    summary = Column(Text, nullable=False)
+    turn_count = Column(Integer, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    session_start = Column(DateTime, nullable=True)
+    session_end = Column(DateTime, nullable=True)

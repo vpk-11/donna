@@ -28,8 +28,8 @@ async def cancel_day(
     )
 
     for session in sessions:
-        session_store.cancel(session.id)
-        session_store.archive(session.id, reason="provider_emergency")
+        pre_status = session_store.cancel(session.id)
+        session_store.archive(session.id, reason="provider_emergency", pre_cancel_status=pre_status)
         client = client_store.get(session.client_id)
         if not client:
             continue

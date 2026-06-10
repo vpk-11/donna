@@ -1,16 +1,15 @@
 import json
 import logging
-from config import settings
 from models.schemas import IntentResult
 from intelligence.prompts import INTENT_PARSER_SYSTEM, INTENT_PARSER_USER_TEMPLATE, INTENT_RETRY_USER_TEMPLATE
+from intelligence.llm_client import call_llm
 
 logger = logging.getLogger(__name__)
 
 FALLBACK_RESULT = IntentResult(
     intent="UNKNOWN",
     entities={},
-    needs_clarification=False,
-    clarification_question=None,
+    confidence=0.0,
 )
 
 
@@ -24,31 +23,18 @@ def _format_history(history: list[dict]) -> str:
     return "\n".join(lines)
 
 
-async def _call_llm(system: str, user: str) -> str:
-    import litellm
-    response = await litellm.acompletion(
-        model=settings.llm_model,
-        messages=[
-            {"role": "system", "content": system},
-            {"role": "user", "content": user},
-        ],
-        api_base=settings.llm_api_base or None,
-        api_key=settings.llm_api_key or None,
-        temperature=settings.llm_temperature,
-        max_tokens=settings.llm_max_tokens,
-    )
-    return response.choices[0].message.content.strip()
-
-
 def _parse_json_response(raw: str) -> IntentResult | None:
     try:
         start = raw.index("{")
         end = raw.rindex("}") + 1
         data = json.loads(raw[start:end])
-        # Normalize null entity values to "" so callers can safely use them as strings
         if isinstance(data.get("entities"), dict):
             data["entities"] = {k: (v if v is not None else "") for k, v in data["entities"].items()}
-        return IntentResult(**data)
+        return IntentResult(
+            intent=data.get("intent", "UNKNOWN"),
+            entities=data.get("entities", {}),
+            confidence=float(data.get("confidence", 0.5)),
+        )
     except Exception:
         return None
 
@@ -60,7 +46,6 @@ async def parse_intent(
     last_donna_message: str,
     history: list[dict] | None = None,
 ) -> IntentResult:
-    # Strip internal keys (_history etc) from context shown to LLM
     clean_context = {k: v for k, v in context.items() if not k.startswith("_")}
 
     user_prompt = INTENT_PARSER_USER_TEMPLATE.format(
@@ -71,7 +56,10 @@ async def parse_intent(
         message=message,
     )
     try:
-        raw = await _call_llm(INTENT_PARSER_SYSTEM, user_prompt)
+        raw = await call_llm(messages=[
+            {"role": "system", "content": INTENT_PARSER_SYSTEM},
+            {"role": "user", "content": user_prompt},
+        ])
         result = _parse_json_response(raw)
         if result:
             logger.info(f"Parsed intent: {result.intent} for role={role}")
@@ -85,7 +73,10 @@ async def parse_intent(
         last_donna_message=last_donna_message or "",
     )
     try:
-        raw = await _call_llm(INTENT_PARSER_SYSTEM, retry_prompt)
+        raw = await call_llm(messages=[
+            {"role": "system", "content": INTENT_PARSER_SYSTEM},
+            {"role": "user", "content": retry_prompt},
+        ])
         result = _parse_json_response(raw)
         if result:
             logger.info(f"Parsed intent (retry): {result.intent}")

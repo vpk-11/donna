@@ -49,9 +49,9 @@ async def handle_client(text: str, client: Client, messaging_client, db: Session
     _lower = text.lower().strip()
     _has_pending = state.context.get("pending_booking") or state.context.get("pending_reschedule")
     if _has_pending and _lower in _AFFIRMATIVES:
-        intent_result = IntentResult(intent="CONFIRM", entities={}, needs_clarification=False, clarification_question=None)
+        intent_result = IntentResult(intent="CONFIRM", entities={}, confidence=1.0)
     elif _has_pending and _lower in _NEGATIVES:
-        intent_result = IntentResult(intent="DECLINE", entities={}, needs_clarification=False, clarification_question=None)
+        intent_result = IntentResult(intent="DECLINE", entities={}, confidence=1.0)
     else:
         intent_result = await parse_intent(
             message=text,

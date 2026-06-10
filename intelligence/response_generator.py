@@ -1,6 +1,6 @@
 import logging
-from config import settings
 from intelligence.prompts import RESPONSE_GENERATOR_SYSTEM_TEMPLATE, RESPONSE_GENERATOR_USER_TEMPLATE
+from intelligence.llm_client import call_llm
 
 logger = logging.getLogger(__name__)
 
@@ -13,22 +13,6 @@ def _format_history(history: list[dict]) -> str:
         label = "User" if turn["role"] == "user" else "Donna"
         lines.append(f"{label}: {turn['content']}")
     return "\n".join(lines) + "\n"
-
-
-async def _call_llm(system: str, user: str) -> str:
-    import litellm
-    response = await litellm.acompletion(
-        model=settings.llm_model,
-        messages=[
-            {"role": "system", "content": system},
-            {"role": "user", "content": user},
-        ],
-        api_base=settings.llm_api_base or None,
-        api_key=settings.llm_api_key or None,
-        temperature=settings.llm_temperature,
-        max_tokens=settings.llm_max_tokens,
-    )
-    return response.choices[0].message.content.strip()
 
 
 async def generate_response(
@@ -51,8 +35,14 @@ async def generate_response(
         recipient=recipient,
     )
     try:
-        raw = await _call_llm(system, user)
+        raw = await call_llm(messages=[
+            {"role": "system", "content": system},
+            {"role": "user", "content": user},
+        ])
         return raw.strip()
     except Exception as e:
         logger.error(f"Response generation failed: {e}")
         return "Sorry, I'm having a technical issue right now. Please try again in a moment."
+
+
+generate = generate_response
