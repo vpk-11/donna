@@ -7,6 +7,7 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from db.database import SessionLocal
 from db.migrations import init_db
 from db.redis_client import ping_redis
+from firewall.warmup import warmup_firewall
 from store.bootstrap import bootstrap_provider
 from messaging.websocket_client import WebSocketConnectionManager, WebSocketMessagingClient
 from core.router import route_message
@@ -36,6 +37,8 @@ async def lifespan(app: FastAPI):
     with open(_BUSINESS_CONFIG_PATH) as f:
         business_config = json.load(f)
     logger.info(f"Loaded business config: {business_config.get('business_type')}")
+
+    warmup_firewall()
 
     db = SessionLocal()
     try:
