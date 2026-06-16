@@ -25,17 +25,18 @@ def _format_history(history: list[dict]) -> str:
 
 def _parse_json_response(raw: str) -> IntentResult | None:
     try:
-        start = raw.index("{")
-        end = raw.rindex("}") + 1
-        data = json.loads(raw[start:end])
+        data = json.loads(raw)
         if isinstance(data.get("entities"), dict):
-            data["entities"] = {k: (v if v is not None else "") for k, v in data["entities"].items()}
+            data["entities"] = {
+                k: (v if v is not None else "")
+                for k, v in data["entities"].items()
+            }
         return IntentResult(
             intent=data.get("intent", "UNKNOWN"),
             entities=data.get("entities", {}),
             confidence=float(data.get("confidence", 0.5)),
         )
-    except Exception:
+    except (json.JSONDecodeError, ValueError, TypeError):
         return None
 
 
@@ -56,10 +57,13 @@ async def parse_intent(
         message=message,
     )
     try:
-        raw = await call_llm(messages=[
-            {"role": "system", "content": INTENT_PARSER_SYSTEM},
-            {"role": "user", "content": user_prompt},
-        ])
+        raw = await call_llm(
+            messages=[
+                {"role": "system", "content": INTENT_PARSER_SYSTEM},
+                {"role": "user", "content": user_prompt},
+            ],
+            response_format={"type": "json_object"},
+        )
         result = _parse_json_response(raw)
         if result:
             logger.info(f"Parsed intent: {result.intent} for role={role}")
@@ -73,10 +77,13 @@ async def parse_intent(
         last_donna_message=last_donna_message or "",
     )
     try:
-        raw = await call_llm(messages=[
-            {"role": "system", "content": INTENT_PARSER_SYSTEM},
-            {"role": "user", "content": retry_prompt},
-        ])
+        raw = await call_llm(
+            messages=[
+                {"role": "system", "content": INTENT_PARSER_SYSTEM},
+                {"role": "user", "content": retry_prompt},
+            ],
+            response_format={"type": "json_object"},
+        )
         result = _parse_json_response(raw)
         if result:
             logger.info(f"Parsed intent (retry): {result.intent}")

@@ -1,0 +1,30 @@
+from typing import Literal
+
+Decision = Literal["autonomous", "notify_admin", "escalate_to_admin"]
+
+ALWAYS_ESCALATE_INTENTS = {
+    "HUMAN_REQUEST",
+    "HANDOFF_REQUEST",
+}
+
+ALWAYS_AUTONOMOUS_INTENTS = {
+    "INQUIRY_SERVICES",
+    "INQUIRY_PRICING",
+    "INQUIRY_AVAILABILITY",
+    "HANDOFF_DELEGATE",
+    "DECLINE",
+    "UNKNOWN",
+}
+
+AUTONOMOUS_WITH_NOTIFY_INTENTS = {
+    "CANCEL_REQUEST",
+    "RESCHEDULE_REQUEST",
+    "CANCEL_SESSION",
+    "RESCHEDULE_SESSION",
+}
+
+CONFIDENCE_THRESHOLD = 0.6
+
+UNKNOWN_ESCALATION_TURN = 5
+
+NEW_CLIENT_STATUSES = {"prospect", "cold_lead", "inactive"}
