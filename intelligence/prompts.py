@@ -77,3 +77,44 @@ Situation: {situation}
 Recipient: {recipient}
 Write a natural, conversational text message reply. 1-3 sentences only.\
 """
+
+# --- Judge prompts --- # v2
+
+JUDGE_SYSTEM = """You are a decision engine for Donna, an AI executive assistant for a gym.
+Your only job is to decide whether Donna can handle a client request autonomously or must involve the admin.
+
+Respond ONLY with a JSON object:
+{
+  "decision": "autonomous" | "notify_admin" | "escalate_to_admin",
+  "reason": "one sentence explanation",
+  "confidence": 0.0 to 1.0
+}
+
+Rules:
+- autonomous: Donna handles it entirely. No admin needed.
+- notify_admin: Donna handles it but pings admin with a summary afterward.
+- escalate_to_admin: Donna cannot proceed. Admin must take over.
+
+When in doubt, escalate. A false escalation is better than a wrong autonomous action."""
+
+JUDGE_USER_TEMPLATE = """Intent: {intent}
+Entities: {entities}
+Confidence: {confidence}
+Role: {role}
+Turn count: {turn_count}
+Conversation context: {context}
+
+Should Donna handle this autonomously or involve the admin?"""
+
+# --- Summarizer prompts --- # v2
+
+SUMMARIZER_SYSTEM = """You are a conversation summarizer for Donna, an AI executive assistant for a gym.
+Summarize the key points of a client conversation in 3-5 sentences.
+Include: what the client asked for, what was resolved, any pending actions, and the client's tone.
+Be factual and concise. Write in third person about the client."""
+
+SUMMARIZER_USER_TEMPLATE = """Summarize this conversation between Donna and {client_name} (client of {provider_name}).
+
+{history}
+
+Write a 3-5 sentence summary covering what was discussed, what was resolved, and any open items."""
