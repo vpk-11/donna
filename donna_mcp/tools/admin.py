@@ -1,14 +1,12 @@
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-
+import json
 from contextlib import contextmanager
 from typing import Any, Optional
 
 from fastmcp import FastMCP
 
 from db.database import SessionLocal
+from db.redis_client import get_redis
+from orchestrator.channels import STATE_AGENT_REGISTRY
 from store.conversation_store import ConversationStore
 from store.provider_store import ProviderStore
 
@@ -95,6 +93,29 @@ def get_conversation_state(phone_number: str) -> dict:
             "handoff_target_phone": state.handoff_target_phone,
             "last_message_at": state.last_message_at.isoformat() if state.last_message_at else None,
         }
+
+
+@admin_mcp.tool()
+def get_all_active_agents() -> dict:
+    """
+    Return all currently active per-client agents from the Redis registry.
+    Used by the orchestrator to give the admin a bird's-eye view.
+    Returns a dict of {phone_number: {agent_id, started_at, last_active}}.
+    """
+    try:
+        r = get_redis()
+        raw = r.hgetall(STATE_AGENT_REGISTRY)
+        agents = {}
+        for phone_bytes, data_bytes in raw.items():
+            phone = phone_bytes.decode() if isinstance(phone_bytes, bytes) else phone_bytes
+            data = data_bytes.decode() if isinstance(data_bytes, bytes) else data_bytes
+            try:
+                agents[phone] = json.loads(data)
+            except json.JSONDecodeError:
+                agents[phone] = {"raw": data}
+        return {"agents": agents, "count": len(agents)}
+    except Exception as e:
+        return {"error": f"Redis unavailable: {str(e)}"}
 
 
 @admin_mcp.tool()

@@ -1,8 +1,3 @@
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-
 from contextlib import contextmanager
 from typing import Optional
 
@@ -13,6 +8,8 @@ from store.client_store import ClientStore
 from store.provider_store import ProviderStore
 
 clients_mcp = FastMCP("clients")
+
+VALID_STATUSES = {"active", "inactive", "prospect"}
 
 
 @contextmanager
@@ -89,6 +86,8 @@ def create_client(
     preferred_days example: ["mon", "wed", "fri"].
     preferred_time example: "morning" or "09:00".
     """
+    if status not in VALID_STATUSES:
+        return {"error": f"Invalid status '{status}'. Must be one of: {sorted(VALID_STATUSES)}"}
     with _db() as db:
         provider = ProviderStore(db).get_first()
         if not provider:
