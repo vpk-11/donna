@@ -10,7 +10,7 @@ from db.redis_client import ping_redis
 from firewall.warmup import warmup_firewall
 from store.bootstrap import bootstrap_provider
 from messaging.websocket_client import WebSocketConnectionManager, WebSocketMessagingClient
-from core.router import route_message
+from orchestrator.central import CentralOrchestrator
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 logger = logging.getLogger(__name__)
@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 ws_manager = WebSocketConnectionManager()
 messaging_client: WebSocketMessagingClient | None = None
 business_config: dict = {}
+orchestrator: CentralOrchestrator | None = None
 
 _BUSINESS_CONFIG_PATH = os.path.join(os.path.dirname(__file__), "config", "business.json")
 
@@ -26,9 +27,15 @@ def get_business_config() -> dict:
     return business_config
 
 
+def get_orchestrator() -> CentralOrchestrator:
+    if orchestrator is None:
+        raise RuntimeError("Orchestrator not initialized")
+    return orchestrator
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global messaging_client, business_config
+    global messaging_client, business_config, orchestrator
     init_db()
 
     if not ping_redis():
@@ -46,6 +53,12 @@ async def lifespan(app: FastAPI):
     finally:
         db.close()
     messaging_client = WebSocketMessagingClient(ws_manager, SessionLocal)
+    orchestrator = CentralOrchestrator(messaging_client, business_config)
+    db = SessionLocal()
+    try:
+        await orchestrator.startup(db)
+    finally:
+        db.close()
     logger.info("Donna is ready.")
     yield
     logger.info("Donna shutting down.")
@@ -70,7 +83,7 @@ async def websocket_endpoint(websocket: WebSocket, phone_number: str):
             logger.info(f"Message from {phone}: {text[:80]}")
             db = SessionLocal()
             try:
-                await route_message(phone, text, messaging_client, db)
+                await orchestrator.handle_message(phone, text, db)
             finally:
                 db.close()
     except WebSocketDisconnect:
