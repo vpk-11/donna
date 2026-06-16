@@ -1,9 +1,11 @@
-# RETIRED: replaced by orchestrator/handoff.py. Kept for reference.
+import json
 import logging
 from sqlalchemy.orm import Session
 from models.orm import Client, Provider
 from store.conversation_store import ConversationStore
 from intelligence.response_generator import generate_response
+from db.redis_client import get_redis
+from orchestrator.channels import STATE_AGENT_REGISTRY
 
 logger = logging.getLogger(__name__)
 
@@ -50,8 +52,7 @@ async def start_handoff_from_admin(
     client_name = "the client"
     if client_state:
         from store.client_store import ClientStore
-        client_store = ClientStore(db)
-        c = client_store.get_by_phone(target_phone)
+        c = ClientStore(db).get_by_phone(target_phone)
         if c:
             client_name = c.name
 
@@ -67,6 +68,17 @@ async def start_handoff_from_admin(
         "handoff_target_phone": target_phone,
         "context": admin_ctx,
     })
+
+    # Mark handoff active in Redis agent registry
+    try:
+        r = get_redis()
+        existing_raw = r.hget(STATE_AGENT_REGISTRY, target_phone)
+        if existing_raw:
+            data = json.loads(existing_raw)
+            data["handoff_active"] = True
+            r.hset(STATE_AGENT_REGISTRY, target_phone, json.dumps(data))
+    except Exception as e:
+        logger.warning(f"handoff.redis_update failed for {target_phone}: {e}")
 
     await messaging_client.send_to_phone(
         target_phone,
@@ -95,6 +107,17 @@ async def trigger_explicit_handoff_from_client(
         "handoff_target_phone": client.phone_number,
         "context": admin_ctx,
     })
+
+    # Mark handoff active in Redis agent registry
+    try:
+        r = get_redis()
+        existing_raw = r.hget(STATE_AGENT_REGISTRY, client.phone_number)
+        if existing_raw:
+            data = json.loads(existing_raw)
+            data["handoff_active"] = True
+            r.hset(STATE_AGENT_REGISTRY, client.phone_number, json.dumps(data))
+    except Exception as e:
+        logger.warning(f"handoff.redis_update failed for {client.phone_number}: {e}")
 
     await messaging_client.send_to_phone(
         client.phone_number,

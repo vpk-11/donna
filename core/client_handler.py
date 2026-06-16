@@ -1,3 +1,4 @@
+# RETIRED: replaced by orchestrator/agent.py (ClientAgent). Kept for reference.
 import logging
 from datetime import datetime
 from sqlalchemy.orm import Session
