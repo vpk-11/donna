@@ -1,16 +1,16 @@
 # Graph Report - donna  (2026-06-16)
 
 ## Corpus Check
-- 65 files · ~13,223 words
+- 61 files · ~12,257 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 335 nodes · 869 edges · 33 communities (28 shown, 5 thin omitted)
-- Extraction: 81% EXTRACTED · 19% INFERRED · 0% AMBIGUOUS · INFERRED: 166 edges (avg confidence: 0.56)
+- 322 nodes · 838 edges · 34 communities (29 shown, 5 thin omitted)
+- Extraction: 80% EXTRACTED · 20% INFERRED · 0% AMBIGUOUS · INFERRED: 167 edges (avg confidence: 0.56)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `54310fe2`
+- Built from commit: `2ec2889d`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -32,6 +32,7 @@
 - [[_COMMUNITY_Community 25|Community 25]]
 - [[_COMMUNITY_Community 26|Community 26]]
 - [[_COMMUNITY_Community 27|Community 27]]
+- [[_COMMUNITY_Community 33|Community 33]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `ClientStore` - 42 edges
@@ -40,8 +41,8 @@
 4. `Provider` - 34 edges
 5. `SessionStore` - 34 edges
 6. `ProviderStore` - 26 edges
-7. `handle_admin()` - 25 edges
-8. `generate_response()` - 23 edges
+7. `generate_response()` - 25 edges
+8. `handle_admin()` - 25 edges
 9. `handle_client()` - 20 edges
 10. `Client` - 18 edges
 
@@ -72,39 +73,39 @@
 - **Conflict Resolution Pipeline: resolve_slot + SessionStore + ClientStore** — scheduling_conflict_resolver_resolve_slot, store_session_store_sessionstore_get_conflict, store_session_store_sessionstore_get_free_slots, store_client_store_clientstore_get, scheduling_conflict_resolver_conflictresult [EXTRACTED 1.00]
 - **Session Lifecycle: create, cancel, archive, reschedule** — store_session_store_sessionstore_create, store_session_store_sessionstore_cancel, store_session_store_sessionstore_archive, store_session_store_sessionstore_reschedule, models_orm_sessionarchive [INFERRED 0.95]
 
-## Communities (33 total, 5 thin omitted)
+## Communities (34 total, 5 thin omitted)
 
 ### Community 0 - "ORM and Scheduling Core"
-Cohesion: 0.12
-Nodes (29): Base, Client, Scheduling Conflict Resolution Strategy, Provider, Session, Provider, Session, SessionArchive (+21 more)
+Cohesion: 0.22
+Nodes (10): SessionArchive, cancel_day(), date, Session, SessionModel, SessionStore, date, datetime (+2 more)
 
 ### Community 1 - "Admin Intent Dispatch"
-Cohesion: 0.11
-Nodes (37): BaseSettings, Intent-Driven Dispatch Pattern, Privacy Guard on Swap Messages, Config, Settings, _check_client_status(), _check_schedule(), handle_admin() (+29 more)
+Cohesion: 0.17
+Nodes (27): Intent-Driven Dispatch Pattern, Privacy Guard on Swap Messages, _check_client_status(), _check_schedule(), handle_admin(), _handle_admin_confirm(), _handle_book_session(), _handle_cancel_session() (+19 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.20
-Nodes (13): should_summarize(), summarize_conversation(), trim_history(), evaluate(), _llm_judge(), IntentResult, JudgeResult, test_cancel_request_notifies_admin() (+5 more)
+Cohesion: 0.22
+Nodes (7): handle_cold_inbound(), Session, route_message(), bootstrap_provider(), Session, ProviderStore, Provider
 
 ### Community 4 - "Messaging Abstraction Layer"
-Cohesion: 0.08
-Nodes (22): ABC, Base, engine, init_db(), get_async_redis(), get_redis(), ping_redis(), FastAPI (+14 more)
+Cohesion: 0.10
+Nodes (15): ABC, get_async_redis(), get_redis(), ping_redis(), FastAPI, warmup_firewall(), lifespan(), websocket_endpoint() (+7 more)
 
 ### Community 6 - "Conversation History Store"
-Cohesion: 0.17
-Nodes (12): Conversation History Ring Buffer, ConversationState, handle_cold_inbound(), Session, Session, route_message(), ConversationState, ConversationStore (+4 more)
+Cohesion: 0.15
+Nodes (17): Conversation History Ring Buffer, ConversationState, _create_and_greet_client(), handle_new_client_intro(), handle_new_client_intro_clarification(), ClientStore, ConversationStore, Provider (+9 more)
 
 ### Community 7 - "New Client Onboarding"
-Cohesion: 0.20
-Nodes (15): Handoff Relay Pattern, Client, ConversationStore, Provider, Session, start_handoff_from_admin(), trigger_dynamic_handoff(), trigger_explicit_handoff_from_client() (+7 more)
+Cohesion: 0.14
+Nodes (31): Base, Client, Scheduling Conflict Resolution Strategy, Handoff Relay Pattern, Provider, Session, Session, Client (+23 more)
 
 ### Community 15 - "FastAPI App Entry"
-Cohesion: 0.19
-Nodes (13): BaseModel, FirewallResult, scan_input(), FirewallResult, scan_output(), FirewallResult, JudgeResult, MessageEnvelope (+5 more)
+Cohesion: 0.17
+Nodes (15): BaseModel, FirewallResult, scan_input(), FirewallResult, scan_output(), FirewallResult, JudgeResult, MessageEnvelope (+7 more)
 
 ### Community 20 - "Python Requirements"
-Cohesion: 0.12
-Nodes (26): ConversationSummary, _client_id(), Phase 2 smoke tests. Requires: running Redis, seeded DB (provider + clients with, test_book_session_conflict_returns_error(), test_book_session_happy_path(), test_cancel_session_preserves_pre_cancel_status(), test_get_all_active_agents(), test_reschedule_session_checks_conflict() (+18 more)
+Cohesion: 0.14
+Nodes (25): _client_id(), Phase 2 smoke tests. Requires: running Redis, seeded DB (provider + clients with, test_book_session_conflict_returns_error(), test_book_session_happy_path(), test_cancel_session_preserves_pre_cancel_status(), test_get_all_active_agents(), test_reschedule_session_checks_conflict(), get_all_active_agents() (+17 more)
 
 ### Community 22 - "DB Wipe Utility"
 Cohesion: 0.30
@@ -115,27 +116,31 @@ Cohesion: 0.14
 Nodes (13): break_between_sessions_mins, business_hours, end, start, business_type, conversation_timeout_mins, days_open, location_type (+5 more)
 
 ### Community 26 - "Community 26"
-Cohesion: 0.40
-Nodes (9): _create_and_greet_client(), handle_new_client_intro(), handle_new_client_intro_clarification(), ClientStore, ConversationStore, Provider, Session, looks_like_phone() (+1 more)
+Cohesion: 0.15
+Nodes (15): BaseSettings, Config, Settings, Exception, _format_history(), parse_intent(), _parse_json_response(), call_llm() (+7 more)
 
 ### Community 27 - "Community 27"
 Cohesion: 0.26
 Nodes (11): Any, _db(), get_conversation_state(), get_provider(), _provider_dict(), Reset conversation context for a phone number.     Clears pending context keys,, Get the current provider configuration., Update a single provider field.     Updatable fields: name, business_type, locat (+3 more)
 
+### Community 33 - "Community 33"
+Cohesion: 0.25
+Nodes (6): Base, engine, init_db(), ConversationSummary, test_db_migration(), test_parse_date_raises_on_garbage()
+
 ## Knowledge Gaps
-- **23 isolated node(s):** `Any`, `WebSocket`, `business_type`, `location_type`, `travel_time_enabled` (+18 more)
+- **28 isolated node(s):** `Any`, `WebSocket`, `business_type`, `location_type`, `travel_time_enabled` (+23 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **5 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `ConversationStore` connect `Conversation History Store` to `ORM and Scheduling Core`, `Admin Intent Dispatch`, `Messaging Abstraction Layer`, `New Client Onboarding`, `Community 26`?**
-  _High betweenness centrality (0.148) - this node is a cross-community bridge._
-- **Why does `SessionStore` connect `ORM and Scheduling Core` to `Admin Intent Dispatch`, `Python Requirements`, `DB Wipe Utility`, `Conversation History Store`?**
+- **Why does `ConversationStore` connect `Conversation History Store` to `Admin Intent Dispatch`, `Community 2`, `Messaging Abstraction Layer`, `New Client Onboarding`?**
+  _High betweenness centrality (0.154) - this node is a cross-community bridge._
+- **Why does `SessionStore` connect `ORM and Scheduling Core` to `Admin Intent Dispatch`, `Community 2`, `New Client Onboarding`, `Python Requirements`, `DB Wipe Utility`?**
   _High betweenness centrality (0.074) - this node is a cross-community bridge._
-- **Why does `Session` connect `ORM and Scheduling Core` to `Conversation History Store`, `New Client Onboarding`, `Python Requirements`, `DB Wipe Utility`, `Community 26`?**
-  _High betweenness centrality (0.063) - this node is a cross-community bridge._
+- **Why does `Session` connect `New Client Onboarding` to `ORM and Scheduling Core`, `Community 33`, `Community 2`, `Conversation History Store`, `DB Wipe Utility`?**
+  _High betweenness centrality (0.067) - this node is a cross-community bridge._
 - **Are the 22 inferred relationships involving `ClientStore` (e.g. with `ClientStore` and `ConversationStore`) actually correct?**
   _`ClientStore` has 22 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 38 inferred relationships involving `Session` (e.g. with `Client` and `ClientStore`) actually correct?**
