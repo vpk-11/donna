@@ -16,7 +16,7 @@ CLIENT_1_PHONE = "+15559990001"
 CLIENT_2_PHONE = "+15559990002"
 
 
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture(scope="function", autouse=True)
 def ensure_seed():
     init_db()
     db = SessionLocal()

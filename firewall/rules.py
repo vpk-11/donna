@@ -1,5 +1,13 @@
 # --- LLM Guard config ---
 
+# PERSON excluded: Donna legitimately addresses clients by name in every response.
+# Keep financial/identity-theft-risk entities only.
+SENSITIVE_ENTITY_TYPES = [
+    "CREDIT_CARD", "CRYPTO", "EMAIL_ADDRESS", "IBAN_CODE", "IP_ADDRESS",
+    "PHONE_NUMBER", "US_SSN", "US_BANK_NUMBER",
+    "CREDIT_CARD_RE", "UUID", "EMAIL_ADDRESS_RE", "US_SSN_RE",
+]
+
 BANNED_INPUT_TOPICS = [
     "workout programming",
     "nutrition advice",
