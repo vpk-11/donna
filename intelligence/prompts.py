@@ -16,6 +16,7 @@ Message: "{message}"
 Return JSON with exactly these fields:
 {{
   "intent": "<intent from the list below>",
+  "confidence": <float 0.0-1.0, how certain you are>,
   "entities": {{<relevant extracted fields>}},
   "needs_clarification": false,
   "clarification_question": null
