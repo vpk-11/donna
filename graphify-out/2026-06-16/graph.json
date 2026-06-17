@@ -99,14 +99,254 @@
   },
   "nodes": [
     {
+      "label": "context_manager.py",
+      "file_type": "code",
+      "source_file": "intelligence/context_manager.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "intelligence_context_manager",
+      "community": 2,
+      "norm_label": "context_manager.py"
+    },
+    {
+      "label": "should_summarize()",
+      "file_type": "code",
+      "source_file": "intelligence/context_manager.py",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "intelligence_context_manager_should_summarize",
+      "community": 2,
+      "norm_label": "should_summarize()"
+    },
+    {
+      "label": "summarize_conversation()",
+      "file_type": "code",
+      "source_file": "intelligence/context_manager.py",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "intelligence_context_manager_summarize_conversation",
+      "community": 2,
+      "norm_label": "summarize_conversation()"
+    },
+    {
+      "label": "trim_history()",
+      "file_type": "code",
+      "source_file": "intelligence/context_manager.py",
+      "source_location": "L44",
+      "_origin": "ast",
+      "id": "intelligence_context_manager_trim_history",
+      "community": 2,
+      "norm_label": "trim_history()"
+    },
+    {
+      "label": "build_context_from_summary()",
+      "file_type": "code",
+      "source_file": "intelligence/context_manager.py",
+      "source_location": "L53",
+      "_origin": "ast",
+      "id": "intelligence_context_manager_build_context_from_summary",
+      "community": 2,
+      "norm_label": "build_context_from_summary()"
+    },
+    {
+      "label": "intent_parser.py",
+      "file_type": "code",
+      "source_file": "intelligence/intent_parser.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "intelligence_intent_parser",
+      "community": 1,
+      "norm_label": "intent_parser.py"
+    },
+    {
+      "label": "_format_history()",
+      "file_type": "code",
+      "source_file": "intelligence/intent_parser.py",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "intelligence_intent_parser_format_history",
+      "community": 1,
+      "norm_label": "_format_history()"
+    },
+    {
+      "label": "_parse_json_response()",
+      "file_type": "code",
+      "source_file": "intelligence/intent_parser.py",
+      "source_location": "L26",
+      "_origin": "ast",
+      "id": "intelligence_intent_parser_parse_json_response",
+      "community": 1,
+      "norm_label": "_parse_json_response()"
+    },
+    {
+      "label": "IntentResult",
+      "file_type": "code",
+      "source_file": "intelligence/intent_parser.py",
+      "source_location": "L26",
+      "_origin": "ast",
+      "id": "intelligence_intent_parser_py_intentresult",
+      "community": 1,
+      "norm_label": "intentresult"
+    },
+    {
+      "label": "parse_intent()",
+      "file_type": "code",
+      "source_file": "intelligence/intent_parser.py",
+      "source_location": "L43",
+      "_origin": "ast",
+      "id": "intelligence_intent_parser_parse_intent",
+      "community": 1,
+      "norm_label": "parse_intent()"
+    },
+    {
+      "label": "judge.py",
+      "file_type": "code",
+      "source_file": "intelligence/judge.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "intelligence_judge",
+      "community": 2,
+      "norm_label": "judge.py"
+    },
+    {
+      "label": "evaluate()",
+      "file_type": "code",
+      "source_file": "intelligence/judge.py",
+      "source_location": "L18",
+      "_origin": "ast",
+      "id": "intelligence_judge_evaluate",
+      "community": 2,
+      "norm_label": "evaluate()"
+    },
+    {
+      "label": "IntentResult",
+      "file_type": "code",
+      "source_file": "intelligence/judge.py",
+      "source_location": "L18",
+      "_origin": "ast",
+      "id": "intelligence_judge_py_intentresult",
+      "community": 2,
+      "norm_label": "intentresult"
+    },
+    {
+      "label": "JudgeResult",
+      "file_type": "code",
+      "source_file": "intelligence/judge.py",
+      "source_location": "L18",
+      "_origin": "ast",
+      "id": "judgeresult",
+      "community": 2,
+      "norm_label": "judgeresult"
+    },
+    {
+      "label": "_llm_judge()",
+      "file_type": "code",
+      "source_file": "intelligence/judge.py",
+      "source_location": "L93",
+      "_origin": "ast",
+      "id": "intelligence_judge_llm_judge",
+      "community": 2,
+      "norm_label": "_llm_judge()"
+    },
+    {
+      "label": "judge_rules.py",
+      "file_type": "code",
+      "source_file": "intelligence/judge_rules.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "intelligence_judge_rules",
+      "community": 2,
+      "norm_label": "judge_rules.py"
+    },
+    {
+      "label": "prompts.py",
+      "file_type": "code",
+      "source_file": "intelligence/prompts.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "intelligence_prompts",
+      "community": 1,
+      "norm_label": "prompts.py"
+    },
+    {
+      "label": "test_phase3a.py",
+      "file_type": "code",
+      "source_file": "tests/test_phase3a.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_test_phase3a",
+      "community": 2,
+      "norm_label": "test_phase3a.py"
+    },
+    {
+      "label": "test_low_confidence_escalates()",
+      "file_type": "code",
+      "source_file": "tests/test_phase3a.py",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "tests_test_phase3a_test_low_confidence_escalates",
+      "community": 2,
+      "norm_label": "test_low_confidence_escalates()"
+    },
+    {
+      "label": "test_human_request_always_escalates()",
+      "file_type": "code",
+      "source_file": "tests/test_phase3a.py",
+      "source_location": "L26",
+      "_origin": "ast",
+      "id": "tests_test_phase3a_test_human_request_always_escalates",
+      "community": 2,
+      "norm_label": "test_human_request_always_escalates()"
+    },
+    {
+      "label": "test_new_client_booking_escalates()",
+      "file_type": "code",
+      "source_file": "tests/test_phase3a.py",
+      "source_location": "L36",
+      "_origin": "ast",
+      "id": "tests_test_phase3a_test_new_client_booking_escalates",
+      "community": 2,
+      "norm_label": "test_new_client_booking_escalates()"
+    },
+    {
+      "label": "test_cancel_request_notifies_admin()",
+      "file_type": "code",
+      "source_file": "tests/test_phase3a.py",
+      "source_location": "L49",
+      "_origin": "ast",
+      "id": "tests_test_phase3a_test_cancel_request_notifies_admin",
+      "community": 2,
+      "norm_label": "test_cancel_request_notifies_admin()"
+    },
+    {
+      "label": "test_context_manager_summarizes()",
+      "file_type": "code",
+      "source_file": "tests/test_phase3a.py",
+      "source_location": "L60",
+      "_origin": "ast",
+      "id": "tests_test_phase3a_test_context_manager_summarizes",
+      "community": 2,
+      "norm_label": "test_context_manager_summarizes()"
+    },
+    {
+      "label": "test_history_trimming()",
+      "file_type": "code",
+      "source_file": "tests/test_phase3a.py",
+      "source_location": "L78",
+      "_origin": "ast",
+      "id": "tests_test_phase3a_test_history_trimming",
+      "community": 2,
+      "norm_label": "test_history_trimming()"
+    },
+    {
       "label": "server.py",
       "file_type": "code",
       "source_file": "donna_mcp/server.py",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "donna_mcp_server",
       "community": 29,
-      "norm_label": "server.py"
+      "norm_label": "server.py",
+      "id": "donna_mcp_server"
     },
     {
       "label": "admin.py",
@@ -114,9 +354,9 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "tools_admin",
       "community": 27,
-      "norm_label": "admin.py"
+      "norm_label": "admin.py",
+      "id": "tools_admin"
     },
     {
       "label": "_db()",
@@ -124,9 +364,9 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L28",
       "_origin": "ast",
-      "id": "tools_admin_db",
       "community": 27,
-      "norm_label": "_db()"
+      "norm_label": "_db()",
+      "id": "tools_admin_db"
     },
     {
       "label": "_provider_dict()",
@@ -134,9 +374,9 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L36",
       "_origin": "ast",
-      "id": "tools_admin_provider_dict",
       "community": 27,
-      "norm_label": "_provider_dict()"
+      "norm_label": "_provider_dict()",
+      "id": "tools_admin_provider_dict"
     },
     {
       "label": "get_provider()",
@@ -144,9 +384,9 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L52",
       "_origin": "ast",
-      "id": "tools_admin_get_provider",
       "community": 27,
-      "norm_label": "get_provider()"
+      "norm_label": "get_provider()",
+      "id": "tools_admin_get_provider"
     },
     {
       "label": "update_provider()",
@@ -154,9 +394,9 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L62",
       "_origin": "ast",
-      "id": "tools_admin_update_provider",
       "community": 27,
-      "norm_label": "update_provider()"
+      "norm_label": "update_provider()",
+      "id": "tools_admin_update_provider"
     },
     {
       "label": "Any",
@@ -164,9 +404,9 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L62",
       "_origin": "ast",
-      "id": "any",
       "community": 27,
-      "norm_label": "any"
+      "norm_label": "any",
+      "id": "any"
     },
     {
       "label": "get_conversation_state()",
@@ -174,9 +414,9 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L80",
       "_origin": "ast",
-      "id": "tools_admin_get_conversation_state",
       "community": 27,
-      "norm_label": "get_conversation_state()"
+      "norm_label": "get_conversation_state()",
+      "id": "tools_admin_get_conversation_state"
     },
     {
       "label": "get_all_active_agents()",
@@ -184,9 +424,9 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L99",
       "_origin": "ast",
-      "id": "tools_admin_get_all_active_agents",
       "community": 20,
-      "norm_label": "get_all_active_agents()"
+      "norm_label": "get_all_active_agents()",
+      "id": "tools_admin_get_all_active_agents"
     },
     {
       "label": "reset_conversation_state()",
@@ -194,9 +434,9 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L122",
       "_origin": "ast",
-      "id": "tools_admin_reset_conversation_state",
       "community": 27,
-      "norm_label": "reset_conversation_state()"
+      "norm_label": "reset_conversation_state()",
+      "id": "tools_admin_reset_conversation_state"
     },
     {
       "label": "Get the current provider configuration.",
@@ -204,9 +444,9 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L53",
       "_origin": "ast",
-      "id": "tools_admin_rationale_53",
       "community": 27,
-      "norm_label": "get the current provider configuration."
+      "norm_label": "get the current provider configuration.",
+      "id": "tools_admin_rationale_53"
     },
     {
       "label": "Update a single provider field.     Updatable fields: name, business_type, locat",
@@ -214,9 +454,9 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L63",
       "_origin": "ast",
-      "id": "tools_admin_rationale_63",
       "community": 27,
-      "norm_label": "update a single provider field.     updatable fields: name, business_type, locat"
+      "norm_label": "update a single provider field.     updatable fields: name, business_type, locat",
+      "id": "tools_admin_rationale_63"
     },
     {
       "label": "Get current conversation state for a phone number (admin or client).",
@@ -224,9 +464,9 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L81",
       "_origin": "ast",
-      "id": "tools_admin_rationale_81",
       "community": 27,
-      "norm_label": "get current conversation state for a phone number (admin or client)."
+      "norm_label": "get current conversation state for a phone number (admin or client).",
+      "id": "tools_admin_rationale_81"
     },
     {
       "label": "Return all currently active per-client agents from the Redis registry.     Used",
@@ -234,9 +474,9 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L100",
       "_origin": "ast",
-      "id": "tools_admin_rationale_100",
       "community": 20,
-      "norm_label": "return all currently active per-client agents from the redis registry.     used"
+      "norm_label": "return all currently active per-client agents from the redis registry.     used",
+      "id": "tools_admin_rationale_100"
     },
     {
       "label": "Reset conversation context for a phone number.     Clears pending context keys,",
@@ -244,9 +484,9 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L123",
       "_origin": "ast",
-      "id": "tools_admin_rationale_123",
       "community": 27,
-      "norm_label": "reset conversation context for a phone number.     clears pending context keys,"
+      "norm_label": "reset conversation context for a phone number.     clears pending context keys,",
+      "id": "tools_admin_rationale_123"
     },
     {
       "label": "clients.py",
@@ -254,9 +494,9 @@
       "source_file": "donna_mcp/tools/clients.py",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "tools_clients",
       "community": 22,
-      "norm_label": "clients.py"
+      "norm_label": "clients.py",
+      "id": "tools_clients"
     },
     {
       "label": "_db()",
@@ -264,9 +504,9 @@
       "source_file": "donna_mcp/tools/clients.py",
       "source_location": "L16",
       "_origin": "ast",
-      "id": "tools_clients_db",
       "community": 22,
-      "norm_label": "_db()"
+      "norm_label": "_db()",
+      "id": "tools_clients_db"
     },
     {
       "label": "_client_dict()",
@@ -274,9 +514,9 @@
       "source_file": "donna_mcp/tools/clients.py",
       "source_location": "L24",
       "_origin": "ast",
-      "id": "tools_clients_client_dict",
       "community": 22,
-      "norm_label": "_client_dict()"
+      "norm_label": "_client_dict()",
+      "id": "tools_clients_client_dict"
     },
     {
       "label": "get_client()",
@@ -284,9 +524,9 @@
       "source_file": "donna_mcp/tools/clients.py",
       "source_location": "L42",
       "_origin": "ast",
-      "id": "tools_clients_get_client",
       "community": 22,
-      "norm_label": "get_client()"
+      "norm_label": "get_client()",
+      "id": "tools_clients_get_client"
     },
     {
       "label": "get_client_by_phone()",
@@ -294,9 +534,9 @@
       "source_file": "donna_mcp/tools/clients.py",
       "source_location": "L52",
       "_origin": "ast",
-      "id": "tools_clients_get_client_by_phone",
       "community": 22,
-      "norm_label": "get_client_by_phone()"
+      "norm_label": "get_client_by_phone()",
+      "id": "tools_clients_get_client_by_phone"
     },
     {
       "label": "list_clients()",
@@ -304,9 +544,9 @@
       "source_file": "donna_mcp/tools/clients.py",
       "source_location": "L62",
       "_origin": "ast",
-      "id": "tools_clients_list_clients",
       "community": 22,
-      "norm_label": "list_clients()"
+      "norm_label": "list_clients()",
+      "id": "tools_clients_list_clients"
     },
     {
       "label": "create_client()",
@@ -314,9 +554,9 @@
       "source_file": "donna_mcp/tools/clients.py",
       "source_location": "L73",
       "_origin": "ast",
-      "id": "tools_clients_create_client",
       "community": 22,
-      "norm_label": "create_client()"
+      "norm_label": "create_client()",
+      "id": "tools_clients_create_client"
     },
     {
       "label": "update_client()",
@@ -324,9 +564,9 @@
       "source_file": "donna_mcp/tools/clients.py",
       "source_location": "L115",
       "_origin": "ast",
-      "id": "tools_clients_update_client",
       "community": 22,
-      "norm_label": "update_client()"
+      "norm_label": "update_client()",
+      "id": "tools_clients_update_client"
     },
     {
       "label": "Get a single client by ID.",
@@ -334,9 +574,9 @@
       "source_file": "donna_mcp/tools/clients.py",
       "source_location": "L43",
       "_origin": "ast",
-      "id": "tools_clients_rationale_43",
       "community": 22,
-      "norm_label": "get a single client by id."
+      "norm_label": "get a single client by id.",
+      "id": "tools_clients_rationale_43"
     },
     {
       "label": "Get a client by their phone number.",
@@ -344,9 +584,9 @@
       "source_file": "donna_mcp/tools/clients.py",
       "source_location": "L53",
       "_origin": "ast",
-      "id": "tools_clients_rationale_53",
       "community": 22,
-      "norm_label": "get a client by their phone number."
+      "norm_label": "get a client by their phone number.",
+      "id": "tools_clients_rationale_53"
     },
     {
       "label": "List all clients for the provider.",
@@ -354,9 +594,9 @@
       "source_file": "donna_mcp/tools/clients.py",
       "source_location": "L63",
       "_origin": "ast",
-      "id": "tools_clients_rationale_63",
       "community": 22,
-      "norm_label": "list all clients for the provider."
+      "norm_label": "list all clients for the provider.",
+      "id": "tools_clients_rationale_63"
     },
     {
       "label": "Create a new client. status must be one of: active, inactive, prospect.     pref",
@@ -364,9 +604,9 @@
       "source_file": "donna_mcp/tools/clients.py",
       "source_location": "L84",
       "_origin": "ast",
-      "id": "tools_clients_rationale_84",
       "community": 22,
-      "norm_label": "create a new client. status must be one of: active, inactive, prospect.     pref"
+      "norm_label": "create a new client. status must be one of: active, inactive, prospect.     pref",
+      "id": "tools_clients_rationale_84"
     },
     {
       "label": "Update one or more fields on an existing client. Only provided fields are change",
@@ -374,9 +614,9 @@
       "source_file": "donna_mcp/tools/clients.py",
       "source_location": "L127",
       "_origin": "ast",
-      "id": "tools_clients_rationale_127",
       "community": 22,
-      "norm_label": "update one or more fields on an existing client. only provided fields are change"
+      "norm_label": "update one or more fields on an existing client. only provided fields are change",
+      "id": "tools_clients_rationale_127"
     },
     {
       "label": "scheduling.py",
@@ -384,9 +624,9 @@
       "source_file": "donna_mcp/tools/scheduling.py",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "tools_scheduling",
       "community": 20,
-      "norm_label": "scheduling.py"
+      "norm_label": "scheduling.py",
+      "id": "tools_scheduling"
     },
     {
       "label": "_db()",
@@ -394,9 +634,9 @@
       "source_file": "donna_mcp/tools/scheduling.py",
       "source_location": "L18",
       "_origin": "ast",
-      "id": "tools_scheduling_db",
       "community": 20,
-      "norm_label": "_db()"
+      "norm_label": "_db()",
+      "id": "tools_scheduling_db"
     },
     {
       "label": "_session_dict()",
@@ -404,9 +644,9 @@
       "source_file": "donna_mcp/tools/scheduling.py",
       "source_location": "L26",
       "_origin": "ast",
-      "id": "tools_scheduling_session_dict",
       "community": 20,
-      "norm_label": "_session_dict()"
+      "norm_label": "_session_dict()",
+      "id": "tools_scheduling_session_dict"
     },
     {
       "label": "get_free_slots()",
@@ -414,9 +654,9 @@
       "source_file": "donna_mcp/tools/scheduling.py",
       "source_location": "L43",
       "_origin": "ast",
-      "id": "tools_scheduling_get_free_slots",
       "community": 20,
-      "norm_label": "get_free_slots()"
+      "norm_label": "get_free_slots()",
+      "id": "tools_scheduling_get_free_slots"
     },
     {
       "label": "check_slot_conflict()",
@@ -424,9 +664,9 @@
       "source_file": "donna_mcp/tools/scheduling.py",
       "source_location": "L64",
       "_origin": "ast",
-      "id": "tools_scheduling_check_slot_conflict",
       "community": 20,
-      "norm_label": "check_slot_conflict()"
+      "norm_label": "check_slot_conflict()",
+      "id": "tools_scheduling_check_slot_conflict"
     },
     {
       "label": "book_session()",
@@ -434,9 +674,9 @@
       "source_file": "donna_mcp/tools/scheduling.py",
       "source_location": "L110",
       "_origin": "ast",
-      "id": "tools_scheduling_book_session",
       "community": 20,
-      "norm_label": "book_session()"
+      "norm_label": "book_session()",
+      "id": "tools_scheduling_book_session"
     },
     {
       "label": "cancel_session()",
@@ -444,9 +684,9 @@
       "source_file": "donna_mcp/tools/scheduling.py",
       "source_location": "L167",
       "_origin": "ast",
-      "id": "tools_scheduling_cancel_session",
       "community": 20,
-      "norm_label": "cancel_session()"
+      "norm_label": "cancel_session()",
+      "id": "tools_scheduling_cancel_session"
     },
     {
       "label": "reschedule_session()",
@@ -454,9 +694,9 @@
       "source_file": "donna_mcp/tools/scheduling.py",
       "source_location": "L192",
       "_origin": "ast",
-      "id": "tools_scheduling_reschedule_session",
       "community": 20,
-      "norm_label": "reschedule_session()"
+      "norm_label": "reschedule_session()",
+      "id": "tools_scheduling_reschedule_session"
     },
     {
       "label": "get_sessions_for_date()",
@@ -464,9 +704,9 @@
       "source_file": "donna_mcp/tools/scheduling.py",
       "source_location": "L234",
       "_origin": "ast",
-      "id": "tools_scheduling_get_sessions_for_date",
       "community": 20,
-      "norm_label": "get_sessions_for_date()"
+      "norm_label": "get_sessions_for_date()",
+      "id": "tools_scheduling_get_sessions_for_date"
     },
     {
       "label": "get_upcoming_sessions()",
@@ -474,9 +714,9 @@
       "source_file": "donna_mcp/tools/scheduling.py",
       "source_location": "L252",
       "_origin": "ast",
-      "id": "tools_scheduling_get_upcoming_sessions",
       "community": 20,
-      "norm_label": "get_upcoming_sessions()"
+      "norm_label": "get_upcoming_sessions()",
+      "id": "tools_scheduling_get_upcoming_sessions"
     },
     {
       "label": "Get available time slots for a given date.     date: ISO date string, e.g. \"2026",
@@ -484,9 +724,9 @@
       "source_file": "donna_mcp/tools/scheduling.py",
       "source_location": "L44",
       "_origin": "ast",
-      "id": "tools_scheduling_rationale_44",
       "community": 20,
-      "norm_label": "get available time slots for a given date.     date: iso date string, e.g. \"2026"
+      "norm_label": "get available time slots for a given date.     date: iso date string, e.g. \"2026",
+      "id": "tools_scheduling_rationale_44"
     },
     {
       "label": "Check if a time slot is free, and if not, whether alternatives or a swap exist.",
@@ -494,9 +734,9 @@
       "source_file": "donna_mcp/tools/scheduling.py",
       "source_location": "L69",
       "_origin": "ast",
-      "id": "tools_scheduling_rationale_69",
       "community": 20,
-      "norm_label": "check if a time slot is free, and if not, whether alternatives or a swap exist."
+      "norm_label": "check if a time slot is free, and if not, whether alternatives or a swap exist.",
+      "id": "tools_scheduling_rationale_69"
     },
     {
       "label": "Book a session for a client.     scheduled_at: ISO datetime string, e.g. \"2026-0",
@@ -504,9 +744,9 @@
       "source_file": "donna_mcp/tools/scheduling.py",
       "source_location": "L119",
       "_origin": "ast",
-      "id": "tools_scheduling_rationale_119",
       "community": 20,
-      "norm_label": "book a session for a client.     scheduled_at: iso datetime string, e.g. \"2026-0"
+      "norm_label": "book a session for a client.     scheduled_at: iso datetime string, e.g. \"2026-0",
+      "id": "tools_scheduling_rationale_119"
     },
     {
       "label": "Cancel a scheduled session by ID.     Returns the session's status before cancel",
@@ -514,9 +754,9 @@
       "source_file": "donna_mcp/tools/scheduling.py",
       "source_location": "L168",
       "_origin": "ast",
-      "id": "tools_scheduling_rationale_168",
       "community": 20,
-      "norm_label": "cancel a scheduled session by id.     returns the session's status before cancel"
+      "norm_label": "cancel a scheduled session by id.     returns the session's status before cancel",
+      "id": "tools_scheduling_rationale_168"
     },
     {
       "label": "Reschedule a session to a new time.     new_time: ISO datetime string, e.g. \"202",
@@ -524,9 +764,9 @@
       "source_file": "donna_mcp/tools/scheduling.py",
       "source_location": "L193",
       "_origin": "ast",
-      "id": "tools_scheduling_rationale_193",
       "community": 20,
-      "norm_label": "reschedule a session to a new time.     new_time: iso datetime string, e.g. \"202"
+      "norm_label": "reschedule a session to a new time.     new_time: iso datetime string, e.g. \"202",
+      "id": "tools_scheduling_rationale_193"
     },
     {
       "label": "Get all scheduled sessions on a given date.     date: ISO date string, e.g. \"202",
@@ -534,9 +774,9 @@
       "source_file": "donna_mcp/tools/scheduling.py",
       "source_location": "L235",
       "_origin": "ast",
-      "id": "tools_scheduling_rationale_235",
       "community": 20,
-      "norm_label": "get all scheduled sessions on a given date.     date: iso date string, e.g. \"202"
+      "norm_label": "get all scheduled sessions on a given date.     date: iso date string, e.g. \"202",
+      "id": "tools_scheduling_rationale_235"
     },
     {
       "label": "Get the next 5 upcoming scheduled sessions for a client.",
@@ -544,9 +784,9 @@
       "source_file": "donna_mcp/tools/scheduling.py",
       "source_location": "L253",
       "_origin": "ast",
-      "id": "tools_scheduling_rationale_253",
       "community": 20,
-      "norm_label": "get the next 5 upcoming scheduled sessions for a client."
+      "norm_label": "get the next 5 upcoming scheduled sessions for a client.",
+      "id": "tools_scheduling_rationale_253"
     },
     {
       "label": "test_phase2.py",
@@ -554,9 +794,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "tests_test_phase2",
       "community": 20,
-      "norm_label": "test_phase2.py"
+      "norm_label": "test_phase2.py",
+      "id": "tests_test_phase2"
     },
     {
       "label": "ensure_seed()",
@@ -564,9 +804,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L20",
       "_origin": "ast",
-      "id": "tests_test_phase2_ensure_seed",
       "community": 20,
-      "norm_label": "ensure_seed()"
+      "norm_label": "ensure_seed()",
+      "id": "tests_test_phase2_ensure_seed"
     },
     {
       "label": "_client_id()",
@@ -574,9 +814,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L39",
       "_origin": "ast",
-      "id": "tests_test_phase2_client_id",
       "community": 20,
-      "norm_label": "_client_id()"
+      "norm_label": "_client_id()",
+      "id": "tests_test_phase2_client_id"
     },
     {
       "label": "test_book_session_happy_path()",
@@ -584,9 +824,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L47",
       "_origin": "ast",
-      "id": "tests_test_phase2_test_book_session_happy_path",
       "community": 20,
-      "norm_label": "test_book_session_happy_path()"
+      "norm_label": "test_book_session_happy_path()",
+      "id": "tests_test_phase2_test_book_session_happy_path"
     },
     {
       "label": "test_book_session_conflict_returns_error()",
@@ -594,9 +834,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L60",
       "_origin": "ast",
-      "id": "tests_test_phase2_test_book_session_conflict_returns_error",
       "community": 20,
-      "norm_label": "test_book_session_conflict_returns_error()"
+      "norm_label": "test_book_session_conflict_returns_error()",
+      "id": "tests_test_phase2_test_book_session_conflict_returns_error"
     },
     {
       "label": "test_cancel_session_preserves_pre_cancel_status()",
@@ -604,9 +844,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L75",
       "_origin": "ast",
-      "id": "tests_test_phase2_test_cancel_session_preserves_pre_cancel_status",
       "community": 20,
-      "norm_label": "test_cancel_session_preserves_pre_cancel_status()"
+      "norm_label": "test_cancel_session_preserves_pre_cancel_status()",
+      "id": "tests_test_phase2_test_cancel_session_preserves_pre_cancel_status"
     },
     {
       "label": "test_reschedule_session_checks_conflict()",
@@ -614,9 +854,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L90",
       "_origin": "ast",
-      "id": "tests_test_phase2_test_reschedule_session_checks_conflict",
       "community": 20,
-      "norm_label": "test_reschedule_session_checks_conflict()"
+      "norm_label": "test_reschedule_session_checks_conflict()",
+      "id": "tests_test_phase2_test_reschedule_session_checks_conflict"
     },
     {
       "label": "test_get_all_active_agents()",
@@ -624,9 +864,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L106",
       "_origin": "ast",
-      "id": "tests_test_phase2_test_get_all_active_agents",
       "community": 20,
-      "norm_label": "test_get_all_active_agents()"
+      "norm_label": "test_get_all_active_agents()",
+      "id": "tests_test_phase2_test_get_all_active_agents"
     },
     {
       "label": "Phase 2 smoke tests. Requires: running Redis, seeded DB (provider + clients with",
@@ -634,9 +874,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "tests_test_phase2_rationale_1",
       "community": 20,
-      "norm_label": "phase 2 smoke tests. requires: running redis, seeded db (provider + clients with"
+      "norm_label": "phase 2 smoke tests. requires: running redis, seeded db (provider + clients with",
+      "id": "tests_test_phase2_rationale_1"
     },
     {
       "label": "__init__.py",
@@ -854,7 +1094,7 @@
       "source_file": "models/schemas.py",
       "source_location": "L14",
       "_origin": "ast",
-      "community": 26,
+      "community": 1,
       "norm_label": "intentresult",
       "id": "models_schemas_intentresult"
     },
@@ -1114,7 +1354,7 @@
       "source_file": "core/client_handler.py",
       "source_location": "L27",
       "_origin": "ast",
-      "community": 7,
+      "community": 0,
       "norm_label": "client",
       "id": "client"
     },
@@ -1124,7 +1364,7 @@
       "source_file": "core/client_handler.py",
       "source_location": "L27",
       "_origin": "ast",
-      "community": 7,
+      "community": 6,
       "norm_label": "session",
       "id": "core_client_handler_py_session"
     },
@@ -1134,7 +1374,7 @@
       "source_file": "core/client_handler.py",
       "source_location": "L163",
       "_origin": "ast",
-      "community": 2,
+      "community": 6,
       "norm_label": "handle_cold_inbound()",
       "id": "core_client_handler_handle_cold_inbound"
     },
@@ -1184,7 +1424,7 @@
       "source_file": "db/migrations.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 33,
+      "community": 20,
       "norm_label": "migrations.py",
       "id": "db_migrations"
     },
@@ -1194,7 +1434,7 @@
       "source_file": "db/migrations.py",
       "source_location": "L6",
       "_origin": "ast",
-      "community": 33,
+      "community": 4,
       "norm_label": "init_db()",
       "id": "db_migrations_init_db"
     },
@@ -1269,62 +1509,12 @@
       "id": "tools_init"
     },
     {
-      "label": "intent_parser.py",
-      "file_type": "code",
-      "source_file": "intelligence/intent_parser.py",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 26,
-      "norm_label": "intent_parser.py",
-      "id": "intelligence_intent_parser"
-    },
-    {
-      "label": "_format_history()",
-      "file_type": "code",
-      "source_file": "intelligence/intent_parser.py",
-      "source_location": "L16",
-      "_origin": "ast",
-      "community": 26,
-      "norm_label": "_format_history()",
-      "id": "intelligence_intent_parser_format_history"
-    },
-    {
-      "label": "_parse_json_response()",
-      "file_type": "code",
-      "source_file": "intelligence/intent_parser.py",
-      "source_location": "L26",
-      "_origin": "ast",
-      "community": 26,
-      "norm_label": "_parse_json_response()",
-      "id": "intelligence_intent_parser_parse_json_response"
-    },
-    {
-      "label": "IntentResult",
-      "file_type": "code",
-      "source_file": "intelligence/intent_parser.py",
-      "source_location": "L26",
-      "_origin": "ast",
-      "community": 26,
-      "norm_label": "intentresult",
-      "id": "intentresult"
-    },
-    {
-      "label": "parse_intent()",
-      "file_type": "code",
-      "source_file": "intelligence/intent_parser.py",
-      "source_location": "L42",
-      "_origin": "ast",
-      "community": 26,
-      "norm_label": "parse_intent()",
-      "id": "intelligence_intent_parser_parse_intent"
-    },
-    {
       "label": "llm_client.py",
       "file_type": "code",
       "source_file": "intelligence/llm_client.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 26,
+      "community": 1,
       "norm_label": "llm_client.py",
       "id": "intelligence_llm_client"
     },
@@ -1334,7 +1524,7 @@
       "source_file": "intelligence/llm_client.py",
       "source_location": "L6",
       "_origin": "ast",
-      "community": 26,
+      "community": 1,
       "norm_label": "llmcallerror",
       "id": "intelligence_llm_client_llmcallerror"
     },
@@ -1344,7 +1534,7 @@
       "source_file": "",
       "source_location": "",
       "_origin": "ast",
-      "community": 26,
+      "community": 1,
       "norm_label": "exception",
       "id": "exception"
     },
@@ -1354,7 +1544,7 @@
       "source_file": "intelligence/llm_client.py",
       "source_location": "L10",
       "_origin": "ast",
-      "community": 26,
+      "community": 1,
       "norm_label": "call_llm()",
       "id": "intelligence_llm_client_call_llm"
     },
@@ -1364,7 +1554,7 @@
       "source_file": "intelligence/response_generator.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 26,
+      "community": 1,
       "norm_label": "response_generator.py",
       "id": "intelligence_response_generator"
     },
@@ -1374,7 +1564,7 @@
       "source_file": "intelligence/response_generator.py",
       "source_location": "L8",
       "_origin": "ast",
-      "community": 26,
+      "community": 1,
       "norm_label": "_format_history()",
       "id": "intelligence_response_generator_format_history"
     },
@@ -1394,7 +1584,7 @@
       "source_file": "models/orm.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 33,
+      "community": 20,
       "norm_label": "orm.py",
       "id": "models_orm"
     },
@@ -1404,7 +1594,7 @@
       "source_file": "models/orm.py",
       "source_location": "L6",
       "_origin": "ast",
-      "community": 7,
+      "community": 0,
       "norm_label": "provider",
       "id": "models_orm_provider"
     },
@@ -1414,7 +1604,7 @@
       "source_file": "",
       "source_location": "",
       "_origin": "ast",
-      "community": 7,
+      "community": 0,
       "norm_label": "base",
       "id": "base"
     },
@@ -1434,7 +1624,7 @@
       "source_file": "models/orm.py",
       "source_location": "L40",
       "_origin": "ast",
-      "community": 7,
+      "community": 0,
       "norm_label": "session",
       "id": "models_orm_session"
     },
@@ -1464,7 +1654,7 @@
       "source_file": "models/orm.py",
       "source_location": "L93",
       "_origin": "ast",
-      "community": 33,
+      "community": 20,
       "norm_label": "conversationsummary",
       "id": "models_orm_conversationsummary"
     },
@@ -1494,7 +1684,7 @@
       "source_file": "orchestrator/channels.py",
       "source_location": "L18",
       "_origin": "ast",
-      "community": 15,
+      "community": 4,
       "norm_label": "make_envelope()",
       "id": "orchestrator_channels_make_envelope"
     },
@@ -1504,7 +1694,7 @@
       "source_file": "scheduling/session_manager.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 2,
+      "community": 0,
       "norm_label": "session_manager.py",
       "id": "scheduling_session_manager"
     },
@@ -1762,7 +1952,7 @@
       "source_file": "tests/test_phase1.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 33,
+      "community": 4,
       "norm_label": "test_phase1.py",
       "id": "tests_test_phase1"
     },
@@ -1772,7 +1962,7 @@
       "source_file": "tests/test_phase1.py",
       "source_location": "L5",
       "_origin": "ast",
-      "community": 15,
+      "community": 4,
       "norm_label": "test_redis_round_trip()",
       "id": "tests_test_phase1_test_redis_round_trip"
     },
@@ -1782,7 +1972,7 @@
       "source_file": "tests/test_phase1.py",
       "source_location": "L32",
       "_origin": "ast",
-      "community": 33,
+      "community": 4,
       "norm_label": "test_db_migration()",
       "id": "tests_test_phase1_test_db_migration"
     },
@@ -1792,7 +1982,7 @@
       "source_file": "tests/test_phase1.py",
       "source_location": "L45",
       "_origin": "ast",
-      "community": 33,
+      "community": 4,
       "norm_label": "test_parse_date_raises_on_garbage()",
       "id": "tests_test_phase1_test_parse_date_raises_on_garbage"
     },
@@ -1802,7 +1992,7 @@
       "source_file": "tests/test_phase1.py",
       "source_location": "L52",
       "_origin": "ast",
-      "community": 33,
+      "community": 4,
       "norm_label": "test_llm_client_import_chain()",
       "id": "tests_test_phase1_test_llm_client_import_chain"
     },
@@ -1812,7 +2002,7 @@
       "source_file": "utils/time_utils.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 6,
+      "community": 26,
       "norm_label": "time_utils.py",
       "id": "utils_time_utils"
     },
@@ -1872,7 +2062,7 @@
       "source_file": "utils/time_utils.py",
       "source_location": "L53",
       "_origin": "ast",
-      "community": 6,
+      "community": 26,
       "norm_label": "datetime",
       "id": "utils_time_utils_py_datetime"
     },
@@ -1882,7 +2072,7 @@
       "source_file": "utils/time_utils.py",
       "source_location": "L59",
       "_origin": "ast",
-      "community": 6,
+      "community": 26,
       "norm_label": "looks_like_phone()",
       "id": "utils_time_utils_looks_like_phone"
     },
@@ -1892,7 +2082,7 @@
       "source_file": "config.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 26,
+      "community": 1,
       "norm_label": "config.py",
       "id": "config"
     },
@@ -1902,7 +2092,7 @@
       "source_file": "config.py",
       "source_location": "L4",
       "_origin": "ast",
-      "community": 26,
+      "community": 1,
       "norm_label": "settings",
       "id": "config_settings"
     },
@@ -1912,7 +2102,7 @@
       "source_file": "",
       "source_location": "",
       "_origin": "ast",
-      "community": 26,
+      "community": 1,
       "norm_label": "basesettings",
       "id": "basesettings"
     },
@@ -1922,7 +2112,7 @@
       "source_file": "config.py",
       "source_location": "L29",
       "_origin": "ast",
-      "community": 26,
+      "community": 1,
       "norm_label": "config",
       "id": "config_config"
     },
@@ -1962,7 +2152,7 @@
       "source_file": "core/admin_handler.py",
       "source_location": "L14",
       "_origin": "ast",
-      "community": 7,
+      "community": 0,
       "norm_label": "provider",
       "id": "core_admin_handler_py_provider"
     },
@@ -1972,7 +2162,7 @@
       "source_file": "core/admin_handler.py",
       "source_location": "L14",
       "_origin": "ast",
-      "community": 7,
+      "community": 0,
       "norm_label": "session",
       "id": "core_admin_handler_py_session"
     },
@@ -2072,7 +2262,7 @@
       "source_file": "core/admin_handler_actions.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 6,
+      "community": 26,
       "norm_label": "admin_handler_actions.py",
       "id": "core_admin_handler_actions"
     },
@@ -2082,7 +2272,7 @@
       "source_file": "core/admin_handler_actions.py",
       "source_location": "L12",
       "_origin": "ast",
-      "community": 6,
+      "community": 26,
       "norm_label": "handle_new_client_intro()",
       "id": "core_admin_handler_actions_handle_new_client_intro"
     },
@@ -2092,7 +2282,7 @@
       "source_file": "core/admin_handler_actions.py",
       "source_location": "L12",
       "_origin": "ast",
-      "community": 6,
+      "community": 26,
       "norm_label": "provider",
       "id": "core_admin_handler_actions_py_provider"
     },
@@ -2102,7 +2292,7 @@
       "source_file": "core/admin_handler_actions.py",
       "source_location": "L12",
       "_origin": "ast",
-      "community": 6,
+      "community": 26,
       "norm_label": "session",
       "id": "core_admin_handler_actions_py_session"
     },
@@ -2112,7 +2302,7 @@
       "source_file": "core/admin_handler_actions.py",
       "source_location": "L12",
       "_origin": "ast",
-      "community": 6,
+      "community": 26,
       "norm_label": "conversationstore",
       "id": "core_admin_handler_actions_py_conversationstore"
     },
@@ -2122,7 +2312,7 @@
       "source_file": "core/admin_handler_actions.py",
       "source_location": "L12",
       "_origin": "ast",
-      "community": 6,
+      "community": 26,
       "norm_label": "clientstore",
       "id": "core_admin_handler_actions_py_clientstore"
     },
@@ -2132,7 +2322,7 @@
       "source_file": "core/admin_handler_actions.py",
       "source_location": "L44",
       "_origin": "ast",
-      "community": 6,
+      "community": 26,
       "norm_label": "handle_new_client_intro_clarification()",
       "id": "core_admin_handler_actions_handle_new_client_intro_clarification"
     },
@@ -2142,7 +2332,7 @@
       "source_file": "core/admin_handler_actions.py",
       "source_location": "L81",
       "_origin": "ast",
-      "community": 6,
+      "community": 26,
       "norm_label": "_create_and_greet_client()",
       "id": "core_admin_handler_actions_create_and_greet_client"
     },
@@ -2232,7 +2422,7 @@
       "source_file": "core/router.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 2,
+      "community": 6,
       "norm_label": "router.py",
       "id": "core_router"
     },
@@ -2242,7 +2432,7 @@
       "source_file": "core/router.py",
       "source_location": "L7",
       "_origin": "ast",
-      "community": 2,
+      "community": 6,
       "norm_label": "route_message()",
       "id": "core_router_route_message"
     },
@@ -2252,7 +2442,7 @@
       "source_file": "core/router.py",
       "source_location": "L7",
       "_origin": "ast",
-      "community": 2,
+      "community": 6,
       "norm_label": "session",
       "id": "core_router_py_session"
     },
@@ -2272,7 +2462,7 @@
       "source_file": "db/database.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 33,
+      "community": 20,
       "norm_label": "database.py",
       "id": "db_database"
     },
@@ -2285,16 +2475,6 @@
       "community": 14,
       "norm_label": "__init__.py",
       "id": "intelligence_init"
-    },
-    {
-      "label": "prompts.py",
-      "file_type": "code",
-      "source_file": "intelligence/prompts.py",
-      "source_location": "L1",
-      "_origin": "ast",
-      "community": 26,
-      "norm_label": "prompts.py",
-      "id": "intelligence_prompts"
     },
     {
       "label": "__init__.py",
@@ -2592,7 +2772,7 @@
       "source_file": "scheduling/conflict_resolver.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 7,
+      "community": 0,
       "norm_label": "conflict_resolver.py",
       "id": "scheduling_conflict_resolver"
     },
@@ -2602,7 +2782,7 @@
       "source_file": "scheduling/conflict_resolver.py",
       "source_location": "L11",
       "_origin": "ast",
-      "community": 7,
+      "community": 0,
       "norm_label": "conflictresult",
       "id": "scheduling_conflict_resolver_conflictresult"
     },
@@ -2612,7 +2792,7 @@
       "source_file": "scheduling/conflict_resolver.py",
       "source_location": "L20",
       "_origin": "ast",
-      "community": 7,
+      "community": 0,
       "norm_label": "resolve_slot()",
       "id": "scheduling_conflict_resolver_resolve_slot"
     },
@@ -2622,7 +2802,7 @@
       "source_file": "scheduling/conflict_resolver.py",
       "source_location": "L20",
       "_origin": "ast",
-      "community": 7,
+      "community": 0,
       "norm_label": "datetime",
       "id": "scheduling_conflict_resolver_py_datetime"
     },
@@ -2632,7 +2812,7 @@
       "source_file": "scheduling/conflict_resolver.py",
       "source_location": "L20",
       "_origin": "ast",
-      "community": 7,
+      "community": 0,
       "norm_label": "session",
       "id": "scheduling_conflict_resolver_py_session"
     },
@@ -2642,7 +2822,7 @@
       "source_file": "scheduling/conflict_resolver.py",
       "source_location": "L20",
       "_origin": "ast",
-      "community": 7,
+      "community": 0,
       "norm_label": "sessionstore",
       "id": "scheduling_conflict_resolver_py_sessionstore"
     },
@@ -2652,7 +2832,7 @@
       "source_file": "scheduling/conflict_resolver.py",
       "source_location": "L20",
       "_origin": "ast",
-      "community": 7,
+      "community": 0,
       "norm_label": "clientstore",
       "id": "scheduling_conflict_resolver_py_clientstore"
     },
@@ -2662,7 +2842,7 @@
       "source_file": "scheduling/conflict_resolver.py",
       "source_location": "L20",
       "_origin": "ast",
-      "community": 7,
+      "community": 0,
       "norm_label": "provider",
       "id": "scheduling_conflict_resolver_py_provider"
     },
@@ -2672,7 +2852,7 @@
       "source_file": "scheduling/travel.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 26,
+      "community": 1,
       "norm_label": "travel.py",
       "id": "scheduling_travel"
     },
@@ -2682,7 +2862,7 @@
       "source_file": "scheduling/travel.py",
       "source_location": "L4",
       "_origin": "ast",
-      "community": 26,
+      "community": 1,
       "norm_label": "get_travel_minutes()",
       "id": "scheduling_travel_get_travel_minutes"
     },
@@ -2730,7 +2910,7 @@
       "source_file": "store/bootstrap.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 2,
+      "community": 0,
       "norm_label": "bootstrap.py",
       "id": "store_bootstrap"
     },
@@ -2740,7 +2920,7 @@
       "source_file": "store/bootstrap.py",
       "source_location": "L10",
       "_origin": "ast",
-      "community": 2,
+      "community": 0,
       "norm_label": "bootstrap_provider()",
       "id": "store_bootstrap_bootstrap_provider"
     },
@@ -2750,7 +2930,7 @@
       "source_file": "store/bootstrap.py",
       "source_location": "L10",
       "_origin": "ast",
-      "community": 2,
+      "community": 0,
       "norm_label": "session",
       "id": "store_bootstrap_py_session"
     },
@@ -2760,7 +2940,7 @@
       "source_file": "store/client_store.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 2,
+      "community": 20,
       "norm_label": "client_store.py",
       "id": "store_client_store"
     },
@@ -3030,7 +3210,7 @@
       "source_file": "store/provider_store.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 2,
+      "community": 0,
       "norm_label": "provider_store.py",
       "id": "store_provider_store"
     },
@@ -3040,7 +3220,7 @@
       "source_file": "store/provider_store.py",
       "source_location": "L5",
       "_origin": "ast",
-      "community": 2,
+      "community": 0,
       "norm_label": "providerstore",
       "id": "store_provider_store_providerstore"
     },
@@ -3050,7 +3230,7 @@
       "source_file": "store/provider_store.py",
       "source_location": "L6",
       "_origin": "ast",
-      "community": 2,
+      "community": 0,
       "norm_label": ".__init__()",
       "id": "store_provider_store_providerstore_init"
     },
@@ -3060,7 +3240,7 @@
       "source_file": "store/provider_store.py",
       "source_location": "L6",
       "_origin": "ast",
-      "community": 7,
+      "community": 0,
       "norm_label": "session",
       "id": "store_provider_store_py_session"
     },
@@ -3070,7 +3250,7 @@
       "source_file": "store/provider_store.py",
       "source_location": "L9",
       "_origin": "ast",
-      "community": 2,
+      "community": 0,
       "norm_label": ".get_by_phone()",
       "id": "store_provider_store_providerstore_get_by_phone"
     },
@@ -3080,7 +3260,7 @@
       "source_file": "store/provider_store.py",
       "source_location": "L9",
       "_origin": "ast",
-      "community": 2,
+      "community": 0,
       "norm_label": "provider",
       "id": "store_provider_store_py_provider"
     },
@@ -3090,7 +3270,7 @@
       "source_file": "store/provider_store.py",
       "source_location": "L12",
       "_origin": "ast",
-      "community": 2,
+      "community": 0,
       "norm_label": ".get_first()",
       "id": "store_provider_store_providerstore_get_first"
     },
@@ -3100,7 +3280,7 @@
       "source_file": "store/provider_store.py",
       "source_location": "L15",
       "_origin": "ast",
-      "community": 2,
+      "community": 0,
       "norm_label": ".get()",
       "id": "store_provider_store_providerstore_get"
     },
@@ -3110,7 +3290,7 @@
       "source_file": "store/provider_store.py",
       "source_location": "L18",
       "_origin": "ast",
-      "community": 2,
+      "community": 0,
       "norm_label": ".create()",
       "id": "store_provider_store_providerstore_create"
     },
@@ -3120,7 +3300,7 @@
       "source_file": "store/provider_store.py",
       "source_location": "L25",
       "_origin": "ast",
-      "community": 2,
+      "community": 0,
       "norm_label": ".update()",
       "id": "store_provider_store_providerstore_update"
     },
@@ -3206,7 +3386,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 33,
+      "community": 4,
       "norm_label": "base",
       "id": "db_database_base"
     },
@@ -3219,74 +3399,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 33,
+      "community": 4,
       "norm_label": "engine",
       "id": "db_database_engine"
-    },
-    {
-      "label": "INTENT_PARSER_SYSTEM",
-      "file_type": "code",
-      "source_file": "intelligence/prompts.py",
-      "source_location": "1",
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "community": 26,
-      "norm_label": "intent_parser_system",
-      "id": "intelligence_prompts_intent_parser_system"
-    },
-    {
-      "label": "INTENT_PARSER_USER_TEMPLATE",
-      "file_type": "code",
-      "source_file": "intelligence/prompts.py",
-      "source_location": "7",
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "community": 26,
-      "norm_label": "intent_parser_user_template",
-      "id": "intelligence_prompts_intent_parser_user_template"
-    },
-    {
-      "label": "INTENT_RETRY_USER_TEMPLATE",
-      "file_type": "code",
-      "source_file": "intelligence/prompts.py",
-      "source_location": "53",
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "community": 26,
-      "norm_label": "intent_retry_user_template",
-      "id": "intelligence_prompts_intent_retry_user_template"
-    },
-    {
-      "label": "RESPONSE_GENERATOR_SYSTEM_TEMPLATE",
-      "file_type": "code",
-      "source_file": "intelligence/prompts.py",
-      "source_location": "62",
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "community": 1,
-      "norm_label": "response_generator_system_template",
-      "id": "intelligence_prompts_response_generator_system_template"
-    },
-    {
-      "label": "RESPONSE_GENERATOR_USER_TEMPLATE",
-      "file_type": "code",
-      "source_file": "intelligence/prompts.py",
-      "source_location": "72",
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "community": 1,
-      "norm_label": "response_generator_user_template",
-      "id": "intelligence_prompts_response_generator_user_template"
     },
     {
       "label": "Handoff Relay Pattern",
@@ -3363,7 +3478,7 @@
       "author": null,
       "contributor": null,
       "rationale": "Conflict resolution cascades through four states: FREE (slot open), ALTERNATIVES (free slots exist same day), SWAP_POSSIBLE (blocking client can be moved), NO_AVAILABILITY. This avoids double-booking while maximizing booking success rate.",
-      "community": 7,
+      "community": 0,
       "norm_label": "scheduling conflict resolution strategy",
       "id": "concept_conflict_resolution_strategy"
     },
@@ -3384,6 +3499,672 @@
   ],
   "links": [
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/context_manager.py",
+      "source_location": "L53",
+      "weight": 1.0,
+      "source": "intelligence_context_manager",
+      "target": "intelligence_context_manager_build_context_from_summary",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/context_manager.py",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "intelligence_context_manager",
+      "target": "intelligence_context_manager_should_summarize",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/context_manager.py",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "intelligence_context_manager",
+      "target": "intelligence_context_manager_summarize_conversation",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/context_manager.py",
+      "source_location": "L44",
+      "weight": 1.0,
+      "source": "intelligence_context_manager",
+      "target": "intelligence_context_manager_trim_history",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/context_manager.py",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "intelligence_context_manager",
+      "target": "intelligence_llm_client",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/context_manager.py",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "intelligence_context_manager",
+      "target": "intelligence_prompts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_phase3a.py",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "tests_test_phase3a",
+      "target": "intelligence_context_manager",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_phase3a.py",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "tests_test_phase3a",
+      "target": "intelligence_context_manager_should_summarize",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_phase3a.py",
+      "source_location": "L69",
+      "weight": 1.0,
+      "source": "tests_test_phase3a_test_context_manager_summarizes",
+      "target": "intelligence_context_manager_should_summarize",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_phase3a.py",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "tests_test_phase3a",
+      "target": "intelligence_context_manager_summarize_conversation",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_phase3a.py",
+      "source_location": "L73",
+      "weight": 1.0,
+      "source": "tests_test_phase3a_test_context_manager_summarizes",
+      "target": "intelligence_context_manager_summarize_conversation",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_phase3a.py",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "tests_test_phase3a",
+      "target": "intelligence_context_manager_trim_history",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_phase3a.py",
+      "source_location": "L80",
+      "weight": 1.0,
+      "source": "tests_test_phase3a_test_history_trimming",
+      "target": "intelligence_context_manager_trim_history",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "core/admin_handler.py",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "core_admin_handler",
+      "target": "intelligence_intent_parser"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "core/client_handler.py",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "core_client_handler",
+      "target": "intelligence_intent_parser"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/intent_parser.py",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "intelligence_intent_parser",
+      "target": "config"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/intent_parser.py",
+      "source_location": "L17",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "intelligence_intent_parser",
+      "target": "intelligence_intent_parser_format_history"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/intent_parser.py",
+      "source_location": "L56",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "intelligence_intent_parser",
+      "target": "intelligence_intent_parser_parse_intent"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/intent_parser.py",
+      "source_location": "L43",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "intelligence_intent_parser",
+      "target": "intelligence_intent_parser_parse_json_response"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/intent_parser.py",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "intelligence_intent_parser",
+      "target": "intelligence_llm_client"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/intent_parser.py",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "intelligence_intent_parser",
+      "target": "intelligence_llm_client_call_llm"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/intent_parser.py",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "intelligence_intent_parser",
+      "target": "intelligence_prompts"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/intent_parser.py",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "intelligence_intent_parser",
+      "target": "models_schemas"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/intent_parser.py",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "intelligence_intent_parser",
+      "target": "models_schemas_intentresult"
+    },
+    {
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "intelligence/intent_parser.py",
+      "source_location": null,
+      "weight": 0.9,
+      "source": "intelligence_intent_parser_format_history",
+      "target": "intelligence_response_generator_format_history"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/intent_parser.py",
+      "source_location": "66",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "intelligence_intent_parser_parse_intent",
+      "target": "intelligence_intent_parser_format_history"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/intent_parser.py",
+      "source_location": "75",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "intelligence_intent_parser_parse_intent",
+      "target": "intelligence_intent_parser_parse_json_response"
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/intent_parser.py",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "intelligence_intent_parser_parse_json_response",
+      "target": "intelligence_intent_parser_py_intentresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/intent_parser.py",
+      "source_location": "L51",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "intelligence_intent_parser_parse_json_response",
+      "target": "models_schemas_intentresult"
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/intent_parser.py",
+      "source_location": "L43",
+      "weight": 1.0,
+      "source": "intelligence_intent_parser_parse_intent",
+      "target": "intelligence_intent_parser_py_intentresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "core/admin_handler.py",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "core_admin_handler",
+      "target": "intelligence_intent_parser_parse_intent"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "core/admin_handler.py",
+      "source_location": "65",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "core_admin_handler_handle_admin",
+      "target": "intelligence_intent_parser_parse_intent"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "core/client_handler.py",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "core_client_handler",
+      "target": "intelligence_intent_parser_parse_intent"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "core/client_handler.py",
+      "source_location": "56",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "core_client_handler_handle_client",
+      "target": "intelligence_intent_parser_parse_intent"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "core/client_handler.py",
+      "source_location": "205",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "core_client_handler_handle_cold_inbound",
+      "target": "intelligence_intent_parser_parse_intent"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/intent_parser.py",
+      "source_location": "L59",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "intelligence_intent_parser_parse_intent",
+      "target": "intelligence_llm_client_call_llm"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_phase1.py",
+      "source_location": "L53",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_test_phase1",
+      "target": "intelligence_intent_parser_parse_intent"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/judge.py",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "intelligence_judge",
+      "target": "intelligence_judge_evaluate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/judge.py",
+      "source_location": "L93",
+      "weight": 1.0,
+      "source": "intelligence_judge",
+      "target": "intelligence_judge_llm_judge",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/judge.py",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "intelligence_judge",
+      "target": "intelligence_judge_rules",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/judge.py",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "intelligence_judge",
+      "target": "intelligence_llm_client",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/judge.py",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "intelligence_judge",
+      "target": "intelligence_prompts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/judge.py",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "intelligence_judge",
+      "target": "models_schemas",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_phase3a.py",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "tests_test_phase3a",
+      "target": "intelligence_judge",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/judge.py",
+      "source_location": "L90",
+      "weight": 1.0,
+      "source": "intelligence_judge_evaluate",
+      "target": "intelligence_judge_llm_judge",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/judge.py",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "intelligence_judge_evaluate",
+      "target": "intelligence_judge_py_intentresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/judge.py",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "intelligence_judge_evaluate",
+      "target": "judgeresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_phase3a.py",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "tests_test_phase3a",
+      "target": "intelligence_judge_evaluate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_phase3a.py",
+      "source_location": "L50",
+      "weight": 1.0,
+      "source": "tests_test_phase3a_test_cancel_request_notifies_admin",
+      "target": "intelligence_judge_evaluate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_phase3a.py",
+      "source_location": "L27",
+      "weight": 1.0,
+      "source": "tests_test_phase3a_test_human_request_always_escalates",
+      "target": "intelligence_judge_evaluate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_phase3a.py",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "tests_test_phase3a_test_low_confidence_escalates",
+      "target": "intelligence_judge_evaluate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_phase3a.py",
+      "source_location": "L37",
+      "weight": 1.0,
+      "source": "tests_test_phase3a_test_new_client_booking_escalates",
+      "target": "intelligence_judge_evaluate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "parameter_type",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/judge.py",
+      "source_location": "L93",
+      "weight": 1.0,
+      "source": "intelligence_judge_llm_judge",
+      "target": "intelligence_judge_py_intentresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "return_type",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/judge.py",
+      "source_location": "L93",
+      "weight": 1.0,
+      "source": "intelligence_judge_llm_judge",
+      "target": "judgeresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "intelligence/response_generator.py",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "intelligence_response_generator",
+      "target": "intelligence_prompts"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_phase3a.py",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "tests_test_phase3a",
+      "target": "models_schemas",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_phase3a.py",
+      "source_location": "L49",
+      "weight": 1.0,
+      "source": "tests_test_phase3a",
+      "target": "tests_test_phase3a_test_cancel_request_notifies_admin",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_phase3a.py",
+      "source_location": "L60",
+      "weight": 1.0,
+      "source": "tests_test_phase3a",
+      "target": "tests_test_phase3a_test_context_manager_summarizes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_phase3a.py",
+      "source_location": "L78",
+      "weight": 1.0,
+      "source": "tests_test_phase3a",
+      "target": "tests_test_phase3a_test_history_trimming",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_phase3a.py",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "tests_test_phase3a",
+      "target": "tests_test_phase3a_test_human_request_always_escalates",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_phase3a.py",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "tests_test_phase3a",
+      "target": "tests_test_phase3a_test_low_confidence_escalates",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_phase3a.py",
+      "source_location": "L36",
+      "weight": 1.0,
+      "source": "tests_test_phase3a",
+      "target": "tests_test_phase3a_test_new_client_booking_escalates",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -3401,9 +4182,9 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_admin",
-      "target": "db_redis_client",
-      "confidence_score": 1.0
+      "target": "db_redis_client"
     },
     {
       "relation": "imports_from",
@@ -3412,9 +4193,9 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_admin",
-      "target": "orchestrator_channels",
-      "confidence_score": 1.0
+      "target": "orchestrator_channels"
     },
     {
       "relation": "imports_from",
@@ -3454,9 +4235,9 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L99",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_admin",
-      "target": "tools_admin_get_all_active_agents",
-      "confidence_score": 1.0
+      "target": "tools_admin_get_all_active_agents"
     },
     {
       "relation": "contains",
@@ -3580,9 +4361,9 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L53",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_admin_rationale_53",
-      "target": "tools_admin_get_provider",
-      "confidence_score": 1.0
+      "target": "tools_admin_get_provider"
     },
     {
       "relation": "rationale_for",
@@ -3590,9 +4371,9 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L63",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_admin_rationale_63",
-      "target": "tools_admin_update_provider",
-      "confidence_score": 1.0
+      "target": "tools_admin_update_provider"
     },
     {
       "relation": "references",
@@ -3611,9 +4392,9 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L81",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_admin_rationale_81",
-      "target": "tools_admin_get_conversation_state",
-      "confidence_score": 1.0
+      "target": "tools_admin_get_conversation_state"
     },
     {
       "relation": "imports",
@@ -3622,9 +4403,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L107",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_phase2",
-      "target": "tools_admin_get_all_active_agents",
-      "confidence_score": 1.0
+      "target": "tools_admin_get_all_active_agents"
     },
     {
       "relation": "calls",
@@ -3633,9 +4414,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L109",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_phase2_test_get_all_active_agents",
-      "target": "tools_admin_get_all_active_agents",
-      "confidence_score": 1.0
+      "target": "tools_admin_get_all_active_agents"
     },
     {
       "relation": "rationale_for",
@@ -3643,9 +4424,9 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L100",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_admin_rationale_100",
-      "target": "tools_admin_get_all_active_agents",
-      "confidence_score": 1.0
+      "target": "tools_admin_get_all_active_agents"
     },
     {
       "relation": "rationale_for",
@@ -3653,9 +4434,9 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L123",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_admin_rationale_123",
-      "target": "tools_admin_reset_conversation_state",
-      "confidence_score": 1.0
+      "target": "tools_admin_reset_conversation_state"
     },
     {
       "relation": "imports_from",
@@ -3887,9 +4668,9 @@
       "source_file": "donna_mcp/tools/clients.py",
       "source_location": "L43",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_clients_rationale_43",
-      "target": "tools_clients_get_client",
-      "confidence_score": 1.0
+      "target": "tools_clients_get_client"
     },
     {
       "relation": "calls",
@@ -3908,9 +4689,9 @@
       "source_file": "donna_mcp/tools/clients.py",
       "source_location": "L53",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_clients_rationale_53",
-      "target": "tools_clients_get_client_by_phone",
-      "confidence_score": 1.0
+      "target": "tools_clients_get_client_by_phone"
     },
     {
       "relation": "calls",
@@ -3929,9 +4710,9 @@
       "source_file": "donna_mcp/tools/clients.py",
       "source_location": "L63",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_clients_rationale_63",
-      "target": "tools_clients_list_clients",
-      "confidence_score": 1.0
+      "target": "tools_clients_list_clients"
     },
     {
       "relation": "calls",
@@ -3950,9 +4731,9 @@
       "source_file": "donna_mcp/tools/clients.py",
       "source_location": "L84",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_clients_rationale_84",
-      "target": "tools_clients_create_client",
-      "confidence_score": 1.0
+      "target": "tools_clients_create_client"
     },
     {
       "relation": "rationale_for",
@@ -3960,9 +4741,9 @@
       "source_file": "donna_mcp/tools/clients.py",
       "source_location": "L127",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_clients_rationale_127",
-      "target": "tools_clients_update_client",
-      "confidence_score": 1.0
+      "target": "tools_clients_update_client"
     },
     {
       "relation": "calls",
@@ -4258,9 +5039,9 @@
       "source_file": "donna_mcp/tools/scheduling.py",
       "source_location": "L44",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_scheduling_rationale_44",
-      "target": "tools_scheduling_get_free_slots",
-      "confidence_score": 1.0
+      "target": "tools_scheduling_get_free_slots"
     },
     {
       "relation": "calls",
@@ -4269,9 +5050,9 @@
       "source_file": "donna_mcp/tools/scheduling.py",
       "source_location": "L132",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_scheduling_book_session",
-      "target": "tools_scheduling_check_slot_conflict",
-      "confidence_score": 1.0
+      "target": "tools_scheduling_check_slot_conflict"
     },
     {
       "relation": "calls",
@@ -4290,9 +5071,9 @@
       "source_file": "donna_mcp/tools/scheduling.py",
       "source_location": "L69",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_scheduling_rationale_69",
-      "target": "tools_scheduling_check_slot_conflict",
-      "confidence_score": 1.0
+      "target": "tools_scheduling_check_slot_conflict"
     },
     {
       "relation": "calls",
@@ -4301,9 +5082,9 @@
       "source_file": "donna_mcp/tools/scheduling.py",
       "source_location": "L213",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_scheduling_reschedule_session",
-      "target": "tools_scheduling_check_slot_conflict",
-      "confidence_score": 1.0
+      "target": "tools_scheduling_check_slot_conflict"
     },
     {
       "relation": "imports",
@@ -4312,9 +5093,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L48",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_phase2",
-      "target": "tools_scheduling_book_session",
-      "confidence_score": 1.0
+      "target": "tools_scheduling_book_session"
     },
     {
       "relation": "calls",
@@ -4323,9 +5104,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L66",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_phase2_test_book_session_conflict_returns_error",
-      "target": "tools_scheduling_book_session",
-      "confidence_score": 1.0
+      "target": "tools_scheduling_book_session"
     },
     {
       "relation": "calls",
@@ -4334,9 +5115,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L50",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_phase2_test_book_session_happy_path",
-      "target": "tools_scheduling_book_session",
-      "confidence_score": 1.0
+      "target": "tools_scheduling_book_session"
     },
     {
       "relation": "calls",
@@ -4345,9 +5126,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L78",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_phase2_test_cancel_session_preserves_pre_cancel_status",
-      "target": "tools_scheduling_book_session",
-      "confidence_score": 1.0
+      "target": "tools_scheduling_book_session"
     },
     {
       "relation": "calls",
@@ -4356,9 +5137,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L96",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_phase2_test_reschedule_session_checks_conflict",
-      "target": "tools_scheduling_book_session",
-      "confidence_score": 1.0
+      "target": "tools_scheduling_book_session"
     },
     {
       "relation": "rationale_for",
@@ -4366,9 +5147,9 @@
       "source_file": "donna_mcp/tools/scheduling.py",
       "source_location": "L119",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_scheduling_rationale_119",
-      "target": "tools_scheduling_book_session",
-      "confidence_score": 1.0
+      "target": "tools_scheduling_book_session"
     },
     {
       "relation": "imports",
@@ -4377,9 +5158,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L76",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_phase2",
-      "target": "tools_scheduling_cancel_session",
-      "confidence_score": 1.0
+      "target": "tools_scheduling_cancel_session"
     },
     {
       "relation": "calls",
@@ -4388,9 +5169,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L85",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_phase2_test_cancel_session_preserves_pre_cancel_status",
-      "target": "tools_scheduling_cancel_session",
-      "confidence_score": 1.0
+      "target": "tools_scheduling_cancel_session"
     },
     {
       "relation": "rationale_for",
@@ -4398,9 +5179,9 @@
       "source_file": "donna_mcp/tools/scheduling.py",
       "source_location": "L168",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_scheduling_rationale_168",
-      "target": "tools_scheduling_cancel_session",
-      "confidence_score": 1.0
+      "target": "tools_scheduling_cancel_session"
     },
     {
       "relation": "imports",
@@ -4409,9 +5190,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L91",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_phase2",
-      "target": "tools_scheduling_reschedule_session",
-      "confidence_score": 1.0
+      "target": "tools_scheduling_reschedule_session"
     },
     {
       "relation": "calls",
@@ -4420,9 +5201,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L101",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_phase2_test_reschedule_session_checks_conflict",
-      "target": "tools_scheduling_reschedule_session",
-      "confidence_score": 1.0
+      "target": "tools_scheduling_reschedule_session"
     },
     {
       "relation": "rationale_for",
@@ -4430,9 +5211,9 @@
       "source_file": "donna_mcp/tools/scheduling.py",
       "source_location": "L193",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_scheduling_rationale_193",
-      "target": "tools_scheduling_reschedule_session",
-      "confidence_score": 1.0
+      "target": "tools_scheduling_reschedule_session"
     },
     {
       "relation": "rationale_for",
@@ -4440,9 +5221,9 @@
       "source_file": "donna_mcp/tools/scheduling.py",
       "source_location": "L235",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_scheduling_rationale_235",
-      "target": "tools_scheduling_get_sessions_for_date",
-      "confidence_score": 1.0
+      "target": "tools_scheduling_get_sessions_for_date"
     },
     {
       "relation": "rationale_for",
@@ -4450,9 +5231,9 @@
       "source_file": "donna_mcp/tools/scheduling.py",
       "source_location": "L253",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tools_scheduling_rationale_253",
-      "target": "tools_scheduling_get_upcoming_sessions",
-      "confidence_score": 1.0
+      "target": "tools_scheduling_get_upcoming_sessions"
     },
     {
       "relation": "imports_from",
@@ -4461,9 +5242,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_phase2",
-      "target": "db_database",
-      "confidence_score": 1.0
+      "target": "db_database"
     },
     {
       "relation": "imports_from",
@@ -4472,9 +5253,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_phase2",
-      "target": "db_migrations",
-      "confidence_score": 1.0
+      "target": "db_migrations"
     },
     {
       "relation": "imports_from",
@@ -4483,9 +5264,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_phase2",
-      "target": "store_bootstrap",
-      "confidence_score": 1.0
+      "target": "store_bootstrap"
     },
     {
       "relation": "imports_from",
@@ -4494,9 +5275,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_phase2",
-      "target": "store_client_store",
-      "confidence_score": 1.0
+      "target": "store_client_store"
     },
     {
       "relation": "imports_from",
@@ -4505,9 +5286,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_phase2",
-      "target": "store_provider_store",
-      "confidence_score": 1.0
+      "target": "store_provider_store"
     },
     {
       "relation": "contains",
@@ -4515,9 +5296,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L39",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_phase2",
-      "target": "tests_test_phase2_client_id",
-      "confidence_score": 1.0
+      "target": "tests_test_phase2_client_id"
     },
     {
       "relation": "contains",
@@ -4525,9 +5306,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_phase2",
-      "target": "tests_test_phase2_ensure_seed",
-      "confidence_score": 1.0
+      "target": "tests_test_phase2_ensure_seed"
     },
     {
       "relation": "contains",
@@ -4535,9 +5316,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L60",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_phase2",
-      "target": "tests_test_phase2_test_book_session_conflict_returns_error",
-      "confidence_score": 1.0
+      "target": "tests_test_phase2_test_book_session_conflict_returns_error"
     },
     {
       "relation": "contains",
@@ -4545,9 +5326,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L47",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_phase2",
-      "target": "tests_test_phase2_test_book_session_happy_path",
-      "confidence_score": 1.0
+      "target": "tests_test_phase2_test_book_session_happy_path"
     },
     {
       "relation": "contains",
@@ -4555,9 +5336,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L75",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_phase2",
-      "target": "tests_test_phase2_test_cancel_session_preserves_pre_cancel_status",
-      "confidence_score": 1.0
+      "target": "tests_test_phase2_test_cancel_session_preserves_pre_cancel_status"
     },
     {
       "relation": "contains",
@@ -4565,9 +5346,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L106",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_phase2",
-      "target": "tests_test_phase2_test_get_all_active_agents",
-      "confidence_score": 1.0
+      "target": "tests_test_phase2_test_get_all_active_agents"
     },
     {
       "relation": "contains",
@@ -4575,9 +5356,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L90",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_phase2",
-      "target": "tests_test_phase2_test_reschedule_session_checks_conflict",
-      "confidence_score": 1.0
+      "target": "tests_test_phase2_test_reschedule_session_checks_conflict"
     },
     {
       "relation": "rationale_for",
@@ -4585,9 +5366,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_phase2_rationale_1",
-      "target": "tests_test_phase2",
-      "confidence_score": 1.0
+      "target": "tests_test_phase2"
     },
     {
       "relation": "calls",
@@ -4596,9 +5377,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L63",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_phase2_test_book_session_conflict_returns_error",
-      "target": "tests_test_phase2_client_id",
-      "confidence_score": 1.0
+      "target": "tests_test_phase2_client_id"
     },
     {
       "relation": "calls",
@@ -4607,9 +5388,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L51",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_phase2_test_book_session_happy_path",
-      "target": "tests_test_phase2_client_id",
-      "confidence_score": 1.0
+      "target": "tests_test_phase2_client_id"
     },
     {
       "relation": "calls",
@@ -4618,9 +5399,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L79",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_phase2_test_cancel_session_preserves_pre_cancel_status",
-      "target": "tests_test_phase2_client_id",
-      "confidence_score": 1.0
+      "target": "tests_test_phase2_client_id"
     },
     {
       "relation": "calls",
@@ -4629,9 +5410,9 @@
       "source_file": "tests/test_phase2.py",
       "source_location": "L93",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_phase2_test_reschedule_session_checks_conflict",
-      "target": "tests_test_phase2_client_id",
-      "confidence_score": 1.0
+      "target": "tests_test_phase2_client_id"
     },
     {
       "relation": "contains",
@@ -5248,17 +6029,6 @@
       "target": "models_schemas"
     },
     {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "intelligence/intent_parser.py",
-      "source_location": "L4",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "intelligence_intent_parser",
-      "target": "models_schemas"
-    },
-    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "models/schemas.py",
@@ -5389,38 +6159,6 @@
       "weight": 0.8,
       "confidence_score": 0.5,
       "source": "core_client_handler_py_session",
-      "target": "models_schemas_intentresult"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "intelligence/intent_parser.py",
-      "source_location": "L4",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "intelligence_intent_parser",
-      "target": "models_schemas_intentresult"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "intelligence/intent_parser.py",
-      "source_location": "L51",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "intelligence_intent_parser_parse_json_response",
-      "target": "models_schemas_intentresult"
-    },
-    {
-      "relation": "uses",
-      "confidence": "INFERRED",
-      "source_file": "intelligence/intent_parser.py",
-      "source_location": "L4",
-      "weight": 0.8,
-      "confidence_score": 0.5,
-      "source": "intentresult",
       "target": "models_schemas_intentresult"
     },
     {
@@ -5712,28 +6450,6 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "core/client_handler.py",
-      "source_location": "L9",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "core_client_handler",
-      "target": "intelligence_intent_parser"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "core/client_handler.py",
-      "source_location": "L9",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "core_client_handler",
-      "target": "intelligence_intent_parser_parse_intent"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "core/client_handler.py",
       "source_location": "L10",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -6019,17 +6735,6 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "core/client_handler.py",
-      "source_location": "56",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "core_client_handler_handle_client",
-      "target": "intelligence_intent_parser_parse_intent"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "core/client_handler.py",
       "source_location": "89",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -6244,17 +6949,6 @@
       "weight": 1.0,
       "source": "core_client_handler_handle_cold_inbound",
       "target": "clientstore"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "core/client_handler.py",
-      "source_location": "205",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "core_client_handler_handle_cold_inbound",
-      "target": "intelligence_intent_parser_parse_intent"
     },
     {
       "relation": "calls",
@@ -6617,219 +7311,6 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "core/admin_handler.py",
-      "source_location": "L8",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "core_admin_handler",
-      "target": "intelligence_intent_parser"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "intelligence/intent_parser.py",
-      "source_location": "L3",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "intelligence_intent_parser",
-      "target": "config"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "intelligence/intent_parser.py",
-      "source_location": "L17",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "intelligence_intent_parser",
-      "target": "intelligence_intent_parser_format_history"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "intelligence/intent_parser.py",
-      "source_location": "L56",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "intelligence_intent_parser",
-      "target": "intelligence_intent_parser_parse_intent"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "intelligence/intent_parser.py",
-      "source_location": "L43",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "intelligence_intent_parser",
-      "target": "intelligence_intent_parser_parse_json_response"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "intelligence/intent_parser.py",
-      "source_location": "L5",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "intelligence_intent_parser",
-      "target": "intelligence_llm_client"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "intelligence/intent_parser.py",
-      "source_location": "L5",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "intelligence_intent_parser",
-      "target": "intelligence_llm_client_call_llm"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "intelligence/intent_parser.py",
-      "source_location": "L5",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "intelligence_intent_parser",
-      "target": "intelligence_prompts"
-    },
-    {
-      "relation": "semantically_similar_to",
-      "confidence": "INFERRED",
-      "confidence_score": 0.9,
-      "source_file": "intelligence/intent_parser.py",
-      "source_location": null,
-      "weight": 0.9,
-      "source": "intelligence_intent_parser_format_history",
-      "target": "intelligence_response_generator_format_history"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "intelligence/intent_parser.py",
-      "source_location": "66",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "intelligence_intent_parser_parse_intent",
-      "target": "intelligence_intent_parser_format_history"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "intelligence/intent_parser.py",
-      "source_location": "75",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "intelligence_intent_parser_parse_intent",
-      "target": "intelligence_intent_parser_parse_json_response"
-    },
-    {
-      "relation": "references",
-      "context": "return_type",
-      "confidence": "EXTRACTED",
-      "source_file": "intelligence/intent_parser.py",
-      "source_location": "L43",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "intelligence_intent_parser_parse_json_response",
-      "target": "intentresult"
-    },
-    {
-      "relation": "references",
-      "context": "return_type",
-      "confidence": "EXTRACTED",
-      "source_file": "intelligence/intent_parser.py",
-      "source_location": "L56",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "intelligence_intent_parser_parse_intent",
-      "target": "intentresult"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "core/admin_handler.py",
-      "source_location": "L8",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "core_admin_handler",
-      "target": "intelligence_intent_parser_parse_intent"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "core/admin_handler.py",
-      "source_location": "65",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "core_admin_handler_handle_admin",
-      "target": "intelligence_intent_parser_parse_intent"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "intelligence/intent_parser.py",
-      "source_location": "L59",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "intelligence_intent_parser_parse_intent",
-      "target": "intelligence_llm_client_call_llm"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "intelligence/intent_parser.py",
-      "source_location": "74",
-      "weight": 1.0,
-      "source": "intelligence_intent_parser_parse_intent",
-      "target": "intelligence_prompts_intent_parser_system"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "intelligence/intent_parser.py",
-      "source_location": "66",
-      "weight": 1.0,
-      "source": "intelligence_intent_parser_parse_intent",
-      "target": "intelligence_prompts_intent_parser_user_template"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "intelligence/intent_parser.py",
-      "source_location": "82",
-      "weight": 1.0,
-      "source": "intelligence_intent_parser_parse_intent",
-      "target": "intelligence_prompts_intent_retry_user_template"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/test_phase1.py",
-      "source_location": "L53",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "tests_test_phase1",
-      "target": "intelligence_intent_parser_parse_intent"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
       "source_file": "intelligence/llm_client.py",
       "source_location": "L3",
       "weight": 1.0,
@@ -6965,17 +7446,6 @@
       "confidence_score": 1.0,
       "source": "intelligence_response_generator",
       "target": "config"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "intelligence/response_generator.py",
-      "source_location": "L3",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "intelligence_response_generator",
-      "target": "intelligence_prompts"
     },
     {
       "relation": "contains",
@@ -7138,26 +7608,6 @@
       "confidence_score": 1.0,
       "source": "core_handoff_trigger_dynamic_handoff",
       "target": "intelligence_response_generator_generate_response"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "intelligence/response_generator.py",
-      "source_location": "42",
-      "weight": 1.0,
-      "source": "intelligence_response_generator_generate_response",
-      "target": "intelligence_prompts_response_generator_system_template"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "intelligence/response_generator.py",
-      "source_location": "47",
-      "weight": 1.0,
-      "source": "intelligence_response_generator_generate_response",
-      "target": "intelligence_prompts_response_generator_user_template"
     },
     {
       "relation": "imports",
@@ -12301,5 +12751,5 @@
       "source_file": "store/session_store.py"
     }
   ],
-  "built_at_commit": "2ec2889db3e1879163de0b4c94a42c735a007e34"
+  "built_at_commit": "54310fe2a2c89070f762befa1f7793cb9397d27f"
 }

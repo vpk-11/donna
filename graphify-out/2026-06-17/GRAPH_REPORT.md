@@ -1,16 +1,16 @@
 # Graph Report - donna  (2026-06-16)
 
 ## Corpus Check
-- 65 files · ~13,223 words
+- 68 files · ~18,918 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 335 nodes · 869 edges · 33 communities (28 shown, 5 thin omitted)
-- Extraction: 81% EXTRACTED · 19% INFERRED · 0% AMBIGUOUS · INFERRED: 166 edges (avg confidence: 0.56)
+- 400 nodes · 1102 edges · 33 communities (28 shown, 5 thin omitted)
+- Extraction: 85% EXTRACTED · 15% INFERRED · 0% AMBIGUOUS · INFERRED: 170 edges (avg confidence: 0.55)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `54310fe2`
+- Built from commit: `61c6a810`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -19,6 +19,7 @@
 - [[_COMMUNITY_Admin Intent Dispatch|Admin Intent Dispatch]]
 - [[_COMMUNITY_Community 2|Community 2]]
 - [[_COMMUNITY_Messaging Abstraction Layer|Messaging Abstraction Layer]]
+- [[_COMMUNITY_Community 5|Community 5]]
 - [[_COMMUNITY_Conversation History Store|Conversation History Store]]
 - [[_COMMUNITY_New Client Onboarding|New Client Onboarding]]
 - [[_COMMUNITY_Mock Terminal Client|Mock Terminal Client]]
@@ -35,33 +36,33 @@
 
 ## God Nodes (most connected - your core abstractions)
 1. `ClientStore` - 42 edges
-2. `Session` - 41 edges
+2. `Session` - 40 edges
 3. `ConversationStore` - 37 edges
-4. `Provider` - 34 edges
-5. `SessionStore` - 34 edges
-6. `ProviderStore` - 26 edges
-7. `handle_admin()` - 25 edges
-8. `generate_response()` - 23 edges
-9. `handle_client()` - 20 edges
-10. `Client` - 18 edges
+4. `Provider` - 33 edges
+5. `SessionStore` - 33 edges
+6. `CentralOrchestrator` - 32 edges
+7. `ClientAgent` - 26 edges
+8. `ProviderStore` - 26 edges
+9. `handle_admin()` - 24 edges
+10. `generate_response()` - 23 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `check_slot_conflict()` --calls--> `ClientStore`  [INFERRED]
-  donna_mcp/tools/scheduling.py → scheduling/session_manager.py
-- `FirewallResult` --uses--> `FirewallResult`  [INFERRED]
-  firewall/input_guard.py → models/schemas.py
-- `FirewallResult` --uses--> `FirewallResult`  [INFERRED]
-  firewall/output_guard.py → models/schemas.py
-- `Client` --uses--> `IntentResult`  [INFERRED]
-  core/client_handler.py → models/schemas.py
-- `Session` --uses--> `IntentResult`  [INFERRED]
-  core/client_handler.py → models/schemas.py
+- `WebSocket` --uses--> `CentralOrchestrator`  [INFERRED]
+  main.py → orchestrator/central.py
+- `Provider` --uses--> `ConversationStore`  [INFERRED]
+  core/admin_handler.py → store/conversation_store.py
+- `Provider` --uses--> `ProviderStore`  [INFERRED]
+  core/admin_handler.py → store/provider_store.py
+- `Session` --uses--> `ConversationStore`  [INFERRED]
+  core/admin_handler.py → store/conversation_store.py
+- `Session` --uses--> `ProviderStore`  [INFERRED]
+  core/admin_handler.py → store/provider_store.py
 
 ## Import Cycles
-- 1-file cycle: `scheduling/conflict_resolver.py -> scheduling/conflict_resolver.py`
 - 1-file cycle: `store/session_store.py -> store/session_store.py`
 - 1-file cycle: `main.py -> main.py`
 - 1-file cycle: `utils/time_utils.py -> utils/time_utils.py`
+- 1-file cycle: `scheduling/conflict_resolver.py -> scheduling/conflict_resolver.py`
 - 2-file cycle: `main.py -> messaging/websocket_client.py -> main.py`
 
 ## Hyperedges (group relationships)
@@ -75,32 +76,36 @@
 ## Communities (33 total, 5 thin omitted)
 
 ### Community 0 - "ORM and Scheduling Core"
-Cohesion: 0.12
-Nodes (29): Base, Client, Scheduling Conflict Resolution Strategy, Provider, Session, Provider, Session, SessionArchive (+21 more)
+Cohesion: 0.11
+Nodes (36): Base, Scheduling Conflict Resolution Strategy, _create_and_greet_client(), handle_new_client_intro(), handle_new_client_intro_clarification(), ClientStore, ConversationStore, Provider (+28 more)
 
 ### Community 1 - "Admin Intent Dispatch"
-Cohesion: 0.11
-Nodes (37): BaseSettings, Intent-Driven Dispatch Pattern, Privacy Guard on Swap Messages, Config, Settings, _check_client_status(), _check_schedule(), handle_admin() (+29 more)
+Cohesion: 0.10
+Nodes (38): _check_client_status(), _check_schedule(), handle_admin(), _handle_admin_confirm(), _handle_book_session(), _handle_cancel_session(), _handle_proactive_message(), _handle_reschedule_session() (+30 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.20
-Nodes (13): should_summarize(), summarize_conversation(), trim_history(), evaluate(), _llm_judge(), IntentResult, JudgeResult, test_cancel_request_notifies_admin() (+5 more)
+Cohesion: 0.11
+Nodes (19): BaseSettings, Config, Settings, Exception, should_summarize(), summarize_conversation(), trim_history(), evaluate() (+11 more)
 
 ### Community 4 - "Messaging Abstraction Layer"
-Cohesion: 0.08
-Nodes (22): ABC, Base, engine, init_db(), get_async_redis(), get_redis(), ping_redis(), FastAPI (+14 more)
+Cohesion: 0.09
+Nodes (14): ABC, Conversation History Ring Buffer, ConversationState, FastAPI, MessagingClient, LinqMessagingClient, WebSocket, WebSocketConnectionManager (+6 more)
+
+### Community 5 - "Community 5"
+Cohesion: 0.17
+Nodes (16): ClientAgent, CentralOrchestrator, ClientStore, ConversationStore, Session, SessionStore, _make_client(), _make_messaging() (+8 more)
 
 ### Community 6 - "Conversation History Store"
-Cohesion: 0.17
-Nodes (12): Conversation History Ring Buffer, ConversationState, handle_cold_inbound(), Session, Session, route_message(), ConversationState, ConversationStore (+4 more)
+Cohesion: 0.14
+Nodes (15): CentralOrchestrator, Base, engine, init_db(), get_async_redis(), get_redis(), ping_redis(), warmup_firewall() (+7 more)
 
 ### Community 7 - "New Client Onboarding"
-Cohesion: 0.20
-Nodes (15): Handoff Relay Pattern, Client, ConversationStore, Provider, Session, start_handoff_from_admin(), trigger_dynamic_handoff(), trigger_explicit_handoff_from_client() (+7 more)
+Cohesion: 0.17
+Nodes (19): ConversationStore, Provider, Session, start_handoff_from_admin(), trigger_dynamic_handoff(), trigger_explicit_handoff_from_client(), Client, ConversationState (+11 more)
 
 ### Community 15 - "FastAPI App Entry"
-Cohesion: 0.19
-Nodes (13): BaseModel, FirewallResult, scan_input(), FirewallResult, scan_output(), FirewallResult, JudgeResult, MessageEnvelope (+5 more)
+Cohesion: 0.18
+Nodes (15): BaseModel, FirewallResult, scan_input(), FirewallResult, scan_output(), FirewallResult, JudgeResult, MessageEnvelope (+7 more)
 
 ### Community 20 - "Python Requirements"
 Cohesion: 0.12
@@ -115,32 +120,32 @@ Cohesion: 0.14
 Nodes (13): break_between_sessions_mins, business_hours, end, start, business_type, conversation_timeout_mins, days_open, location_type (+5 more)
 
 ### Community 26 - "Community 26"
-Cohesion: 0.40
-Nodes (9): _create_and_greet_client(), handle_new_client_intro(), handle_new_client_intro_clarification(), ClientStore, ConversationStore, Provider, Session, looks_like_phone() (+1 more)
+Cohesion: 0.28
+Nodes (8): IntentResult, ClientAgent, Client, ClientStore, ConversationStore, Provider, Session, SessionStore
 
 ### Community 27 - "Community 27"
 Cohesion: 0.26
 Nodes (11): Any, _db(), get_conversation_state(), get_provider(), _provider_dict(), Reset conversation context for a phone number.     Clears pending context keys,, Get the current provider configuration., Update a single provider field.     Updatable fields: name, business_type, locat (+3 more)
 
 ## Knowledge Gaps
-- **23 isolated node(s):** `Any`, `WebSocket`, `business_type`, `location_type`, `travel_time_enabled` (+18 more)
+- **25 isolated node(s):** `Client`, `Client`, `Provider`, `Any`, `business_type` (+20 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **5 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `ConversationStore` connect `Conversation History Store` to `ORM and Scheduling Core`, `Admin Intent Dispatch`, `Messaging Abstraction Layer`, `New Client Onboarding`, `Community 26`?**
-  _High betweenness centrality (0.148) - this node is a cross-community bridge._
-- **Why does `SessionStore` connect `ORM and Scheduling Core` to `Admin Intent Dispatch`, `Python Requirements`, `DB Wipe Utility`, `Conversation History Store`?**
-  _High betweenness centrality (0.074) - this node is a cross-community bridge._
-- **Why does `Session` connect `ORM and Scheduling Core` to `Conversation History Store`, `New Client Onboarding`, `Python Requirements`, `DB Wipe Utility`, `Community 26`?**
-  _High betweenness centrality (0.063) - this node is a cross-community bridge._
+- **Why does `ConversationStore` connect `Messaging Abstraction Layer` to `ORM and Scheduling Core`, `Admin Intent Dispatch`, `New Client Onboarding`?**
+  _High betweenness centrality (0.113) - this node is a cross-community bridge._
+- **Why does `CentralOrchestrator` connect `Community 5` to `Community 26`, `Messaging Abstraction Layer`, `Conversation History Store`, `New Client Onboarding`?**
+  _High betweenness centrality (0.101) - this node is a cross-community bridge._
+- **Why does `ClientAgent` connect `Community 26` to `Community 5`, `New Client Onboarding`?**
+  _High betweenness centrality (0.094) - this node is a cross-community bridge._
 - **Are the 22 inferred relationships involving `ClientStore` (e.g. with `ClientStore` and `ConversationStore`) actually correct?**
   _`ClientStore` has 22 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 38 inferred relationships involving `Session` (e.g. with `Client` and `ClientStore`) actually correct?**
-  _`Session` has 38 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 37 inferred relationships involving `Session` (e.g. with `ClientStore` and `ConversationState`) actually correct?**
+  _`Session` has 37 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 17 inferred relationships involving `ConversationStore` (e.g. with `ClientStore` and `ConversationStore`) actually correct?**
   _`ConversationStore` has 17 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 24 inferred relationships involving `Provider` (e.g. with `Client` and `ClientStore`) actually correct?**
-  _`Provider` has 24 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 23 inferred relationships involving `Provider` (e.g. with `ClientStore` and `ConversationStore`) actually correct?**
+  _`Provider` has 23 INFERRED edges - model-reasoned connections that need verification._
