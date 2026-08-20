@@ -342,7 +342,11 @@ class ClientAgent:
             else:
                 from utils.time_utils import parse_date
                 target_date = parse_date(date_str or "today")
-                slots = session_store.get_free_slots(self.provider.id, target_date, 60, self.provider)
+                slots = session_store.get_free_slots(
+                    self.provider.id, target_date,
+                    self._business_config.get("session_duration_mins", 60),
+                    self.provider,
+                )
                 if slots:
                     slot_strs = [s.strftime("%I:%M %p") for s in slots[:5]]
                     situation = f"Client asked about availability on {target_date.strftime('%A %b %d')}. Available slots: {', '.join(slot_strs)}."
