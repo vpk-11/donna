@@ -30,12 +30,37 @@ Date and time are always two separate keys, never merged into one
 mostly as the user said them (e.g. "Monday", "tomorrow", "6pm") — a separate
 parser normalizes them later, you're extracting, not converting.
 
-Admin intents:
+Two-date rule (RESCHEDULE_SESSION / RESCHEDULE_REQUEST only) — a reschedule
+message often names two days: the session's CURRENT day and the NEW day
+being moved to. Only the NEW day/time go in the "date"/"time" entities.
+Never put the current/old day in "date" or "time", and never invent a key
+like "new_time" or "old_date" to hold the other one — if the current day
+isn't needed to identify which session, drop it entirely. If only one date
+is mentioned, treat it as the new date. The word right before "to"/"for" is
+almost always the OLD day; the word right after it is almost always the NEW
+day — extract only what comes after.
+
+Examples:
+  "move my Tuesday session to Thursday" -> {{"date": "Thursday"}}
+  "reschedule my Wednesday session to Friday 10am" -> {{"date": "Friday", "time": "10am"}}
+  "can we switch my Monday 9am to Wednesday same time" -> {{"date": "Wednesday", "time": "9am"}}
+  "change thursday's session to next monday at 3" -> {{"date": "next monday", "time": "3"}}
+  "move Sarah's Tuesday session to Thursday at 5pm" -> {{"client_name": "Sarah", "date": "Thursday", "time": "5pm"}}
+
+Role contract — Role is "{role}". Admin intents are ONLY valid when Role is
+"admin". Client intents are ONLY valid when Role is "client". Never pick an
+intent from the other role's list, even if the wording resembles it — e.g. a
+client saying "push it to 11am" is RESCHEDULE_REQUEST, never
+RESCHEDULE_SESSION (that's admin-only). If Role is "client" and nothing in
+the Client intents list fits, use UNKNOWN — do not fall back to an admin
+intent, and the same in reverse for Role "admin".
+
+Admin intents (Role "admin" only):
   NEW_CLIENT_INTRO      - admin introducing or registering a new client. Entities: client_name, phone_number (if given), notes (if given)
   BOOK_SESSION          - admin booking a session for a named client. Entities: client_name, date, time
   CANCEL_DAY            - admin cancelling all sessions for a specific day. Entities: date
   CANCEL_SESSION        - admin cancelling one specific session. Entities: client_name, date (if given)
-  RESCHEDULE_SESSION    - admin rescheduling a session. Entities: client_name, date, time
+  RESCHEDULE_SESSION    - admin rescheduling a session. Entities: client_name, date, time (see two-date rule below)
   CHECK_SCHEDULE        - admin asking about their schedule or sessions. Entities: none
   CHECK_CLIENT_STATUS   - admin asking what a specific client said or their status. Entities: client_name
   CLIENT_INFO           - admin adding notes or info about an existing client. Entities: client_name, notes
@@ -46,12 +71,12 @@ Admin intents:
   DECLINE               - admin declining something Donna suggested. Entities: none
   UNKNOWN               - cannot determine intent. Entities: none
 
-Client intents:
+Client intents (Role "client" only):
   INQUIRY_SERVICES      - asking what services are offered. Entities: none
   INQUIRY_PRICING       - asking about cost or rates. Entities: none
   INQUIRY_AVAILABILITY  - asking about open time slots or their own booked sessions. Entities: date (if a specific day was asked about)
   BOOK_REQUEST          - requesting to book a session. Entities: date, time
-  RESCHEDULE_REQUEST    - wanting to change an existing session to a NEW time (different from current). Entities: date, time
+  RESCHEDULE_REQUEST    - wanting to change an existing session to a NEW time (different from current). Entities: date, time (see two-date rule below)
   CANCEL_REQUEST        - wanting to cancel a session. Entities: none
   CONFIRM               - confirming something Donna asked. Entities: date, time (only if they specified a new slot while confirming)
   DECLINE               - declining or rejecting something Donna offered or asked. Also use this when client says their current time is fine, they don't want to change, or reaffirms the same slot (e.g. "keep it at 8am", "8 AM is fine", "not needed", "no change needed", "same time is ok"). Entities: none
