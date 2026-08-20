@@ -3,6 +3,7 @@ import logging
 from llm_guard.output_scanners import Sensitive, BanTopics, NoRefusal
 from firewall.rules import (
     BANNED_OUTPUT_TOPICS,
+    BAN_TOPICS_THRESHOLD,
     BOOKING_CONFIRMATION_PATTERNS,
     BLOCK_GENERIC_RESPONSE,
     SENSITIVE_ENTITY_TYPES,
@@ -12,7 +13,7 @@ from models.schemas import FirewallResult
 logger = logging.getLogger(__name__)
 
 _sensitive_scanner = Sensitive(entity_types=SENSITIVE_ENTITY_TYPES)
-_topic_scanner = BanTopics(topics=BANNED_OUTPUT_TOPICS, threshold=0.75)
+_topic_scanner = BanTopics(topics=BANNED_OUTPUT_TOPICS, threshold=BAN_TOPICS_THRESHOLD)
 _refusal_scanner = NoRefusal()
 _booking_patterns = [re.compile(p, re.IGNORECASE) for p in BOOKING_CONFIRMATION_PATTERNS]
 
