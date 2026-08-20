@@ -122,7 +122,7 @@
       "label": "Architecture",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L11",
+      "source_location": "L13",
       "_origin": "ast",
       "id": "readme_architecture",
       "community": 19,
@@ -132,7 +132,7 @@
       "label": "Setup",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L36",
+      "source_location": "L38",
       "_origin": "ast",
       "id": "readme_setup",
       "community": 19,
@@ -142,7 +142,7 @@
       "label": "1. Create the environment",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L38",
+      "source_location": "L40",
       "_origin": "ast",
       "id": "readme_1_create_the_environment",
       "community": 19,
@@ -152,7 +152,7 @@
       "label": "2. Start Redis",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L46",
+      "source_location": "L48",
       "_origin": "ast",
       "id": "readme_2_start_redis",
       "community": 19,
@@ -162,7 +162,7 @@
       "label": "3. Start an LLM",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L55",
+      "source_location": "L57",
       "_origin": "ast",
       "id": "readme_3_start_an_llm",
       "community": 19,
@@ -172,7 +172,7 @@
       "label": "4. Set environment variables",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L66",
+      "source_location": "L68",
       "_origin": "ast",
       "id": "readme_4_set_environment_variables",
       "community": 19,
@@ -182,7 +182,7 @@
       "label": "5. Run it",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L91",
+      "source_location": "L93",
       "_origin": "ast",
       "id": "readme_5_run_it",
       "community": 19,
@@ -192,7 +192,7 @@
       "label": "6. Seed test data",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L113",
+      "source_location": "L115",
       "_origin": "ast",
       "id": "readme_6_seed_test_data",
       "community": 19,
@@ -202,7 +202,7 @@
       "label": "Config",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L128",
+      "source_location": "L130",
       "_origin": "ast",
       "id": "readme_config",
       "community": 19,
@@ -212,7 +212,7 @@
       "label": "Scripts",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L135",
+      "source_location": "L137",
       "_origin": "ast",
       "id": "readme_scripts",
       "community": 19,
@@ -222,7 +222,7 @@
       "label": "Scope",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L144",
+      "source_location": "L146",
       "_origin": "ast",
       "id": "readme_scope",
       "community": 19,
@@ -232,11 +232,21 @@
       "label": "Stack",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L157",
+      "source_location": "L159",
       "_origin": "ast",
       "id": "readme_stack",
       "community": 19,
       "norm_label": "stack"
+    },
+    {
+      "label": "Changelog",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L165",
+      "_origin": "ast",
+      "id": "readme_changelog",
+      "community": 19,
+      "norm_label": "changelog"
     },
     {
       "label": "main.py",
@@ -406,7 +416,7 @@
       "source_file": "orchestrator/agent.py",
       "source_location": "L49",
       "_origin": "ast",
-      "community": 1,
+      "community": 20,
       "norm_label": ".__init__()",
       "id": "orchestrator_agent_clientagent_init"
     },
@@ -417,7 +427,7 @@
       "source_location": "",
       "origin_file": "/Users/vpk/Desktop/Development/donna/orchestrator/agent.py",
       "_origin": "ast",
-      "community": 1,
+      "community": 20,
       "norm_label": "client",
       "id": "client"
     },
@@ -428,7 +438,7 @@
       "source_location": "",
       "origin_file": "/Users/vpk/Desktop/Development/donna/orchestrator/agent.py",
       "_origin": "ast",
-      "community": 1,
+      "community": 20,
       "norm_label": "provider",
       "id": "provider"
     },
@@ -1168,7 +1178,7 @@
       "source_file": "core/client_handler.py",
       "source_location": "L164",
       "_origin": "ast",
-      "community": 7,
+      "community": 1,
       "norm_label": "handle_cold_inbound()",
       "id": "core_client_handler_handle_cold_inbound"
     },
@@ -1258,7 +1268,7 @@
       "source_file": "core/router.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 7,
+      "community": 1,
       "norm_label": "router.py",
       "id": "core_router"
     },
@@ -1268,7 +1278,7 @@
       "source_file": "core/router.py",
       "source_location": "L8",
       "_origin": "ast",
-      "community": 7,
+      "community": 1,
       "norm_label": "route_message()",
       "id": "core_router_route_message"
     },
@@ -1399,7 +1409,7 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 7,
+      "community": 20,
       "norm_label": "admin.py",
       "id": "tools_admin"
     },
@@ -1409,7 +1419,7 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L28",
       "_origin": "ast",
-      "community": 7,
+      "community": 20,
       "norm_label": "_db()",
       "id": "tools_admin_db"
     },
@@ -1419,7 +1429,7 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L36",
       "_origin": "ast",
-      "community": 7,
+      "community": 20,
       "norm_label": "_provider_dict()",
       "id": "tools_admin_provider_dict"
     },
@@ -1429,7 +1439,7 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L52",
       "_origin": "ast",
-      "community": 7,
+      "community": 20,
       "norm_label": "get_provider()",
       "id": "tools_admin_get_provider"
     },
@@ -1439,7 +1449,7 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L62",
       "_origin": "ast",
-      "community": 7,
+      "community": 20,
       "norm_label": "update_provider()",
       "id": "tools_admin_update_provider"
     },
@@ -1450,7 +1460,7 @@
       "source_location": "",
       "origin_file": "/Users/vpk/Desktop/Development/donna/donna_mcp/tools/admin.py",
       "_origin": "ast",
-      "community": 7,
+      "community": 20,
       "norm_label": "any",
       "id": "any"
     },
@@ -1460,7 +1470,7 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L80",
       "_origin": "ast",
-      "community": 7,
+      "community": 20,
       "norm_label": "get_conversation_state()",
       "id": "tools_admin_get_conversation_state"
     },
@@ -1480,7 +1490,7 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L122",
       "_origin": "ast",
-      "community": 7,
+      "community": 20,
       "norm_label": "reset_conversation_state()",
       "id": "tools_admin_reset_conversation_state"
     },
@@ -1490,7 +1500,7 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L53",
       "_origin": "ast",
-      "community": 7,
+      "community": 20,
       "norm_label": "get the current provider configuration.",
       "id": "tools_admin_rationale_53"
     },
@@ -1500,7 +1510,7 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L63",
       "_origin": "ast",
-      "community": 7,
+      "community": 20,
       "norm_label": "update a single provider field.     updatable fields: name, business_type, locat",
       "id": "tools_admin_rationale_63"
     },
@@ -1510,7 +1520,7 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L81",
       "_origin": "ast",
-      "community": 7,
+      "community": 20,
       "norm_label": "get current conversation state for a phone number (admin or client).",
       "id": "tools_admin_rationale_81"
     },
@@ -1530,7 +1540,7 @@
       "source_file": "donna_mcp/tools/admin.py",
       "source_location": "L123",
       "_origin": "ast",
-      "community": 7,
+      "community": 20,
       "norm_label": "reset conversation context for a phone number.     clears pending context keys,",
       "id": "tools_admin_rationale_123"
     },
@@ -2412,7 +2422,7 @@
       "source_file": "models/orm.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 20,
+      "community": 1,
       "norm_label": "orm.py",
       "id": "models_orm"
     },
@@ -2422,7 +2432,7 @@
       "source_file": "models/orm.py",
       "source_location": "L6",
       "_origin": "ast",
-      "community": 1,
+      "community": 20,
       "norm_label": "provider",
       "id": "models_orm_provider"
     },
@@ -2432,7 +2442,7 @@
       "source_file": "",
       "source_location": "",
       "_origin": "ast",
-      "community": 1,
+      "community": 5,
       "norm_label": "base",
       "id": "base"
     },
@@ -2472,7 +2482,7 @@
       "source_file": "models/orm.py",
       "source_location": "L74",
       "_origin": "ast",
-      "community": 7,
+      "community": 5,
       "norm_label": "conversationstate",
       "id": "models_orm_conversationstate"
     },
@@ -2482,7 +2492,7 @@
       "source_file": "models/orm.py",
       "source_location": "L93",
       "_origin": "ast",
-      "community": 20,
+      "community": 5,
       "norm_label": "conversationsummary",
       "id": "models_orm_conversationsummary"
     },
@@ -2583,7 +2593,7 @@
       "source_file": "orchestrator/channels.py",
       "source_location": "L18",
       "_origin": "ast",
-      "community": 2,
+      "community": 20,
       "norm_label": "make_envelope()",
       "id": "orchestrator_channels_make_envelope"
     },
@@ -2931,7 +2941,7 @@
       "source_file": "store/conversation_store.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 7,
+      "community": 1,
       "norm_label": "conversation_store.py",
       "id": "store_conversation_store"
     },
@@ -2941,7 +2951,7 @@
       "source_file": "store/conversation_store.py",
       "source_location": "L8",
       "_origin": "ast",
-      "community": 7,
+      "community": 5,
       "norm_label": "conversationstore",
       "id": "store_conversation_store_conversationstore"
     },
@@ -2951,7 +2961,7 @@
       "source_file": "store/conversation_store.py",
       "source_location": "L9",
       "_origin": "ast",
-      "community": 7,
+      "community": 5,
       "norm_label": ".__init__()",
       "id": "store_conversation_store_conversationstore_init"
     },
@@ -2961,7 +2971,7 @@
       "source_file": "store/conversation_store.py",
       "source_location": "L12",
       "_origin": "ast",
-      "community": 7,
+      "community": 5,
       "norm_label": ".get_by_phone()",
       "id": "store_conversation_store_conversationstore_get_by_phone"
     },
@@ -2971,7 +2981,7 @@
       "source_file": "store/conversation_store.py",
       "source_location": "L19",
       "_origin": "ast",
-      "community": 7,
+      "community": 5,
       "norm_label": ".get_or_create()",
       "id": "store_conversation_store_conversationstore_get_or_create"
     },
@@ -2981,7 +2991,7 @@
       "source_file": "store/conversation_store.py",
       "source_location": "L34",
       "_origin": "ast",
-      "community": 7,
+      "community": 5,
       "norm_label": ".update()",
       "id": "store_conversation_store_conversationstore_update"
     },
@@ -2991,7 +3001,7 @@
       "source_file": "store/conversation_store.py",
       "source_location": "L45",
       "_origin": "ast",
-      "community": 7,
+      "community": 5,
       "norm_label": ".update_context()",
       "id": "store_conversation_store_conversationstore_update_context"
     },
@@ -3001,7 +3011,7 @@
       "source_file": "store/conversation_store.py",
       "source_location": "L55",
       "_origin": "ast",
-      "community": 7,
+      "community": 5,
       "norm_label": ".clear_context()",
       "id": "store_conversation_store_conversationstore_clear_context"
     },
@@ -3011,7 +3021,7 @@
       "source_file": "store/conversation_store.py",
       "source_location": "L65",
       "_origin": "ast",
-      "community": 7,
+      "community": 5,
       "norm_label": ".append_history()",
       "id": "store_conversation_store_conversationstore_append_history"
     },
@@ -3021,7 +3031,7 @@
       "source_file": "store/conversation_store.py",
       "source_location": "L80",
       "_origin": "ast",
-      "community": 7,
+      "community": 5,
       "norm_label": ".get_history()",
       "id": "store_conversation_store_conversationstore_get_history"
     },
@@ -3031,7 +3041,7 @@
       "source_file": "store/conversation_store.py",
       "source_location": "L86",
       "_origin": "ast",
-      "community": 7,
+      "community": 5,
       "norm_label": ".update_last_donna_message()",
       "id": "store_conversation_store_conversationstore_update_last_donna_message"
     },
@@ -3041,7 +3051,7 @@
       "source_file": "store/conversation_store.py",
       "source_location": "L56",
       "_origin": "ast",
-      "community": 7,
+      "community": 5,
       "norm_label": "clear pending state but preserve history and protected keys (prefixed _).",
       "id": "store_conversation_store_rationale_56"
     },
@@ -3051,7 +3061,7 @@
       "source_file": "store/conversation_store.py",
       "source_location": "L66",
       "_origin": "ast",
-      "community": 7,
+      "community": 5,
       "norm_label": "append a turn to conversation history. role is 'user' or 'donna'.",
       "id": "store_conversation_store_rationale_66"
     },
@@ -3061,7 +3071,7 @@
       "source_file": "store/conversation_store.py",
       "source_location": "L87",
       "_origin": "ast",
-      "community": 7,
+      "community": 5,
       "norm_label": "called after every donna send. updates last_donna_message and appends to history",
       "id": "store_conversation_store_rationale_87"
     },
@@ -3071,7 +3081,7 @@
       "source_file": "store/provider_store.py",
       "source_location": "L1",
       "_origin": "ast",
-      "community": 22,
+      "community": 20,
       "norm_label": "provider_store.py",
       "id": "store_provider_store"
     },
@@ -3081,7 +3091,7 @@
       "source_file": "store/provider_store.py",
       "source_location": "L5",
       "_origin": "ast",
-      "community": 22,
+      "community": 20,
       "norm_label": "providerstore",
       "id": "store_provider_store_providerstore"
     },
@@ -3091,7 +3101,7 @@
       "source_file": "store/provider_store.py",
       "source_location": "L6",
       "_origin": "ast",
-      "community": 0,
+      "community": 20,
       "norm_label": ".__init__()",
       "id": "store_provider_store_providerstore_init"
     },
@@ -3111,7 +3121,7 @@
       "source_file": "store/provider_store.py",
       "source_location": "L12",
       "_origin": "ast",
-      "community": 22,
+      "community": 20,
       "norm_label": ".get_first()",
       "id": "store_provider_store_providerstore_get_first"
     },
@@ -3121,7 +3131,7 @@
       "source_file": "store/provider_store.py",
       "source_location": "L15",
       "_origin": "ast",
-      "community": 1,
+      "community": 20,
       "norm_label": ".get()",
       "id": "store_provider_store_providerstore_get"
     },
@@ -3141,7 +3151,7 @@
       "source_file": "store/provider_store.py",
       "source_location": "L25",
       "_origin": "ast",
-      "community": 1,
+      "community": 20,
       "norm_label": ".update()",
       "id": "store_provider_store_providerstore_update"
     },
@@ -3171,7 +3181,7 @@
       "source_file": "store/session_store.py",
       "source_location": "L8",
       "_origin": "ast",
-      "community": 0,
+      "community": 22,
       "norm_label": ".__init__()",
       "id": "store_session_store_sessionstore_init"
     },
@@ -3897,7 +3907,7 @@
       "author": null,
       "contributor": null,
       "rationale": "History is stored inside the context JSON column as _history (prefixed underscore marks it as protected). A cap of HISTORY_MAX_TURNS=10 trims oldest entries, providing LLM context without unbounded growth. Protected keys survive clear_context calls.",
-      "community": 7,
+      "community": 5,
       "norm_label": "conversation history ring buffer",
       "id": "concept_conversation_history_ring_buffer"
     }
@@ -3927,11 +3937,21 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
-      "source_location": "L128",
+      "source_location": "L165",
       "weight": 1.0,
       "source": "readme_donna",
-      "target": "readme_config",
+      "target": "readme_changelog",
       "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L128",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "readme_donna",
+      "target": "readme_config"
     },
     {
       "relation": "contains",
@@ -3939,9 +3959,9 @@
       "source_file": "README.md",
       "source_location": "L144",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme_donna",
-      "target": "readme_scope",
-      "confidence_score": 1.0
+      "target": "readme_scope"
     },
     {
       "relation": "contains",
@@ -3969,9 +3989,9 @@
       "source_file": "README.md",
       "source_location": "L157",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme_donna",
-      "target": "readme_stack",
-      "confidence_score": 1.0
+      "target": "readme_stack"
     },
     {
       "relation": "contains",
@@ -3979,9 +3999,9 @@
       "source_file": "README.md",
       "source_location": "L38",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme_setup",
-      "target": "readme_1_create_the_environment",
-      "confidence_score": 1.0
+      "target": "readme_1_create_the_environment"
     },
     {
       "relation": "contains",
@@ -3989,9 +4009,9 @@
       "source_file": "README.md",
       "source_location": "L46",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme_setup",
-      "target": "readme_2_start_redis",
-      "confidence_score": 1.0
+      "target": "readme_2_start_redis"
     },
     {
       "relation": "contains",
@@ -3999,9 +4019,9 @@
       "source_file": "README.md",
       "source_location": "L55",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme_setup",
-      "target": "readme_3_start_an_llm",
-      "confidence_score": 1.0
+      "target": "readme_3_start_an_llm"
     },
     {
       "relation": "contains",
@@ -4009,9 +4029,9 @@
       "source_file": "README.md",
       "source_location": "L66",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme_setup",
-      "target": "readme_4_set_environment_variables",
-      "confidence_score": 1.0
+      "target": "readme_4_set_environment_variables"
     },
     {
       "relation": "contains",
@@ -4019,9 +4039,9 @@
       "source_file": "README.md",
       "source_location": "L91",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme_setup",
-      "target": "readme_5_run_it",
-      "confidence_score": 1.0
+      "target": "readme_5_run_it"
     },
     {
       "relation": "contains",
@@ -4029,9 +4049,9 @@
       "source_file": "README.md",
       "source_location": "L113",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "readme_setup",
-      "target": "readme_6_seed_test_data",
-      "confidence_score": 1.0
+      "target": "readme_6_seed_test_data"
     },
     {
       "relation": "imports_from",
@@ -18008,5 +18028,5 @@
       "source_file": "store/session_store.py"
     }
   ],
-  "built_at_commit": "0d2e3a1affed203d2b92d7b3bfb3de96cb596c69"
+  "built_at_commit": "58322d0e64e2567a830efb010405618934103318"
 }
