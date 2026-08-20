@@ -157,7 +157,7 @@ def book_session(
                 "is_recurring": is_recurring,
                 "recurrence_type": recurrence_type,
                 "notes": notes,
-            })
+            }, buffer_mins=provider.buffer_mins)
         except ValueError as e:
             return {"error": str(e)}
         return _session_dict(session)

@@ -90,13 +90,13 @@ class SessionStore:
             .all()
         )
 
-    def create(self, data: dict) -> SessionModel:
+    def create(self, data: dict, buffer_mins: int = 15) -> SessionModel:
         # Hard conflict guard — prevent double-booking regardless of caller logic
         conflict = self.get_conflict(
             data["provider_id"],
             data["scheduled_at"],
             data.get("duration_mins", 60),
-            15,  # default buffer — safe minimum
+            buffer_mins,
         )
         if conflict and conflict.client_id != data.get("client_id"):
             raise ValueError(
