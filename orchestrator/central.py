@@ -437,7 +437,7 @@ class CentralOrchestrator:
         conflict = await asyncio.to_thread(
             check_slot_conflict,
             requested_at=slot.isoformat(),
-            duration_mins=60,
+            duration_mins=self._business_config.get("session_duration_mins", 60),
             requesting_client_id=client.id,
         )
         if "error" in conflict:
@@ -451,7 +451,7 @@ class CentralOrchestrator:
                 book_session,
                 client_id=client.id,
                 scheduled_at=slot.isoformat(),
-                duration_mins=60,
+                duration_mins=self._business_config.get("session_duration_mins", 60),
             )
             if "error" in result:
                 await self._messaging_client.send_to_admin(f"Can't book that slot - {result['error']}")
@@ -623,7 +623,7 @@ class CentralOrchestrator:
                     book_session,
                     client_id=client.id,
                     scheduled_at=slot.isoformat(),
-                    duration_mins=60,
+                    duration_mins=self._business_config.get("session_duration_mins", 60),
                 )
                 conv_store.clear_context(self._provider.phone_number)
                 if "error" in result:

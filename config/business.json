@@ -9,5 +9,7 @@
   "max_sessions_per_client_per_day": 2,
   "session_model": "1on1",
   "max_concurrent_sessions": 1,
-  "conversation_timeout_mins": 5
+  "conversation_timeout_mins": 5,
+  "services": "PLACEHOLDER - edit with real services offered, e.g. '1-on-1 personal training, 60-minute sessions'",
+  "pricing": "PLACEHOLDER - edit with real pricing, e.g. '$80/session, packages available'"
 }

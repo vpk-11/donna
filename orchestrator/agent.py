@@ -532,7 +532,7 @@ class ClientAgent:
         conflict = await asyncio.to_thread(
             check_slot_conflict,
             requested_at=slot.isoformat(),
-            duration_mins=60,
+            duration_mins=self._business_config.get("session_duration_mins", 60),
             requesting_client_id=client.id,
         )
         if "error" in conflict:
@@ -550,7 +550,7 @@ class ClientAgent:
                     book_session,
                     client_id=client.id,
                     scheduled_at=slot.isoformat(),
-                    duration_mins=60,
+                    duration_mins=self._business_config.get("session_duration_mins", 60),
                 )
                 if "error" in book_result:
                     return await generate_response(
@@ -748,7 +748,7 @@ class ClientAgent:
                 book_session,
                 client_id=client.id,
                 scheduled_at=slot.isoformat(),
-                duration_mins=60,
+                duration_mins=self._business_config.get("session_duration_mins", 60),
             )
             if "error" in result:
                 conv_store.clear_context(client.phone_number)
