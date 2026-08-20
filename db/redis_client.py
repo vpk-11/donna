@@ -16,6 +16,7 @@ def get_redis() -> redis.Redis:
     return _sync_client
 
 
+# Not called yet — reserved for V3's async pub/sub dispatch work.
 def get_async_redis() -> aioredis.Redis:
     global _async_client
     if _async_client is None:
