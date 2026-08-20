@@ -10,6 +10,19 @@ from orchestrator.channels import STATE_AGENT_REGISTRY
 logger = logging.getLogger(__name__)
 
 
+def _set_agent_handoff_flag(phone: str, active: bool) -> None:
+    """Mark handoff_active in the Redis agent registry, if the phone is registered."""
+    try:
+        r = get_redis()
+        existing_raw = r.hget(STATE_AGENT_REGISTRY, phone)
+        if existing_raw:
+            data = json.loads(existing_raw)
+            data["handoff_active"] = active
+            r.hset(STATE_AGENT_REGISTRY, phone, json.dumps(data))
+    except Exception as e:
+        logger.warning(f"handoff.redis_update failed for {phone}: {e}")
+
+
 async def trigger_dynamic_handoff(
     client: Client,
     provider: Provider,
@@ -69,16 +82,7 @@ async def start_handoff_from_admin(
         "context": admin_ctx,
     })
 
-    # Mark handoff active in Redis agent registry
-    try:
-        r = get_redis()
-        existing_raw = r.hget(STATE_AGENT_REGISTRY, target_phone)
-        if existing_raw:
-            data = json.loads(existing_raw)
-            data["handoff_active"] = True
-            r.hset(STATE_AGENT_REGISTRY, target_phone, json.dumps(data))
-    except Exception as e:
-        logger.warning(f"handoff.redis_update failed for {target_phone}: {e}")
+    _set_agent_handoff_flag(target_phone, True)
 
     await messaging_client.send_to_phone(
         target_phone,
@@ -108,16 +112,7 @@ async def trigger_explicit_handoff_from_client(
         "context": admin_ctx,
     })
 
-    # Mark handoff active in Redis agent registry
-    try:
-        r = get_redis()
-        existing_raw = r.hget(STATE_AGENT_REGISTRY, client.phone_number)
-        if existing_raw:
-            data = json.loads(existing_raw)
-            data["handoff_active"] = True
-            r.hset(STATE_AGENT_REGISTRY, client.phone_number, json.dumps(data))
-    except Exception as e:
-        logger.warning(f"handoff.redis_update failed for {client.phone_number}: {e}")
+    _set_agent_handoff_flag(client.phone_number, True)
 
     await messaging_client.send_to_phone(
         client.phone_number,
