@@ -11,6 +11,7 @@ from orchestrator.channels import (
 )
 from intelligence.intent_parser import parse_intent
 from intelligence.judge import evaluate as judge_evaluate
+from intelligence.judge_rules import NEW_CLIENT_STATUSES
 from intelligence.response_generator import generate_response
 from intelligence.context_manager import (
     summarize_conversation, trim_history,
@@ -135,7 +136,7 @@ class ClientAgent:
         conv_store.update(self.phone, {"turn_count": self._turn_count})
 
         # --- Step 4: Judge ---
-        is_new_client = self.client.status in ("prospect", "cold_lead") if self.client else True
+        is_new_client = self.client.status in NEW_CLIENT_STATUSES if self.client else True
 
         judge_result = await judge_evaluate(
             intent_result=intent_result,
