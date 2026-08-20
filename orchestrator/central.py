@@ -32,6 +32,14 @@ class CentralOrchestrator:
         self._messaging_client = messaging_client
         self._business_config = business_config
 
+    def _gkw(self, recipient: str, **extra) -> dict:
+        return dict(
+            recipient=recipient,
+            provider_name=self._provider.name,
+            business_type=self._provider.business_type,
+            **extra,
+        )
+
     async def startup(self, db: Session) -> None:
         self._provider = ProviderStore(db).get_first()
         if not self._provider:
@@ -230,9 +238,7 @@ class CentralOrchestrator:
         else:
             response = await generate_response(
                 situation=f"Admin sent an unclear message: '{text}'. Ask for clarification.",
-                recipient=self._provider.name,
-                provider_name=self._provider.name,
-                business_type=self._provider.business_type,
+                **self._gkw(self._provider.name),
             )
             await self._messaging_client.send_to_admin(response)
 
@@ -302,9 +308,7 @@ class CentralOrchestrator:
         )
         response = await generate_response(
             situation=situation,
-            recipient=self._provider.name,
-            provider_name=self._provider.name,
-            business_type=self._provider.business_type,
+            **self._gkw(self._provider.name),
         )
         await self._messaging_client.send_to_admin(response)
 
@@ -400,9 +404,7 @@ class CentralOrchestrator:
 
         greeting = await generate_response(
             situation=f"{self._provider.name} introduced a new prospect named {name} ({notes or 'no extra notes'}). Send a warm greeting introducing yourself as Donna, {self._provider.name}'s assistant, and ask how you can help.",
-            recipient=name,
-            provider_name=self._provider.name,
-            business_type=self._provider.business_type,
+            **self._gkw(name),
         )
         await self._messaging_client.send_to_phone(phone, greeting)
         conv_store.clear_context(self._provider.phone_number)
@@ -601,9 +603,7 @@ class CentralOrchestrator:
                 blocking_history = conv_store.get_history(blocking_client.phone_number)
                 swap_msg = await generate_response(
                     situation=f"Ask {blocking_client.name} if they can shift their session to {new_slot.strftime('%A at %I:%M %p')} instead. Say something came up on our end. Do not mention any other client's name.",
-                    recipient=blocking_client.name,
-                    provider_name=self._provider.name,
-                    business_type=self._provider.business_type,
+                    **self._gkw(blocking_client.name),
                     history=blocking_history,
                     client_profile=build_client_profile(blocking_client),
                 )
@@ -672,9 +672,7 @@ class CentralOrchestrator:
 
         outbound = await generate_response(
             situation=f"Send this message to {client.name} on behalf of {self._provider.name}: {message_to_send}",
-            recipient=client.name,
-            provider_name=self._provider.name,
-            business_type=self._provider.business_type,
+            **self._gkw(client.name),
         )
         await self._messaging_client.send_to_phone(client.phone_number, outbound)
 
@@ -721,8 +719,6 @@ class CentralOrchestrator:
         )
         summary = await generate_response(
             situation=situation,
-            recipient=self._provider.name,
-            provider_name=self._provider.name,
-            business_type=self._provider.business_type,
+            **self._gkw(self._provider.name),
         )
         await self._messaging_client.send_to_admin(summary)
