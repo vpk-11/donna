@@ -68,6 +68,9 @@ class ClientAgent:
     def load_summary(self, summary: str) -> None:
         self._history = build_context_from_summary(summary)
 
+    def recent_history(self, n: int) -> list[dict]:
+        return self._history[-n:] if self._history else []
+
     def _gkw(self, history: list, client_profile: str, **extra) -> dict:
         return dict(
             recipient=self.client.name,
