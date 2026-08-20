@@ -8,9 +8,9 @@ from rich.console import Console
 console = Console()
 
 
-async def run(phone: str, name: str) -> None:
+async def run(phone: str, name: str, port: int = 8000) -> None:
     encoded_phone = quote(phone, safe="")
-    uri = f"ws://localhost:8000/ws/{encoded_phone}"
+    uri = f"ws://localhost:{port}/ws/{encoded_phone}"
 
     console.print(f"Connecting as [bold]{name}[/bold] ({phone})...")
     try:
