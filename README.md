@@ -1,4 +1,6 @@
 # Donna
+<!-- version: v2.0.0 -->
+![Version](https://img.shields.io/badge/version-v2.0.0-blue)
 
 AI business assistant that runs both sides of a service business over iMessage: the provider (admin) side and the client side. iMessage integration isn't built yet — a WebSocket mock stands in for it during development. Named after Donna Paulsen from Suits.
 
@@ -157,3 +159,7 @@ Deliberately not built:
 ## Stack
 
 Python 3.12 · FastAPI (WebSocket) · SQLAlchemy (sync, SQLite) · Pydantic v2 · LiteLLM (async) · FastMCP · Redis · LLM Guard
+
+---
+
+## Changelog
