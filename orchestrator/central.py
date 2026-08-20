@@ -12,14 +12,9 @@ from intelligence.response_generator import generate_response
 from firewall.input_guard import scan_input
 from donna_mcp.tools.scheduling import (
     book_session, cancel_session, reschedule_session,
-    get_sessions_for_date, get_free_slots, get_upcoming_sessions,
-    check_slot_conflict,
+    get_sessions_for_date, check_slot_conflict,
 )
-from donna_mcp.tools.clients import (
-    get_client, get_client_by_phone, list_clients,
-    create_client, update_client,
-)
-from donna_mcp.tools.admin import get_all_active_agents, get_conversation_state
+from donna_mcp.tools.clients import create_client, update_client
 from store.conversation_store import ConversationStore
 from store.client_store import ClientStore
 from store.provider_store import ProviderStore
@@ -287,7 +282,7 @@ class CentralOrchestrator:
         live_context = ""
         if client.phone_number in self._agents:
             agent = self._agents[client.phone_number]
-            recent = agent._history[-3:] if agent._history else []
+            recent = agent.recent_history(3)
             if recent:
                 live_context = " Recent live: " + " | ".join(
                     f"{'Donna' if t['role'] == 'donna' else client.name}: {t['content'][:60]}"
