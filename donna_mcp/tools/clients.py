@@ -9,7 +9,7 @@ from store.provider_store import ProviderStore
 
 clients_mcp = FastMCP("clients")
 
-VALID_STATUSES = {"active", "inactive", "prospect"}
+VALID_STATUSES = {"active", "inactive", "prospect", "cold_lead"}
 
 
 @contextmanager
@@ -82,7 +82,7 @@ def create_client(
     notes: Optional[str] = None,
 ) -> dict:
     """
-    Create a new client. status must be one of: active, inactive, prospect.
+    Create a new client. status must be one of: active, inactive, prospect, cold_lead.
     preferred_days example: ["mon", "wed", "fri"].
     preferred_time example: "morning" or "09:00".
     """

@@ -420,13 +420,19 @@ class ClientAgent:
             # We access it via a private attr set on self.
             name_text = getattr(self, "_current_sanitized", "there").strip()
 
+            result = await asyncio.to_thread(
+                create_client,
+                name=name_text,
+                phone_number=phone,
+                status="cold_lead",
+            )
+            if "error" in result:
+                logger.error(f"agent.cold_inbound create_client failed: {result['error']}")
+                await self._send("Sorry, something went wrong on my end — try again in a moment?", conv_store)
+                return
+
             client_store = ClientStore(db)
-            new_client = client_store.create({
-                "provider_id": provider.id,
-                "name": name_text,
-                "phone_number": phone,
-                "status": "cold_lead",
-            })
+            new_client = client_store.get_by_phone(phone)
             ctx = dict(state.context)
             ctx.pop("awaiting_name", None)
             ctx["client_created"] = True
