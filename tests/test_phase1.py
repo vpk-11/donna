@@ -51,5 +51,5 @@ def test_parse_date_raises_on_garbage():
 
 def test_llm_client_import_chain():
     from intelligence.intent_parser import parse_intent  # noqa
-    from intelligence.response_generator import generate  # noqa
+    from intelligence.response_generator import generate_response  # noqa
     from intelligence.llm_client import call_llm  # noqa
