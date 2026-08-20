@@ -2,12 +2,17 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    # LLM
-    llm_model: str = "openrouter/deepseek/deepseek-chat-v3-0324:free"
-    llm_api_base: str = ""
+    # LLM — local Ollama by default. Swappable to any litellm-supported provider
+    # via env vars alone (LLM_MODEL/LLM_API_BASE/LLM_API_KEY), no code change needed.
+    llm_model: str = "ollama_chat/qwen2.5:7b-instruct"
+    llm_api_base: str = "http://localhost:11434"
     llm_api_key: str = ""
     llm_temperature: float = 0.2
     llm_max_tokens: int = 500
+    # Per-call model override (e.g. a different model for one-off testing).
+    # Was an undocumented os.environ.get("DONNA_MODEL") read in llm_client.py;
+    # now a real Settings field, still read from the DONNA_MODEL env var.
+    donna_model: str = ""
 
     # Provider bootstrap
     admin_phone: str

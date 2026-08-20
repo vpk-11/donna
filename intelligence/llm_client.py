@@ -1,4 +1,3 @@
-import os
 import litellm
 from config import settings
 
@@ -12,7 +11,7 @@ async def call_llm(
     response_format: dict | None = None,
     model: str | None = None,
 ) -> str:
-    resolved_model = model or os.environ.get("DONNA_MODEL") or settings.llm_model
+    resolved_model = model or settings.donna_model or settings.llm_model
     try:
         kwargs = dict(
             model=resolved_model,
