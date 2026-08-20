@@ -23,7 +23,9 @@ def register_client_names(names: list[str]) -> None:
     _known_client_names.update(n.lower() for n in names)
 
 
-def scan_output(response: str, phone: str, tool_calls_made: list[str]) -> FirewallResult:
+def scan_output(
+    response: str, phone: str, tool_calls_made: list[str], exclude_name: str | None = None
+) -> FirewallResult:
     try:
         _, is_valid, _ = _sensitive_scanner.scan(prompt="", output=response)
         if not is_valid:
@@ -71,8 +73,11 @@ def scan_output(response: str, phone: str, tool_calls_made: list[str]) -> Firewa
         )
 
     response_lower = response.lower()
+    excluded = exclude_name.lower() if exclude_name else None
     for name in _known_client_names:
-        if name in response_lower:
+        if name == excluded:
+            continue
+        if re.search(r"\b" + re.escape(name) + r"\b", response_lower):
             logger.error(
                 "firewall.output.cross_client_leak",
                 extra={"phone": phone, "leaked_name": name},

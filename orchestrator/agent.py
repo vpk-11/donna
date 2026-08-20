@@ -177,6 +177,7 @@ class ClientAgent:
             response=response,
             phone=self.phone,
             tool_calls_made=self._last_tool_calls,
+            exclude_name=self.client.name if self.client else None,
         )
         if out_result.action != "pass":
             await self._send(

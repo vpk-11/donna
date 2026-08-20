@@ -6,6 +6,7 @@ from fastmcp import FastMCP
 from db.database import SessionLocal
 from store.client_store import ClientStore
 from store.provider_store import ProviderStore
+from firewall.output_guard import register_client_names
 
 clients_mcp = FastMCP("clients")
 
@@ -108,6 +109,7 @@ def create_client(
             "notes": notes,
         }
         client = ClientStore(db).create(data)
+        register_client_names([client.name])
         return _client_dict(client)
 
 

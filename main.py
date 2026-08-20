@@ -8,7 +8,10 @@ from db.database import SessionLocal
 from db.migrations import init_db
 from db.redis_client import ping_redis
 from firewall.warmup import warmup_firewall
+from firewall.output_guard import register_client_names
 from store.bootstrap import bootstrap_provider
+from store.client_store import ClientStore
+from store.provider_store import ProviderStore
 from messaging.websocket_client import WebSocketConnectionManager, WebSocketMessagingClient
 from orchestrator.central import CentralOrchestrator
 
@@ -50,6 +53,9 @@ async def lifespan(app: FastAPI):
     db = SessionLocal()
     try:
         bootstrap_provider(db)
+        provider = ProviderStore(db).get_first()
+        if provider:
+            register_client_names([c.name for c in ClientStore(db).list_by_provider(provider.id)])
     finally:
         db.close()
     messaging_client = WebSocketMessagingClient(ws_manager, SessionLocal)
