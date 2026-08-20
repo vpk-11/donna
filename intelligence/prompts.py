@@ -17,38 +17,46 @@ Return JSON with exactly these fields:
 {{
   "intent": "<intent from the list below>",
   "confidence": <float 0.0-1.0, how certain you are>,
-  "entities": {{<relevant extracted fields>}},
+  "entities": {{<only the exact keys listed for this intent below, omit any you didn't find>}},
   "needs_clarification": false,
   "clarification_question": null
 }}
 
+Entity key contract — use these exact key names, never a synonym or a
+combined key. There are only six possible entity keys in this whole system:
+"date", "time", "client_name", "phone_number", "notes", "message_to_send".
+Date and time are always two separate keys, never merged into one
+("new_time", "when", "datetime" are all wrong). Pass date/time phrases through
+mostly as the user said them (e.g. "Monday", "tomorrow", "6pm") — a separate
+parser normalizes them later, you're extracting, not converting.
+
 Admin intents:
-  NEW_CLIENT_INTRO      - admin introducing or registering a new client
-  BOOK_SESSION          - admin booking a session for a named client
-  CANCEL_DAY            - admin cancelling all sessions for a specific day
-  CANCEL_SESSION        - admin cancelling one specific session
-  RESCHEDULE_SESSION    - admin rescheduling a session
-  CHECK_SCHEDULE        - admin asking about their schedule or sessions
-  CHECK_CLIENT_STATUS   - admin asking what a specific client said or their status
-  CLIENT_INFO           - admin adding notes or info about an existing client
-  HANDOFF_REQUEST       - admin wanting to personally join a client conversation
-  HANDOFF_DELEGATE      - admin telling Donna to keep handling it
-  PROACTIVE_MESSAGE     - admin asking Donna to send a specific message to a client on their behalf (e.g. "message James and ask him X", "ping Sarah about Y", "text Marcus to confirm Z", "can u ping James +15550000111"). Entities: client_name, message_to_send, phone_number (if provided)
-  CONFIRM               - admin confirming something Donna asked
-  DECLINE               - admin declining something Donna suggested
-  UNKNOWN               - cannot determine intent
+  NEW_CLIENT_INTRO      - admin introducing or registering a new client. Entities: client_name, phone_number (if given), notes (if given)
+  BOOK_SESSION          - admin booking a session for a named client. Entities: client_name, date, time
+  CANCEL_DAY            - admin cancelling all sessions for a specific day. Entities: date
+  CANCEL_SESSION        - admin cancelling one specific session. Entities: client_name, date (if given)
+  RESCHEDULE_SESSION    - admin rescheduling a session. Entities: client_name, date, time
+  CHECK_SCHEDULE        - admin asking about their schedule or sessions. Entities: none
+  CHECK_CLIENT_STATUS   - admin asking what a specific client said or their status. Entities: client_name
+  CLIENT_INFO           - admin adding notes or info about an existing client. Entities: client_name, notes
+  HANDOFF_REQUEST       - admin wanting to personally join a client conversation. Entities: client_name
+  HANDOFF_DELEGATE      - admin telling Donna to keep handling it. Entities: none
+  PROACTIVE_MESSAGE     - admin asking Donna to send a specific message to a client on their behalf (e.g. "message James and ask him X", "ping Sarah about Y", "text Marcus to confirm Z", "can u ping James +15550000111"). Entities: client_name, message_to_send, phone_number (if provided), date/time (if the message references a specific slot)
+  CONFIRM               - admin confirming something Donna asked. Entities: none
+  DECLINE               - admin declining something Donna suggested. Entities: none
+  UNKNOWN               - cannot determine intent. Entities: none
 
 Client intents:
-  INQUIRY_SERVICES      - asking what services are offered
-  INQUIRY_PRICING       - asking about cost or rates
-  INQUIRY_AVAILABILITY  - asking about open time slots or their own booked sessions
-  BOOK_REQUEST          - requesting to book a session
-  RESCHEDULE_REQUEST    - wanting to change an existing session to a NEW time (different from current)
-  CANCEL_REQUEST        - wanting to cancel a session
-  CONFIRM               - confirming something Donna asked
-  DECLINE               - declining or rejecting something Donna offered or asked. Also use this when client says their current time is fine, they don't want to change, or reaffirms the same slot (e.g. "keep it at 8am", "8 AM is fine", "not needed", "no change needed", "same time is ok")
-  HUMAN_REQUEST         - explicitly wants to speak to the actual person
-  UNKNOWN               - cannot determine intent\
+  INQUIRY_SERVICES      - asking what services are offered. Entities: none
+  INQUIRY_PRICING       - asking about cost or rates. Entities: none
+  INQUIRY_AVAILABILITY  - asking about open time slots or their own booked sessions. Entities: date (if a specific day was asked about)
+  BOOK_REQUEST          - requesting to book a session. Entities: date, time
+  RESCHEDULE_REQUEST    - wanting to change an existing session to a NEW time (different from current). Entities: date, time
+  CANCEL_REQUEST        - wanting to cancel a session. Entities: none
+  CONFIRM               - confirming something Donna asked. Entities: date, time (only if they specified a new slot while confirming)
+  DECLINE               - declining or rejecting something Donna offered or asked. Also use this when client says their current time is fine, they don't want to change, or reaffirms the same slot (e.g. "keep it at 8am", "8 AM is fine", "not needed", "no change needed", "same time is ok"). Entities: none
+  HUMAN_REQUEST         - explicitly wants to speak to the actual person. Entities: none
+  UNKNOWN               - cannot determine intent. Entities: none\
 """
 
 INTENT_RETRY_USER_TEMPLATE = """\
