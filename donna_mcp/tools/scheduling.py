@@ -5,6 +5,7 @@ from typing import Optional
 
 from fastmcp import FastMCP
 
+from config import load_business_config
 from db.database import SessionLocal
 from scheduling.conflict_resolver import resolve_slot
 from store.client_store import ClientStore
@@ -128,6 +129,26 @@ def book_session(
 
     if scheduled_dt <= datetime.now():
         return {"error": f"Cannot book a session in the past: {scheduled_at}"}
+
+    business_config = load_business_config()
+
+    days_open = business_config.get("days_open")
+    if days_open is not None and scheduled_dt.weekday() not in days_open:
+        return {"error": f"Closed on {scheduled_dt.strftime('%A')}s."}
+
+    max_per_day = business_config.get("max_sessions_per_client_per_day")
+    if max_per_day is not None:
+        with _db() as db:
+            provider = ProviderStore(db).get_first()
+            if not provider:
+                return {"error": "No provider configured"}
+            existing_today = SessionStore(db).get_sessions_for_date(provider.id, scheduled_dt.date())
+        client_count = sum(1 for s in existing_today if s.client_id == client_id)
+        if client_count >= max_per_day:
+            return {
+                "error": f"Client already has {client_count} session(s) booked on "
+                         f"{scheduled_dt.date()}, max is {max_per_day} per day."
+            }
 
     conflict_result = check_slot_conflict(
         requested_at=scheduled_at,

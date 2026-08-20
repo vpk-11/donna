@@ -1,3 +1,5 @@
+import json
+import os
 from pydantic_settings import BaseSettings
 
 
@@ -37,3 +39,16 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+_BUSINESS_CONFIG_PATH = os.path.join(os.path.dirname(__file__), "config", "business.json")
+_business_config: dict | None = None
+
+
+def load_business_config() -> dict:
+    """Load config/business.json once, cache in-process. Static file, no
+    conversational onboarding — see .claude/CLAUDE.md."""
+    global _business_config
+    if _business_config is None:
+        with open(_BUSINESS_CONFIG_PATH) as f:
+            _business_config = json.load(f)
+    return _business_config
