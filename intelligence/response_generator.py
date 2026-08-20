@@ -43,6 +43,3 @@ async def generate_response(
     except Exception as e:
         logger.error(f"Response generation failed: {e}")
         return "Sorry, I'm having a technical issue right now. Please try again in a moment."
-
-
-generate = generate_response
