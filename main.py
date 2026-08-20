@@ -1,85 +1,91 @@
-import logging
-from contextlib import asynccontextmanager
-from urllib.parse import unquote
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from config import load_business_config
-from db.database import SessionLocal
-from db.migrations import init_db
-from db.redis_client import ping_redis
-from firewall.warmup import warmup_firewall
-from firewall.output_guard import register_client_names
-from store.bootstrap import bootstrap_provider
-from store.client_store import ClientStore
-from store.provider_store import ProviderStore
-from messaging.websocket_client import WebSocketConnectionManager, WebSocketMessagingClient
-from orchestrator.central import CentralOrchestrator
+"""
+Donna's CLI entrypoint. One process, one command:
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
-logger = logging.getLogger(__name__)
+    python main.py --admin
+        Starts the server and drops you into the admin's live terminal chat,
+        in the same process. Reads ADMIN_PHONE/ADMIN_NAME from .env.
 
-ws_manager = WebSocketConnectionManager()
+    python main.py --client-name NAME --client-phone PHONE
+        Connects as a client to a server already running via --admin in
+        another terminal. Deliberately lightweight — does not import the
+        server, firewall, or orchestrator, so it starts instantly.
 
+`uvicorn server:app` still works for anyone who wants the server alone.
+"""
+import argparse
+import asyncio
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    init_db()
+# Load .env (if present) before config.py's Settings() reads it — needed in
+# every mode, since ADMIN_PHONE/ADMIN_NAME are required fields regardless of
+# whether this process ends up acting as admin or client.
+from dotenv import load_dotenv
+load_dotenv()
 
-    if not ping_redis():
-        raise RuntimeError("Redis is not reachable. Start Redis before Donna.")
-
-    business_config = load_business_config()
-    logger.info(f"Loaded business config: {business_config.get('business_type')}")
-    if business_config.get("max_concurrent_sessions", 1) != 1:
-        logger.warning(
-            "max_concurrent_sessions=%s in config/business.json, but the conflict-detection "
-            "logic (scheduling/conflict_resolver.py) hard-assumes a single concurrent session "
-            "per provider. Values other than 1 are not actually enforced.",
-            business_config.get("max_concurrent_sessions"),
-        )
-
-    warmup_firewall()
-
-    db = SessionLocal()
-    try:
-        bootstrap_provider(db, business_config)
-        provider = ProviderStore(db).get_first()
-        if provider:
-            register_client_names([c.name for c in ClientStore(db).list_by_provider(provider.id)])
-    finally:
-        db.close()
-    app.state.messaging_client = WebSocketMessagingClient(ws_manager, SessionLocal)
-    app.state.orchestrator = CentralOrchestrator(app.state.messaging_client, business_config)
-    db = SessionLocal()
-    try:
-        await app.state.orchestrator.startup(db)
-    finally:
-        db.close()
-    logger.info("Donna is ready.")
-    yield
-    logger.info("Donna shutting down.")
+from config import settings
 
 
-app = FastAPI(lifespan=lifespan)
-
-
-@app.get("/health")
-async def health():
-    return {"status": "ok"}
-
-
-@app.websocket("/ws/{phone_number}")
-async def websocket_endpoint(websocket: WebSocket, phone_number: str):
-    phone = unquote(phone_number)
-    await ws_manager.connect(phone, websocket)
-    await websocket.app.state.messaging_client.deliver_pending(phone)
-    try:
-        while True:
-            text = await websocket.receive_text()
-            logger.info(f"Message from {phone}: {text[:80]}")
-            db = SessionLocal()
+async def _wait_for_health(port: int, timeout: float = 30.0) -> None:
+    import httpx
+    loop = asyncio.get_event_loop()
+    deadline = loop.time() + timeout
+    async with httpx.AsyncClient() as client:
+        while loop.time() < deadline:
             try:
-                await websocket.app.state.orchestrator.handle_message(phone, text, db)
-            finally:
-                db.close()
-    except WebSocketDisconnect:
-        ws_manager.disconnect(phone)
+                r = await client.get(f"http://localhost:{port}/health", timeout=2.0)
+                if r.status_code == 200:
+                    return
+            except httpx.HTTPError:
+                pass
+            await asyncio.sleep(0.3)
+    raise RuntimeError(f"Server did not become healthy within {timeout}s.")
+
+
+async def _run_admin() -> None:
+    import uvicorn
+    from server import app  # heavy import (firewall, orchestrator, db) — admin mode only
+    from mock.client import run as run_mock_client
+
+    config = uvicorn.Config(app, host="0.0.0.0", port=settings.port, log_level="warning")
+    server = uvicorn.Server(config)
+    server_task = asyncio.create_task(server.serve())
+    try:
+        await _wait_for_health(settings.port)
+        await run_mock_client(settings.admin_phone, settings.admin_name, port=settings.port)
+    finally:
+        server.should_exit = True
+        await server_task
+
+
+def _cli_main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Donna — run the server as admin, or connect as a client."
+    )
+    parser.add_argument(
+        "--admin", action="store_true",
+        help="Start the server and connect as the admin (ADMIN_PHONE/ADMIN_NAME from .env).",
+    )
+    parser.add_argument("--client-name", help="Connect as a client with this display name.")
+    parser.add_argument("--client-phone", help="Client's phone number, e.g. +15550001111.")
+    args = parser.parse_args()
+
+    if args.admin:
+        if args.client_name or args.client_phone:
+            parser.error("--admin can't be combined with --client-name/--client-phone.")
+        asyncio.run(_run_admin())
+        return
+
+    if args.client_name or args.client_phone:
+        if not (args.client_name and args.client_phone):
+            parser.error("--client-name and --client-phone are required together.")
+        from mock.client import run as run_mock_client
+        try:
+            asyncio.run(run_mock_client(args.client_phone, args.client_name, port=settings.port))
+        except KeyboardInterrupt:
+            pass
+        return
+
+    parser.error("Pass --admin, or --client-name NAME --client-phone PHONE.")
+
+
+if __name__ == "__main__":
+    _cli_main()
