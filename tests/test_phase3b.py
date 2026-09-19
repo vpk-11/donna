@@ -60,6 +60,8 @@ def test_orchestrator_routes_admin():
     provider = _make_provider()
     orch = CentralOrchestrator(messaging, {"business_type": "personal_training"})
     orch._provider = provider
+    orch._admin_agent = MagicMock()
+    orch._admin_agent.handle_message = AsyncMock()
 
     mock_db = MagicMock()
     mock_conv_store = MagicMock()
@@ -75,10 +77,9 @@ def test_orchestrator_routes_admin():
 
     with patch("orchestrator.central.ConversationStore", return_value=mock_conv_store), \
          patch("orchestrator.central.ClientStore"), \
-         patch("orchestrator.central.ProviderStore"), \
-         patch.object(orch, "_handle_admin", new=AsyncMock()) as mock_admin:
+         patch("orchestrator.central.ProviderStore"):
         asyncio.run(orch.handle_message(provider.phone_number, "show me the schedule", mock_db))
-        mock_admin.assert_called_once_with("show me the schedule", mock_db)
+        orch._admin_agent.handle_message.assert_called_once_with("show me the schedule", mock_db)
 
 
 def test_orchestrator_spawns_agent_for_client():
@@ -87,6 +88,7 @@ def test_orchestrator_spawns_agent_for_client():
     client = _make_client()
     orch = CentralOrchestrator(messaging, {"business_type": "personal_training"})
     orch._provider = provider
+    orch._admin_agent = MagicMock()
 
     mock_db = MagicMock()
     mock_conv_store = MagicMock()
