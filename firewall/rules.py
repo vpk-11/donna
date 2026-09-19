@@ -40,6 +40,14 @@ BANNED_OUTPUT_TOPICS = [
 
 TOKEN_LIMIT = 500
 
+# Behavior when an input scanner raises: "closed" blocks the message, "open" lets it through.
+INPUT_SCANNER_FAIL_MODE = {
+    "token_limit": "open",
+    "prompt_injection": "closed",
+    "identity_spoof": "closed",
+    "ban_topics": "open",
+}
+
 # --- Donna custom detector patterns ---
 
 IDENTITY_SPOOF_PATTERNS = [
@@ -78,6 +86,12 @@ BOOKING_CONFIRMATION_PATTERNS = [
     r"your (session|appointment|booking) (has been|is) (confirmed|booked|scheduled)",
     r"(booked|scheduled|confirmed) for",
     r"(see|expect) you (on|at)",
+]
+
+REGISTRATION_CLAIM_PATTERNS = [
+    r"(i'?ve?|i have) (registered|signed you up|added you)",
+    r"you('re| are| have been) (now )?registered",
+    r"registered you",
 ]
 
 REDIRECT_OUT_OF_SCOPE = (

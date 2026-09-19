@@ -17,7 +17,8 @@ from db.migrations import init_db
 from db.redis_client import ping_redis
 from firewall.warmup import warmup_firewall
 from firewall.output_guard import register_client_names
-from store.bootstrap import bootstrap_provider
+from donna_mcp.guard import acting_as
+from donna_mcp.tools.admin import bootstrap_provider_tool
 from store.client_store import ClientStore
 from store.provider_store import ProviderStore
 from messaging.websocket_client import WebSocketConnectionManager, WebSocketMessagingClient
@@ -50,7 +51,8 @@ async def lifespan(app: FastAPI):
 
     db = SessionLocal()
     try:
-        bootstrap_provider(db, business_config)
+        with acting_as("system"):
+            bootstrap_provider_tool(business_config)
         provider = ProviderStore(db).get_first()
         if provider:
             register_client_names([c.name for c in ClientStore(db).list_by_provider(provider.id)])
@@ -80,7 +82,8 @@ async def health():
 async def websocket_endpoint(websocket: WebSocket, phone_number: str):
     phone = unquote(phone_number)
     await ws_manager.connect(phone, websocket)
-    await websocket.app.state.messaging_client.deliver_pending(phone)
+    with acting_as("orchestrator"):
+        await websocket.app.state.messaging_client.deliver_pending(phone)
     try:
         while True:
             text = await websocket.receive_text()
