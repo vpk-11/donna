@@ -10,7 +10,7 @@ from orchestrator.channels import STATE_AGENT_REGISTRY
 logger = logging.getLogger(__name__)
 
 
-def _set_agent_handoff_flag(phone: str, active: bool) -> None:
+def set_agent_handoff_flag(phone: str, active: bool) -> None:
     """Mark handoff_active in the Redis agent registry, if the phone is registered."""
     try:
         r = get_redis()
@@ -82,7 +82,7 @@ async def start_handoff_from_admin(
         "context": admin_ctx,
     })
 
-    _set_agent_handoff_flag(target_phone, True)
+    set_agent_handoff_flag(target_phone, True)
 
     await messaging_client.send_to_phone(
         target_phone,
@@ -112,7 +112,7 @@ async def trigger_explicit_handoff_from_client(
         "context": admin_ctx,
     })
 
-    _set_agent_handoff_flag(client.phone_number, True)
+    set_agent_handoff_flag(client.phone_number, True)
 
     await messaging_client.send_to_phone(
         client.phone_number,

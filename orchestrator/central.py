@@ -103,6 +103,14 @@ class CentralOrchestrator:
     # Agent-to-agent: requests come here, this agent decides whom to relay to
     # -------------------------------------------------------------------------
 
+    async def request_slot_freed(self, requester_phone: str, client, slot, db: Session) -> str:
+        return await self.route_request(
+            requester_phone,
+            f"Client {client.name} (id {client.id}) needs the {slot.isoformat()} slot freed. "
+            f"Find who holds it and ask that client's agent to move.",
+            db,
+        )
+
     async def route_request(self, requester_phone: str, request: str, db: Session) -> str:
         """LLM orchestrator step. Finds the slot holder and relays to that client's own agent."""
         session_store = SessionStore(db)
