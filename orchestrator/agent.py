@@ -226,6 +226,7 @@ class ClientAgent:
                 if "error" not in result:
                     self.client = ClientStore(db).get_by_phone(self.phone)
                     conv_store.update(self.phone, {"client_id": self.client.id})
+                    result["confirmation"] = f"Thanks {name}, you're registered. How can I help you today?"
                 return result
             tools["register_me"] = (
                 "Register this contact as a new lead. name is the person's own name (never Donna, that is you).",
@@ -266,7 +267,10 @@ class ClientAgent:
                 await self._messaging_client.send_to_admin(
                     f"{client.name} wants {slot.strftime('%A %b %d at %I:%M %p')}. Confirm to book."
                 )
-                return {"booked": False, "status": "sent to the admin for confirmation"}
+                return {
+                    "booked": False, "status": "sent to the admin for confirmation",
+                    "confirmation": f"I've sent your request for {slot.strftime('%A %b %d at %I:%M %p')} to the admin for confirmation.",
+                }
             result = await asyncio.to_thread(
                 book_session, client_id=client.id, scheduled_at=slot.isoformat(), duration_mins=duration,
             )
@@ -274,6 +278,7 @@ class ClientAgent:
                 await self._messaging_client.send_to_admin(
                     f"{client.name} booked {slot.strftime('%A %b %d at %I:%M %p')}. Added to your schedule."
                 )
+                result["confirmation"] = f"You're booked for {slot.strftime('%A %b %d at %I:%M %p')}."
             return result
 
         async def reschedule(session_id: int, date: str, time: str):
@@ -285,12 +290,14 @@ class ClientAgent:
                 await self._messaging_client.send_to_admin(
                     f"{client.name} moved a session to {new_slot.strftime('%A %b %d at %I:%M %p')}."
                 )
+                result["confirmation"] = f"Your session is moved to {new_slot.strftime('%A %b %d at %I:%M %p')}."
             return result
 
         async def cancel(session_id: int):
             result = await asyncio.to_thread(cancel_session, session_id=session_id)
             if "error" not in result:
                 await self._messaging_client.send_to_admin(f"{client.name} cancelled a session.")
+                result["confirmation"] = "Your session is cancelled."
             return result
 
         async def ask_human():

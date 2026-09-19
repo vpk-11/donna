@@ -221,3 +221,21 @@ def test_record_donna_message_sets_last_message_and_history():
         assert store.get_history(PHONE_A)[-1] == {"role": "donna", "content": "hello there"}
     finally:
         db.close()
+
+
+def test_tool_confirmation_replaces_model_phrasing():
+    import json
+    from orchestrator.llm_agent import run_agent
+
+    replies = iter([
+        {"content": "", "tool_calls": [{"id": "1", "function": {"name": "do_it", "arguments": "{}"}}]},
+        {"content": "All done, enjoy your free massage!", "tool_calls": None},
+    ])
+
+    async def fake_llm(messages, tools, **kw):
+        return next(replies)
+
+    tools = {"do_it": ("does it", {"type": "object", "properties": {}}, lambda: {"confirmation": "You're booked for Monday."})}
+    with patch("orchestrator.llm_agent.call_llm_tools", fake_llm):
+        out = asyncio.run(run_agent("sys", [], "book me", tools))
+    assert out == "You're booked for Monday."
