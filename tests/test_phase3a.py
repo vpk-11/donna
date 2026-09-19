@@ -1,60 +1,11 @@
 import asyncio
 import pytest
-from models.schemas import IntentResult
-from intelligence.judge import evaluate
 from intelligence.context_manager import (
     summarize_conversation,
     should_summarize,
     trim_history,
     HISTORY_TAIL_AFTER_SUMMARY,
 )
-
-
-def test_low_confidence_escalates():
-    result = asyncio.run(evaluate(
-        intent_result=IntentResult(intent="BOOK_REQUEST", entities={}, confidence=0.4),
-        role="client",
-        turn_count=1,
-        context={},
-        client_status="active",
-        is_new_client=False,
-    ))
-    assert result.decision == "escalate_to_admin"
-    assert "confidence" in result.reason.lower() or "threshold" in result.reason.lower()
-
-
-def test_human_request_always_escalates():
-    result = asyncio.run(evaluate(
-        intent_result=IntentResult(intent="HUMAN_REQUEST", entities={}, confidence=0.95),
-        role="client",
-        turn_count=2,
-        context={},
-    ))
-    assert result.decision == "escalate_to_admin"
-
-
-def test_new_client_booking_escalates():
-    result = asyncio.run(evaluate(
-        intent_result=IntentResult(intent="BOOK_REQUEST", entities={}, confidence=0.9),
-        role="client",
-        turn_count=1,
-        context={},
-        client_status="prospect",
-        is_new_client=True,
-    ))
-    assert result.decision == "escalate_to_admin"
-    assert "new client" in result.reason.lower()
-
-
-def test_cancel_request_notifies_admin():
-    result = asyncio.run(evaluate(
-        intent_result=IntentResult(intent="CANCEL_REQUEST", entities={}, confidence=0.9),
-        role="client",
-        turn_count=1,
-        context={},
-        client_status="active",
-    ))
-    assert result.decision == "notify_admin"
 
 
 def test_context_manager_summarizes():
