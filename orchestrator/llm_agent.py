@@ -71,6 +71,7 @@ async def run_agent(
             text = (msg.get("content") or "").strip()
             if not text and not retried:  # reasoning models can spend the whole budget thinking
                 retried = True
+                messages.append({"role": "user", "content": "Reply now with your final text message."})
                 continue
             return " ".join(confirmations) or text
         messages.append({"role": "assistant", "content": msg.get("content") or "", "tool_calls": calls})
