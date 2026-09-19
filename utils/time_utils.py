@@ -65,3 +65,9 @@ def looks_like_phone(text: str) -> bool:
         .replace(")", "")
     )
     return (cleaned.startswith("+") or cleaned.isdigit()) and len(cleaned) >= 7
+
+
+def calendar_hint(days: int = 14) -> str:
+    """Next `days` dates with weekday names, so models never do weekday arithmetic."""
+    today = date.today()
+    return ", ".join((today + timedelta(days=i)).strftime("%a %Y-%m-%d") for i in range(days))
