@@ -92,7 +92,9 @@ class ClientAgent:
         if self.client is None:
             self.client = client_store.get_by_phone(self.phone)
 
-        state = conv_store.get_by_phone(self.phone) or conv_store.get_or_create(self.phone, "client")
+        state = await asyncio.to_thread(
+            lambda: conv_store.get_by_phone(self.phone) or conv_store.get_or_create(self.phone, "client")
+        )
 
         # --- Input guard (clients only, admin is trusted) ---
         firewall_result = scan_input(message=text, phone=self.phone, is_admin=False)
@@ -119,7 +121,7 @@ class ClientAgent:
             return
 
         self._turn_count += 1
-        conv_store.update(self.phone, {"turn_count": self._turn_count})
+        await asyncio.to_thread(conv_store.update, self.phone, {"turn_count": self._turn_count})
 
         # --- The agent decides and acts ---
         self._last_tool_calls = []
@@ -390,7 +392,7 @@ class ClientAgent:
 
     async def _send(self, text: str, conv_store: ConversationStore) -> None:
         await self._messaging_client.send_to_phone(self.phone, text)
-        conv_store.update_last_donna_message(self.phone, text)
+        await asyncio.to_thread(conv_store.update_last_donna_message, self.phone, text)
         try:
             get_redis().set(STATE_LAST_DONNA.format(phone=self.phone), text, ex=24 * 3600)
         except Exception as e:
