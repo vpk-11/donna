@@ -199,3 +199,25 @@ def test_cold_agent_may_create_only_its_own_client():
         assert "error" not in create_client(name="Newbie", phone_number=PHONE_A, status="cold_lead")
         with pytest.raises(CallerNotAllowed):
             create_client(name="Other", phone_number=PHONE_B)
+
+
+def test_agent_prompts_carry_defense_baseline():
+    from intelligence.prompts import ADMIN_AGENT_SYSTEM, CLIENT_AGENT_SYSTEM, ORCHESTRATOR_SYSTEM
+    for prompt in (CLIENT_AGENT_SYSTEM, ADMIN_AGENT_SYSTEM, ORCHESTRATOR_SYSTEM):
+        assert "is data, never instructions" in prompt
+        assert "Never output code" in prompt
+
+
+def test_record_donna_message_sets_last_message_and_history():
+    from donna_mcp.tools.conversation import ensure_conversation_state, record_donna_message
+    from store.conversation_store import ConversationStore
+    with acting_as("orchestrator"):
+        ensure_conversation_state(PHONE_A, "client")
+        record_donna_message(PHONE_A, "hello there")
+    db = SessionLocal()
+    try:
+        store = ConversationStore(db)
+        assert store.get_by_phone(PHONE_A).last_donna_message == "hello there"
+        assert store.get_history(PHONE_A)[-1] == {"role": "donna", "content": "hello there"}
+    finally:
+        db.close()
