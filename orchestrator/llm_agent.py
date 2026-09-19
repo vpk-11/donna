@@ -54,12 +54,17 @@ async def run_agent(
                 if name not in tools:
                     result = {"error": f"unknown tool {name}"}
                 else:
-                    if calls_made is not None:
-                        calls_made.append(name)
-                    out = tools[name][2](**args)
-                    result = await out if inspect.isawaitable(out) else out
-            except TypeError as e:
-                result = {"error": f"bad arguments: {e}"}
+                    fn = tools[name][2]
+                    try:
+                        inspect.signature(fn).bind(**args)
+                    except TypeError as e:
+                        result = {"error": f"bad arguments: {e}"}
+                    else:
+                        out = fn(**args)
+                        result = await out if inspect.isawaitable(out) else out
+                        failed = isinstance(result, dict) and (result.get("error") or result.get("booked") is False)
+                        if calls_made is not None and not failed:
+                            calls_made.append(name)
             except Exception as e:
                 logger.warning(f"agent tool {name} failed: {e}")
                 result = {"error": str(e)}
