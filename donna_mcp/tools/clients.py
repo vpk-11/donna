@@ -4,6 +4,7 @@ from typing import Optional
 from fastmcp import FastMCP
 
 from db.database import SessionLocal
+from donna_mcp.guard import mutating
 from store.client_store import ClientStore
 from store.provider_store import ProviderStore
 from firewall.output_guard import register_client_names
@@ -71,6 +72,7 @@ def list_clients() -> list[dict]:
 
 
 @clients_mcp.tool()
+@mutating("create_client")
 def create_client(
     name: str,
     phone_number: str,
@@ -114,6 +116,7 @@ def create_client(
 
 
 @clients_mcp.tool()
+@mutating("client_id")
 def update_client(
     client_id: int,
     name: Optional[str] = None,

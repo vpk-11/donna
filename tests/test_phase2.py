@@ -7,7 +7,9 @@ or just ensure the DB has a provider and at least two clients.
 import pytest
 from db.migrations import init_db
 from db.database import SessionLocal
-from store.bootstrap import bootstrap_provider
+from donna_mcp.guard import acting_as
+from donna_mcp.tools.admin import bootstrap_provider_tool
+from donna_mcp.tools.clients import create_client
 from store.client_store import ClientStore
 from store.provider_store import ProviderStore
 
@@ -21,17 +23,12 @@ def ensure_seed():
     init_db()
     db = SessionLocal()
     try:
-        bootstrap_provider(db)
-        provider = ProviderStore(db).get_first()
+        with acting_as("system"):
+            bootstrap_provider_tool()
         for phone, name in [(CLIENT_1_PHONE, "Test Client One"), (CLIENT_2_PHONE, "Test Client Two")]:
             if not ClientStore(db).get_by_phone(phone):
-                ClientStore(db).create({
-                    "provider_id": provider.id,
-                    "name": name,
-                    "phone_number": phone,
-                    "status": "active",
-                    "preferred_days": [],
-                })
+                with acting_as("admin"):
+                    create_client(name=name, phone_number=phone, status="active")
     finally:
         db.close()
 
