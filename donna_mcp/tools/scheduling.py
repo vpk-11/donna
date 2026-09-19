@@ -7,6 +7,7 @@ from fastmcp import FastMCP
 
 from config import load_business_config
 from db.database import SessionLocal
+from donna_mcp.guard import mutating
 from scheduling.conflict_resolver import resolve_slot
 from store.client_store import ClientStore
 from store.provider_store import ProviderStore
@@ -108,6 +109,7 @@ def check_slot_conflict(
 
 
 @scheduling_mcp.tool()
+@mutating("client_id")
 def book_session(
     client_id: int,
     scheduled_at: str,
@@ -185,6 +187,7 @@ def book_session(
 
 
 @scheduling_mcp.tool()
+@mutating("session_id")
 def cancel_session(session_id: int) -> dict:
     """
     Cancel a scheduled session by ID.
@@ -210,6 +213,7 @@ def cancel_session(session_id: int) -> dict:
 
 
 @scheduling_mcp.tool()
+@mutating("session_id")
 def reschedule_session(session_id: int, new_time: str) -> dict:
     """
     Reschedule a session to a new time.

@@ -5,6 +5,7 @@ from typing import Any, Optional
 from fastmcp import FastMCP
 
 from db.database import SessionLocal
+from donna_mcp.guard import mutating
 from db.redis_client import get_redis
 from orchestrator.channels import STATE_AGENT_REGISTRY
 from store.conversation_store import ConversationStore
@@ -59,6 +60,7 @@ def get_provider() -> dict:
 
 
 @admin_mcp.tool()
+@mutating("admin")
 def update_provider(field: str, value: Any) -> dict:
     """
     Update a single provider field.
@@ -80,7 +82,9 @@ def update_provider(field: str, value: Any) -> dict:
 def get_conversation_state(phone_number: str) -> dict:
     """Get current conversation state for a phone number (admin or client)."""
     with _db() as db:
-        state = ConversationStore(db).get_or_create(phone_number, role="unknown")
+        state = ConversationStore(db).get_by_phone(phone_number)
+        if not state:
+            return {"error": f"No conversation state for {phone_number}"}
         return {
             "phone_number": state.phone_number,
             "role": state.role,
@@ -119,6 +123,7 @@ def get_all_active_agents() -> dict:
 
 
 @admin_mcp.tool()
+@mutating("admin")
 def reset_conversation_state(phone_number: str) -> dict:
     """
     Reset conversation context for a phone number.
@@ -127,11 +132,21 @@ def reset_conversation_state(phone_number: str) -> dict:
     """
     with _db() as db:
         store = ConversationStore(db)
-        state = store.get_or_create(phone_number, role="unknown")
-        store.clear_context(state.phone_number)
-        store.update(state.phone_number, {
+        state = store._get_or_create(phone_number, role="unknown")
+        store._clear_context(state.phone_number)
+        store._update(state.phone_number, {
             "handoff_active": False,
             "handoff_target_phone": None,
             "turn_count": 0,
         })
         return {"ok": True, "phone_number": phone_number}
+
+
+@admin_mcp.tool()
+@mutating("system")
+def bootstrap_provider_tool(business_config: Optional[dict] = None) -> dict:
+    """Seed the provider row from settings and business config if it does not exist."""
+    from store.bootstrap import bootstrap_provider
+    with _db() as db:
+        bootstrap_provider(db, business_config)
+        return {"ok": True}
