@@ -1,7 +1,7 @@
 import inspect
 import json
 import logging
-from typing import Awaitable, Callable
+from typing import Callable
 
 from intelligence.llm_client import call_llm_tools
 
@@ -9,15 +9,42 @@ logger = logging.getLogger(__name__)
 
 MAX_STEPS = 6
 
-# name -> (json-schema parameters, async or sync callable returning a JSON-serializable result)
-Tool = tuple[dict, Callable[..., Awaitable | object]]
+NONE = {"type": "object", "properties": {}}
+DATE_TIME = {
+    "date": {"type": "string", "description": "Date, e.g. 2026-09-22 or 'Monday'"},
+    "time": {"type": "string", "description": "Time, e.g. '10:00' or '10am'"},
+}
 
+
+def obj(props: dict) -> dict:
+    """JSON schema for an object whose properties are all required."""
+    return {"type": "object", "properties": props, "required": list(props)}
 
 def tool_specs(tools: dict[str, tuple[str, dict, Callable]]) -> list[dict]:
     return [
         {"type": "function", "function": {"name": n, "description": d, "parameters": p}}
         for n, (d, p, _) in tools.items()
     ]
+
+
+async def _call_tool(tools: dict, name: str, raw) -> tuple[object, bool]:
+    """Run one tool call. Returns (result, succeeded). A dict with `error` or booked=False is a failure."""
+    if name not in tools:
+        return {"error": f"unknown tool {name}"}, False
+    fn = tools[name][2]
+    try:
+        args = json.loads(raw) if isinstance(raw, str) else dict(raw)
+        try:
+            inspect.signature(fn).bind(**args)
+        except TypeError as e:
+            return {"error": f"bad arguments: {e}"}, False
+        out = fn(**args)
+        result = await out if inspect.isawaitable(out) else out
+    except Exception as e:
+        logger.warning(f"agent tool {name} failed: {e}")
+        return {"error": str(e)}, False
+    failed = isinstance(result, dict) and (result.get("error") or result.get("booked") is False)
+    return result, not failed
 
 
 async def run_agent(
@@ -49,25 +76,9 @@ async def run_agent(
         for call in calls:
             name = call["function"]["name"]
             raw = call["function"].get("arguments") or "{}"
-            try:
-                args = json.loads(raw) if isinstance(raw, str) else dict(raw)
-                if name not in tools:
-                    result = {"error": f"unknown tool {name}"}
-                else:
-                    fn = tools[name][2]
-                    try:
-                        inspect.signature(fn).bind(**args)
-                    except TypeError as e:
-                        result = {"error": f"bad arguments: {e}"}
-                    else:
-                        out = fn(**args)
-                        result = await out if inspect.isawaitable(out) else out
-                        failed = isinstance(result, dict) and (result.get("error") or result.get("booked") is False)
-                        if calls_made is not None and not failed:
-                            calls_made.append(name)
-            except Exception as e:
-                logger.warning(f"agent tool {name} failed: {e}")
-                result = {"error": str(e)}
+            result, ok = await _call_tool(tools, name, raw)
+            if ok and calls_made is not None:
+                calls_made.append(name)
             logger.info(f"agent.tool {name}({raw}) -> {json.dumps(result, default=str)[:300]}")
             messages.append({
                 "role": "tool",

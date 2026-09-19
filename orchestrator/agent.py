@@ -7,7 +7,7 @@ from db.redis_client import get_redis
 from orchestrator.channels import (
     STATE_AGENT_REGISTRY, STATE_SESSION, STATE_LAST_DONNA, STATE_TIMEOUT,
 )
-from orchestrator.llm_agent import run_agent
+from orchestrator.llm_agent import DATE_TIME, NONE, obj, run_agent
 from intelligence.judge_rules import NEW_CLIENT_STATUSES
 from intelligence.prompts import CLIENT_AGENT_SYSTEM
 from intelligence.context_manager import (
@@ -35,16 +35,6 @@ HANDOFF_TRIGGERS = [
     "real person", "talk to kaushik", "speak to kaushik", "a human",
     "can i speak to", "can i talk to",
 ]
-
-_DATE_TIME = {
-    "date": {"type": "string", "description": "Date, e.g. 2026-09-22 or 'Monday'"},
-    "time": {"type": "string", "description": "Time, e.g. '10:00' or '10am'"},
-}
-_NONE = {"type": "object", "properties": {}}
-
-
-def _obj(props: dict) -> dict:
-    return {"type": "object", "properties": props, "required": list(props)}
 
 
 class ClientAgent:
@@ -102,7 +92,7 @@ class ClientAgent:
         if self.client is None:
             self.client = client_store.get_by_phone(self.phone)
 
-        state = conv_store.get_or_create(self.phone, "client")
+        state = conv_store.get_by_phone(self.phone) or conv_store.get_or_create(self.phone, "client")
 
         # --- Input guard (clients only, admin is trusted) ---
         firewall_result = scan_input(message=text, phone=self.phone, is_admin=False)
@@ -223,7 +213,7 @@ class ClientAgent:
         config = self.provider.business_config or {}
         tools: dict = {
             "get_services_and_pricing": (
-                "Services and pricing this business offers.", _NONE,
+                "Services and pricing this business offers.", NONE,
                 lambda: {"services": config.get("services"), "pricing": config.get("pricing")},
             ),
         }
@@ -239,7 +229,7 @@ class ClientAgent:
                 return result
             tools["register_me"] = (
                 "Register this contact as a new lead. name is the person's own name (never Donna, that is you).",
-                _obj({"name": {"type": "string"}}), register_me,
+                obj({"name": {"type": "string"}}), register_me,
             )
             return tools
 
@@ -314,12 +304,7 @@ class ClientAgent:
             if self._orchestrator is None:
                 return {"error": "no orchestrator"}
             slot = parse_datetime(date, time)
-            return {"result": await self._orchestrator.route_request(
-                self.phone,
-                f"Client {client.name} (id {client.id}) needs the {slot.isoformat()} slot freed. "
-                f"Find who holds it and ask that client's agent to move.",
-                db,
-            )}
+            return {"result": await self._orchestrator.request_slot_freed(self.phone, client, slot, db)}
 
         async def report(outcome: str):
             if self._orchestrator is None:
@@ -335,23 +320,23 @@ class ClientAgent:
             return {"ok": True}
 
         tools.update({
-            "get_my_upcoming_sessions": ("List this client's upcoming sessions.", _NONE, my_sessions),
-            "get_free_slots": ("Open slots on a date.", _obj({"date": _DATE_TIME["date"]}), free_slots),
+            "get_my_upcoming_sessions": ("List this client's upcoming sessions.", NONE, my_sessions),
+            "get_free_slots": ("Open slots on a date.", obj({"date": DATE_TIME["date"]}), free_slots),
             "book_session": ("Book a session. Never say it is booked unless this returns booked data.",
-                             _obj(_DATE_TIME), book),
+                             obj(DATE_TIME), book),
             "reschedule_session": ("Move an existing session of this client.",
-                                   _obj({"session_id": {"type": "integer"}, **_DATE_TIME}), reschedule),
+                                   obj({"session_id": {"type": "integer"}, **DATE_TIME}), reschedule),
             "cancel_session": ("Cancel one of this client's sessions.",
-                               _obj({"session_id": {"type": "integer"}}), cancel),
+                               obj({"session_id": {"type": "integer"}}), cancel),
             "ask_orchestrator_to_free_slot": (
                 "When the wanted slot is held by someone else, ask the orchestrator to arrange it. "
-                "You never contact other clients yourself.", _obj(_DATE_TIME), ask_orchestrator),
+                "You never contact other clients yourself.", obj(DATE_TIME), ask_orchestrator),
             "report_to_orchestrator": (
                 "After acting on an open relayed request, tell the orchestrator the outcome "
-                "(no personal details).", _obj({"outcome": {"type": "string"}}), report),
-            "request_human": ("Hand the conversation to the business owner.", _NONE, ask_human),
-            "end_conversation": ("Call when the client says goodbye or the request is fully done.", _NONE, end),
-            "clear_open_request": ("Mark the orchestrator-relayed request as answered.", _NONE, clear_open_request),
+                "(no personal details).", obj({"outcome": {"type": "string"}}), report),
+            "request_human": ("Hand the conversation to the business owner.", NONE, ask_human),
+            "end_conversation": ("Call when the client says goodbye or the request is fully done.", NONE, end),
+            "clear_open_request": ("Mark the orchestrator-relayed request as answered.", NONE, clear_open_request),
         })
         return tools
 

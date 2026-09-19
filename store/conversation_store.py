@@ -119,13 +119,4 @@ class ConversationStore:
         if not state:
             return
         state.last_donna_message = message
-        # Append to history
-        ctx = dict(state.context or {})
-        history = list(ctx.get("_history", []))
-        history.append({"role": "donna", "content": message})
-        if len(history) > HISTORY_MAX_TURNS:
-            history = history[-HISTORY_MAX_TURNS:]
-        ctx["_history"] = history
-        state.context = ctx
-        state.updated_at = datetime.utcnow()
-        self.db.commit()
+        self._append_history(phone_number, "donna", message)

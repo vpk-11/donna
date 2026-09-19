@@ -5,15 +5,14 @@ from datetime import date, datetime, timedelta
 
 from sqlalchemy.orm import Session
 
-from db.redis_client import get_redis
 from donna_mcp.guard import acting_as
 from donna_mcp.tools.clients import create_client, update_client
 from donna_mcp.tools.scheduling import (
     book_session, cancel_session, reschedule_session, check_slot_conflict, get_sessions_for_date,
 )
 from intelligence.prompts import ADMIN_AGENT_SYSTEM
-from orchestrator.channels import STATE_AGENT_REGISTRY
-from orchestrator.llm_agent import run_agent
+from orchestrator.handoff import set_agent_handoff_flag
+from orchestrator.llm_agent import DATE_TIME as _DT, NONE as _NONE, obj as _obj, run_agent
 from store.client_store import ClientStore
 from store.conversation_store import ConversationStore
 from store.session_store import SessionStore
@@ -21,16 +20,7 @@ from utils.time_utils import calendar_hint, parse_date, parse_datetime
 
 logger = logging.getLogger(__name__)
 
-_NONE = {"type": "object", "properties": {}}
-_DT = {
-    "date": {"type": "string", "description": "Date, e.g. 2026-09-22 or 'Monday'"},
-    "time": {"type": "string", "description": "Time, e.g. '10:00' or '10am'"},
-}
 _NAME = {"client_name": {"type": "string"}}
-
-
-def _obj(props: dict) -> dict:
-    return {"type": "object", "properties": props, "required": list(props)}
 
 
 class AdminAgent:
@@ -88,15 +78,7 @@ class AdminAgent:
             target = state.handoff_target_phone
             conv_store.update(phone, {"handoff_active": False, "handoff_target_phone": None})
             conv_store.update(target, {"handoff_active": False})
-            try:
-                r = get_redis()
-                raw = r.hget(STATE_AGENT_REGISTRY, target)
-                if raw:
-                    data = json.loads(raw)
-                    data["handoff_active"] = False
-                    r.hset(STATE_AGENT_REGISTRY, target, json.dumps(data))
-            except Exception as e:
-                logger.warning(f"admin.handoff_close redis failed: {e}")
+            set_agent_handoff_flag(target, False)
             await self._messaging_client.send_to_admin("Got it - I'm back in control.")
             await self._summarize_handoff(target, db, conv_store)
         else:
@@ -150,6 +132,10 @@ class AdminAgent:
         def find(name: str):
             return client_store.get_by_name(name, provider.id)
 
+        def need(name: str):
+            c = find(name)
+            return c, (None if c else {"error": f"No client named {name}"})
+
         def schedule(days: int = 7):
             out = []
             for i in range(days):
@@ -160,9 +146,9 @@ class AdminAgent:
             return sorted(out, key=lambda s: s["when"]) or "No sessions scheduled."
 
         def client_info(client_name: str):
-            c = find(client_name)
-            if not c:
-                return {"error": f"No client named {client_name}"}
+            c, err = need(client_name)
+            if err:
+                return err
             state = conv_store.get_by_phone(c.phone_number)
             agent = self._orchestrator._agents.get(c.phone_number)
             return {
@@ -174,9 +160,9 @@ class AdminAgent:
             }
 
         async def add_note(client_name: str, notes: str):
-            c = find(client_name)
-            if not c:
-                return {"error": f"No client named {client_name}"}
+            c, err = need(client_name)
+            if err:
+                return err
             merged = f"{c.notes}\n{notes}".strip() if c.notes else notes
             return await asyncio.to_thread(update_client, client_id=c.id, notes=merged)
 
@@ -192,9 +178,9 @@ class AdminAgent:
             return result
 
         async def message_client(client_name: str, message: str, date: str = "", time: str = ""):
-            c = find(client_name)
-            if not c:
-                return {"error": f"No client named {client_name}"}
+            c, err = need(client_name)
+            if err:
+                return err
             await self._messaging_client.send_to_phone(c.phone_number, message)
             if date and time:
                 slot = parse_datetime(date, time)
@@ -205,9 +191,9 @@ class AdminAgent:
             return {"sent": True}
 
         async def book_for_client(client_name: str, date: str, time: str):
-            c = find(client_name)
-            if not c:
-                return {"error": f"No client named {client_name}"}
+            c, err = need(client_name)
+            if err:
+                return err
             slot = parse_datetime(date, time)
             conflict = await asyncio.to_thread(
                 check_slot_conflict, requested_at=slot.isoformat(), duration_mins=duration, requesting_client_id=c.id,
@@ -268,24 +254,19 @@ class AdminAgent:
             return {"cancelled": cancelled}
 
         async def start_handoff(client_name: str):
-            c = find(client_name)
-            if not c:
-                return {"error": f"No client named {client_name}"}
+            c, err = need(client_name)
+            if err:
+                return err
             from orchestrator.handoff import start_handoff_from_admin
             await start_handoff_from_admin(provider, c.phone_number, self._messaging_client, db, conv_store)
             return {"ok": True}
 
         async def swap(client_name: str, date: str, time: str):
-            c = find(client_name)
-            if not c:
-                return {"error": f"No client named {client_name}"}
+            c, err = need(client_name)
+            if err:
+                return err
             slot = parse_datetime(date, time)
-            return {"result": await self._orchestrator.route_request(
-                provider.phone_number,
-                f"Client {c.name} (id {c.id}) needs the {slot.isoformat()} slot freed. "
-                f"Find who holds it and ask that client's agent to move.",
-                db,
-            )}
+            return {"result": await self._orchestrator.request_slot_freed(provider.phone_number, c, slot, db)}
 
         return {
             "get_schedule": ("Upcoming sessions for the next N days.",
