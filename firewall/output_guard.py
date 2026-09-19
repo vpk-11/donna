@@ -5,6 +5,7 @@ from firewall.rules import (
     BANNED_OUTPUT_TOPICS,
     BAN_TOPICS_THRESHOLD,
     BOOKING_CONFIRMATION_PATTERNS,
+    REGISTRATION_CLAIM_PATTERNS,
     BLOCK_GENERIC_RESPONSE,
     SENSITIVE_ENTITY_TYPES,
 )
@@ -16,6 +17,7 @@ _sensitive_scanner = Sensitive(entity_types=SENSITIVE_ENTITY_TYPES)
 _topic_scanner = BanTopics(topics=BANNED_OUTPUT_TOPICS, threshold=BAN_TOPICS_THRESHOLD)
 _refusal_scanner = NoRefusal()
 _booking_patterns = [re.compile(p, re.IGNORECASE) for p in BOOKING_CONFIRMATION_PATTERNS]
+_registration_patterns = [re.compile(p, re.IGNORECASE) for p in REGISTRATION_CLAIM_PATTERNS]
 
 _known_client_names: set[str] = set()
 
@@ -71,6 +73,16 @@ def scan_output(
                 "tool_calls_made": tool_calls_made,
                 "response_preview": response[:100],
             },
+        )
+
+    if any(p.search(response) for p in _registration_patterns) and "register_me" not in tool_calls_made:
+        logger.error("firewall.output.registration_hallucination", extra={"phone": phone})
+        return FirewallResult(
+            action="block",
+            threat="RegistrationHallucination",
+            severity="high",
+            redirect_message="Sorry, could you tell me your name once more?",
+            log_entry={"phone": phone, "tool_calls_made": tool_calls_made, "response_preview": response[:100]},
         )
 
     response_lower = response.lower()
