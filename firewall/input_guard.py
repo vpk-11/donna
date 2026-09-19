@@ -7,6 +7,7 @@ from firewall.rules import (
     BAN_TOPICS_THRESHOLD,
     TOKEN_LIMIT,
     IDENTITY_SPOOF_PATTERNS,
+    INPUT_SCANNER_FAIL_MODE,
     SYSTEM_PROMPT_PATTERNS,
     EXFILTRATION_PATTERNS,
     REDIRECT_OUT_OF_SCOPE,
@@ -25,6 +26,21 @@ _identity_spoof_patterns = [re.compile(p, re.IGNORECASE) for p in IDENTITY_SPOOF
 _exfiltration_patterns = [re.compile(p, re.IGNORECASE) for p in EXFILTRATION_PATTERNS]
 
 
+def _scanner_failed(name: str, exc: Exception, phone: str) -> FirewallResult | None:
+    """Fail-closed scanners return a block result; fail-open scanners return None."""
+    if INPUT_SCANNER_FAIL_MODE[name] == "open":
+        logger.error("firewall.input.scanner_error %s: %s", name, exc, extra={"phone": phone})
+        return None
+    logger.error("firewall.input.fail_closed %s: %s", name, exc, extra={"phone": phone})
+    return FirewallResult(
+        action="block",
+        threat="ScannerFailClosed",
+        severity="high",
+        redirect_message=BLOCK_GENERIC_RESPONSE,
+        log_entry={"phone": phone, "scanner": name, "error": str(exc)},
+    )
+
+
 def scan_input(message: str, phone: str, is_admin: bool) -> FirewallResult:
     try:
         _, is_valid, _ = _token_scanner.scan(prompt=message)
@@ -38,7 +54,8 @@ def scan_input(message: str, phone: str, is_admin: bool) -> FirewallResult:
                 log_entry={"phone": phone, "message_preview": message[:100]},
             )
     except Exception as exc:
-        logger.error("firewall.input.scanner_error token_limit: %s", exc, extra={"phone": phone})
+        if failed := _scanner_failed("token_limit", exc, phone):
+            return failed
 
     for pattern in _system_prompt_patterns:
         if pattern.search(message):
@@ -54,8 +71,13 @@ def scan_input(message: str, phone: str, is_admin: bool) -> FirewallResult:
     # Run specific identity spoof check before generic injection ML so that
     # more precise threat label wins when both would fire.
     if not is_admin:
-        for pattern in _identity_spoof_patterns:
-            if pattern.search(message):
+        try:
+            spoofed = any(p.search(message) for p in _identity_spoof_patterns)
+        except Exception as exc:
+            if failed := _scanner_failed("identity_spoof", exc, phone):
+                return failed
+        else:
+            if spoofed:
                 logger.warning("firewall.input.identity_spoof", extra={"phone": phone})
                 return FirewallResult(
                     action="block",
@@ -80,7 +102,8 @@ def scan_input(message: str, phone: str, is_admin: bool) -> FirewallResult:
                 log_entry={"phone": phone, "risk_score": risk_score, "message_preview": message[:100]},
             )
     except Exception as exc:
-        logger.error("firewall.input.scanner_error prompt_injection: %s", exc, extra={"phone": phone})
+        if failed := _scanner_failed("prompt_injection", exc, phone):
+            return failed
 
     try:
         _, is_valid, topics_meta = _topic_scanner.scan(prompt=message)
@@ -99,7 +122,8 @@ def scan_input(message: str, phone: str, is_admin: bool) -> FirewallResult:
                 log_entry={"phone": phone, "topics": topics_meta},
             )
     except Exception as exc:
-        logger.error("firewall.input.scanner_error ban_topics: %s", exc, extra={"phone": phone})
+        if failed := _scanner_failed("ban_topics", exc, phone):
+            return failed
 
     for pattern in _exfiltration_patterns:
         if pattern.search(message):
