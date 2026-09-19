@@ -13,10 +13,40 @@ class ConversationStore:
         return (
             self.db.query(ConversationState)
             .filter(ConversationState.phone_number == phone_number)
+            .populate_existing()
             .first()
         )
 
+    # Public mutators delegate to the MCP conversation tools (the only write path).
+    # The underscore-prefixed methods below are the raw store ops those tools call.
+
     def get_or_create(self, phone_number: str, role: str) -> ConversationState:
+        from donna_mcp.tools.conversation import ensure_conversation_state
+        ensure_conversation_state(phone_number, role)
+        return self.get_by_phone(phone_number)
+
+    def update(self, phone_number: str, data: dict) -> ConversationState | None:
+        from donna_mcp.tools.conversation import update_conversation_state
+        update_conversation_state(phone_number, data)
+        return self.get_by_phone(phone_number)
+
+    def update_context(self, phone_number: str, context_updates: dict) -> None:
+        from donna_mcp.tools.conversation import update_conversation_context
+        update_conversation_context(phone_number, context_updates)
+
+    def clear_context(self, phone_number: str) -> None:
+        from donna_mcp.tools.conversation import clear_conversation_context
+        clear_conversation_context(phone_number)
+
+    def append_history(self, phone_number: str, role: str, content: str) -> None:
+        from donna_mcp.tools.conversation import append_conversation_history
+        append_conversation_history(phone_number, role, content)
+
+    def update_last_donna_message(self, phone_number: str, message: str) -> None:
+        from donna_mcp.tools.conversation import record_donna_message
+        record_donna_message(phone_number, message)
+
+    def _get_or_create(self, phone_number: str, role: str) -> ConversationState:
         state = self.get_by_phone(phone_number)
         if not state:
             state = ConversationState(
@@ -31,7 +61,7 @@ class ConversationStore:
             self.db.refresh(state)
         return state
 
-    def update(self, phone_number: str, data: dict) -> ConversationState | None:
+    def _update(self, phone_number: str, data: dict) -> ConversationState | None:
         state = self.get_by_phone(phone_number)
         if not state:
             return None
@@ -42,7 +72,7 @@ class ConversationStore:
         self.db.refresh(state)
         return state
 
-    def update_context(self, phone_number: str, context_updates: dict) -> None:
+    def _update_context(self, phone_number: str, context_updates: dict) -> None:
         state = self.get_by_phone(phone_number)
         if not state:
             return
@@ -52,7 +82,7 @@ class ConversationStore:
         state.updated_at = datetime.utcnow()
         self.db.commit()
 
-    def clear_context(self, phone_number: str) -> None:
+    def _clear_context(self, phone_number: str) -> None:
         """Clear pending state but preserve history and protected keys (prefixed _)."""
         state = self.get_by_phone(phone_number)
         if not state:
@@ -62,7 +92,7 @@ class ConversationStore:
         state.updated_at = datetime.utcnow()
         self.db.commit()
 
-    def append_history(self, phone_number: str, role: str, content: str) -> None:
+    def _append_history(self, phone_number: str, role: str, content: str) -> None:
         """Append a turn to conversation history. role is 'user' or 'donna'."""
         state = self.get_by_phone(phone_number)
         if not state:
@@ -83,7 +113,7 @@ class ConversationStore:
             return []
         return list((state.context or {}).get("_history", []))
 
-    def update_last_donna_message(self, phone_number: str, message: str) -> None:
+    def _update_last_donna_message(self, phone_number: str, message: str) -> None:
         """Called after every Donna send. Updates last_donna_message and appends to history."""
         state = self.get_by_phone(phone_number)
         if not state:
