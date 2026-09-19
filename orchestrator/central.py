@@ -8,7 +8,7 @@ from orchestrator.channels import STATE_AGENT_REGISTRY, STATE_SESSION
 from orchestrator.admin_agent import AdminAgent
 from orchestrator.agent import ClientAgent
 from orchestrator.llm_agent import run_agent
-from donna_mcp.guard import acting_as
+from donna_mcp.guard import acting_as, runs_as
 from intelligence.prompts import ORCHESTRATOR_SYSTEM
 from store.conversation_store import ConversationStore
 from store.client_store import ClientStore
@@ -37,10 +37,10 @@ class CentralOrchestrator:
         self._admin_agent = AdminAgent(self._provider, self._messaging_client, self, self._business_config)
         logger.info(f"Orchestrator started for provider: {self._provider.name}")
 
+    @runs_as("orchestrator")
     async def handle_message(self, phone: str, text: str, db: Session) -> None:
         try:
-            with acting_as("orchestrator"):
-                await self._handle_message_inner(phone, text, db)
+            await self._handle_message_inner(phone, text, db)
         except Exception as e:
             logger.exception(f"orchestrator.handle_message unhandled error for {phone}: {e}")
 

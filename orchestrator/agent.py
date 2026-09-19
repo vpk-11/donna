@@ -21,7 +21,7 @@ from donna_mcp.tools.scheduling import (
 )
 from donna_mcp.tools.clients import create_client
 from donna_mcp.tools.conversation import save_conversation_summary
-from donna_mcp.guard import acting_as
+from donna_mcp.guard import runs_as
 from store.conversation_store import ConversationStore
 from store.client_store import ClientStore
 from store.session_store import SessionStore
@@ -74,10 +74,10 @@ class ClientAgent:
     def recent_history(self, n: int) -> list[dict]:
         return self.scoped_history()[-n:]
 
+    @runs_as("agent")
     async def handle_message(self, text: str, db: Session) -> None:
         try:
-            with acting_as("agent", self.phone):
-                await self._handle_message_inner(text, db)
+            await self._handle_message_inner(text, db)
         except Exception as e:
             logger.exception(f"agent.handle_message unhandled error for {self.phone}: {e}")
             try:
@@ -351,42 +351,42 @@ class ClientAgent:
     # Orchestrator-relayed requests (agent-to-agent goes only through the orchestrator)
     # -------------------------------------------------------------------------
 
+    @runs_as("agent")
     async def handle_orchestrator_request(self, request: str, db: Session) -> str:
         """Another client needs something from this client. This agent asks its own client and acts itself."""
-        with acting_as("agent", self.phone):
-            conv_store = ConversationStore(db)
-            conv_store.get_or_create(self.phone, "client")
-            message = await run_agent(
-                system=self._system_prompt(conv_store.get_by_phone(self.phone)),
-                history=self.scoped_history(),
-                user_text=(
-                    "Write the text message asking this client to shift their session to one of the alternative "
-                    "slots listed in the request, using only those slots, as plain weekday and time. Say 'something came up on our end'. Never mention any other "
-                    f"person. Request from the orchestrator: {request}"
-                ),
-                tools={},
-            )
-            if not message:
-                return "no response from agent"
-            conv_store.update_context(self.phone, {"pending_orchestrator_request": request})
-            await self._send(message, conv_store)
-            return "asked own client; awaiting their answer"
+        conv_store = ConversationStore(db)
+        conv_store.get_or_create(self.phone, "client")
+        message = await run_agent(
+            system=self._system_prompt(conv_store.get_by_phone(self.phone)),
+            history=self.scoped_history(),
+            user_text=(
+                "Write the text message asking this client to shift their session to one of the alternative "
+                "slots listed in the request, using only those slots, as plain weekday and time. Say 'something came up on our end'. Never mention any other "
+                f"person. Request from the orchestrator: {request}"
+            ),
+            tools={},
+        )
+        if not message:
+            return "no response from agent"
+        conv_store.update_context(self.phone, {"pending_orchestrator_request": request})
+        await self._send(message, conv_store)
+        return "asked own client; awaiting their answer"
 
+    @runs_as("agent")
     async def handle_orchestrator_update(self, update: str, db: Session) -> None:
         """The orchestrator reports on a request this agent made. Tell the own client."""
-        with acting_as("agent", self.phone):
-            conv_store = ConversationStore(db)
-            message = await run_agent(
-                system=self._system_prompt(conv_store.get_by_phone(self.phone)),
-                history=self.scoped_history(),
-                user_text=(
-                    "Write the text message telling this client the news below, and offer to book the slot "
-                    f"if it is now free. Never mention any other person. Update: {update}"
-                ),
-                tools={},
-            )
-            if message:
-                await self._send(message, conv_store)
+        conv_store = ConversationStore(db)
+        message = await run_agent(
+            system=self._system_prompt(conv_store.get_by_phone(self.phone)),
+            history=self.scoped_history(),
+            user_text=(
+                "Write the text message telling this client the news below, and offer to book the slot "
+                f"if it is now free. Never mention any other person. Update: {update}"
+            ),
+            tools={},
+        )
+        if message:
+            await self._send(message, conv_store)
 
     async def _send(self, text: str, conv_store: ConversationStore) -> None:
         await self._messaging_client.send_to_phone(self.phone, text)

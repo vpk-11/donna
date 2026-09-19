@@ -5,7 +5,7 @@ from datetime import date, datetime, timedelta
 
 from sqlalchemy.orm import Session
 
-from donna_mcp.guard import acting_as
+from donna_mcp.guard import runs_as
 from donna_mcp.tools.clients import create_client, update_client
 from donna_mcp.tools.scheduling import (
     book_session, cancel_session, reschedule_session, check_slot_conflict, get_sessions_for_date,
@@ -32,9 +32,9 @@ class AdminAgent:
         self._orchestrator = orchestrator
         self._business_config = business_config
 
+    @runs_as("admin")
     async def handle_message(self, text: str, db: Session) -> None:
-        with acting_as("admin"):
-            await self._handle(text, db)
+        await self._handle(text, db)
 
     async def _handle(self, text: str, db: Session) -> None:
         conv_store = ConversationStore(db)

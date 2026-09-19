@@ -37,6 +37,18 @@ def acting_as(kind: str, phone: str | None = None):
         _caller.reset(token)
 
 
+def runs_as(kind: str):
+    """Decorator for async methods: run the whole method under a caller identity.
+    kind "agent" uses self.phone, so an agent entry point cannot forget to declare itself."""
+    def deco(fn):
+        @functools.wraps(fn)
+        async def wrapper(self, *a, **kw):
+            with acting_as(kind, getattr(self, "phone", None) if kind == "agent" else None):
+                return await fn(self, *a, **kw)
+        return wrapper
+    return deco
+
+
 def _client_phone(client_id: int) -> str | None:
     db = SessionLocal()
     try:
