@@ -115,8 +115,9 @@ class ConversationStore:
 
     def _update_last_donna_message(self, phone_number: str, message: str) -> None:
         """Called after every Donna send. Updates last_donna_message and appends to history."""
+        self._append_history(phone_number, "donna", message)
         state = self.get_by_phone(phone_number)
         if not state:
             return
         state.last_donna_message = message
-        self._append_history(phone_number, "donna", message)
+        self.db.commit()
