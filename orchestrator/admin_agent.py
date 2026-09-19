@@ -137,13 +137,13 @@ class AdminAgent:
             return c, (None if c else {"error": f"No client named {name}"})
 
         def schedule(days: int = 7):
-            out = []
-            for i in range(days):
-                res = get_sessions_for_date((date.today() + timedelta(days=i)).isoformat())
-                for s in res.get("sessions", []):
-                    c = client_store.get(s["client_id"])
-                    out.append({"client": c.name if c else "Unknown", "when": s["scheduled_at"], "session_id": s["id"]})
-            return sorted(out, key=lambda s: s["when"]) or "No sessions scheduled."
+            start = datetime.combine(date.today(), datetime.min.time())
+            sessions = session_store.get_sessions_between(provider.id, start, start + timedelta(days=days))
+            names = {c.id: c.name for c in client_store.list_by_provider(provider.id)}
+            return [
+                {"client": names.get(s.client_id, "Unknown"), "when": s.scheduled_at.isoformat(), "session_id": s.id}
+                for s in sessions
+            ] or "No sessions scheduled."
 
         def client_info(client_name: str):
             c, err = need(client_name)
