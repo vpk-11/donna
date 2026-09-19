@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 
 HANDOFF_TRIGGERS = [
     "frustrated", "not happy", "speak to someone", "talk to a person",
-    "real person", "talk to kaushik", "speak to kaushik", "human",
+    "real person", "talk to kaushik", "speak to kaushik", "a human",
     "can i speak to", "can i talk to",
 ]
 
@@ -133,6 +133,7 @@ class ClientAgent:
 
         # --- The agent decides and acts ---
         self._last_tool_calls = []
+        self._ending = False
         response = await run_agent(
             system=self._system_prompt(state),
             history=self.scoped_history(),
@@ -141,6 +142,8 @@ class ClientAgent:
             calls_made=self._last_tool_calls,
         )
         if not response:
+            logger.warning(f"agent.empty_response for {self.phone}")
+            await self._send("Sorry, I couldn't work that out. Could you say that again?", conv_store)
             return
 
         # --- Output guard ---
@@ -185,6 +188,8 @@ class ClientAgent:
 
         if self._ending:
             await self._finalize_conversation(db, conv_store)
+            if self._orchestrator is not None:
+                self._orchestrator.retire_agent(self.phone)
 
     # -------------------------------------------------------------------------
     # Prompt + tools
