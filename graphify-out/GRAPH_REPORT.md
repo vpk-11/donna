@@ -1,16 +1,16 @@
-# Graph Report - donna  (2026-08-20)
+# Graph Report - donna  (2026-09-20)
 
 ## Corpus Check
-- 70 files · ~21,277 words
+- 67 files · ~17,100 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 375 nodes · 1307 edges · 29 communities (25 shown, 4 thin omitted)
-- Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 59 edges (avg confidence: 0.61)
+- 407 nodes · 1199 edges · 29 communities (25 shown, 4 thin omitted)
+- Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 70 edges (avg confidence: 0.6)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `58322d0e`
+- Built from commit: `ad2e74ac`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -21,6 +21,7 @@
 - [[_COMMUNITY_Messaging Abstraction Layer|Messaging Abstraction Layer]]
 - [[_COMMUNITY_Community 5|Community 5]]
 - [[_COMMUNITY_Community 6|Community 6]]
+- [[_COMMUNITY_Community 7|Community 7]]
 - [[_COMMUNITY_Community 8|Community 8]]
 - [[_COMMUNITY_Nuke Script|Nuke Script]]
 - [[_COMMUNITY_Seed Script|Seed Script]]
@@ -31,28 +32,28 @@
 - [[_COMMUNITY_Community 22|Community 22]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `ConversationStore` - 67 edges
-2. `ClientStore` - 62 edges
-3. `Session` - 58 edges
-4. `SessionStore` - 46 edges
-5. `generate_response()` - 41 edges
-6. `Provider` - 38 edges
-7. `ProviderStore` - 37 edges
-8. `CentralOrchestrator` - 35 edges
-9. `ClientAgent` - 31 edges
-10. `Client` - 25 edges
+1. `ConversationStore` - 50 edges
+2. `ClientStore` - 48 edges
+3. `Session` - 45 edges
+4. `SessionStore` - 36 edges
+5. `ProviderStore` - 35 edges
+6. `CentralOrchestrator` - 33 edges
+7. `ClientAgent` - 30 edges
+8. `Provider` - 27 edges
+9. `book_session()` - 23 edges
+10. `Client` - 22 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `ClientAgent` --uses--> `Client`  [INFERRED]
-  orchestrator/agent.py → models/orm.py
-- `ClientAgent` --uses--> `Provider`  [INFERRED]
-  orchestrator/agent.py → models/orm.py
-- `ClientAgent` --uses--> `Session`  [INFERRED]
-  orchestrator/agent.py → models/orm.py
-- `ClientAgent` --uses--> `IntentResult`  [INFERRED]
-  orchestrator/agent.py → models/schemas.py
-- `ClientAgent` --uses--> `ClientStore`  [INFERRED]
-  orchestrator/agent.py → store/client_store.py
+- `MutationGuardError` --uses--> `Session`  [INFERRED]
+  db/database.py → models/orm.py
+- `test_db_migration()` --calls--> `init_db()`  [EXTRACTED]
+  tests/test_phase1.py → db/migrations.py
+- `CallerNotAllowed` --uses--> `Client`  [INFERRED]
+  donna_mcp/guard.py → models/orm.py
+- `CallerNotAllowed` --uses--> `Session`  [INFERRED]
+  donna_mcp/guard.py → models/orm.py
+- `WebSocketConnectionManager` --uses--> `ConversationStore`  [INFERRED]
+  messaging/websocket_client.py → store/conversation_store.py
 
 ## Import Cycles
 - None detected.
@@ -68,64 +69,68 @@
 ## Communities (29 total, 4 thin omitted)
 
 ### Community 0 - "Community 0"
-Cohesion: 0.32
-Nodes (7): Session, CentralOrchestrator, ClientStore, ConversationStore, Session, SessionStore, ClientStore
+Cohesion: 0.12
+Nodes (23): get_redis(), Exception, build_context_from_summary(), should_summarize(), summarize_conversation(), trim_history(), call_llm(), call_llm_tools() (+15 more)
 
 ### Community 1 - "Admin Intent Dispatch"
-Cohesion: 0.12
-Nodes (35): _create_and_greet_client(), handle_new_client_intro(), handle_new_client_intro_clarification(), _check_client_status(), _check_schedule(), handle_admin(), _handle_admin_confirm(), _handle_book_session() (+27 more)
+Cohesion: 0.14
+Nodes (12): Scheduling Conflict Resolution Strategy, Client, SessionArchive, ConflictResult, datetime, resolve_slot(), seed.sh Database Seed Script, SessionModel (+4 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.10
-Nodes (34): BaseModel, BaseSettings, Config, Settings, Exception, scan_input(), scan_output(), build_context_from_summary() (+26 more)
+Cohesion: 0.20
+Nodes (13): BaseModel, Exception, Fail-closed scanners return a block result; fail-open scanners return None., scan_input(), _scanner_failed(), scan_output(), FirewallResult, MessageEnvelope (+5 more)
 
 ### Community 4 - "Messaging Abstraction Layer"
-Cohesion: 0.09
-Nodes (17): ABC, FastAPI, warmup_firewall(), _cli_main(), Donna's CLI entrypoint. One process, one command:      python main.py --admin, _run_admin(), _wait_for_health(), MessagingClient (+9 more)
+Cohesion: 0.08
+Nodes (24): ABC, BaseSettings, Config, load_business_config(), Load config/business.json once, cache in-process. Static file, no     conversati, Settings, get_async_redis(), ping_redis() (+16 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.14
-Nodes (17): Base, Conversation History Ring Buffer, datetime, IntentResult, ConversationState, ConversationSummary, ClientAgent, ClientStore (+9 more)
+Cohesion: 0.15
+Nodes (20): Conversation History Ring Buffer, ConversationState, ConversationStore, Called after every Donna send. Updates last_donna_message and appends to history, Clear pending state but preserve history and protected keys (prefixed _)., Append a turn to conversation history. role is 'user' or 'donna'., test_record_donna_message_sets_last_message_and_history(), append_conversation_history() (+12 more)
+
+### Community 6 - "Community 6"
+Cohesion: 0.13
+Nodes (20): acting_as(), kind: system | orchestrator | admin | agent (agent requires the client's phone)., Live end-to-end checks against a local Ollama model.  Run: DONNA_LIVE=1 DONNA_MO, Recorder, send(), state(), test_admin_agent_answers_and_acts(), test_book_request_goes_to_admin_then_admin_confirms() (+12 more)
 
 ### Community 8 - "Community 8"
-Cohesion: 0.26
-Nodes (13): register_client_names(), _client_dict(), create_client(), _db(), get_client(), get_client_by_phone(), list_clients(), Update one or more fields on an existing client. Only provided fields are change (+5 more)
+Cohesion: 0.11
+Nodes (20): RuntimeError, _agent(), _boom(), clients(), _messaging(), test_cold_agent_may_create_only_its_own_client(), test_identity_spoof_scanner_error_fails_closed(), test_other_clients_context_never_reaches_llm() (+12 more)
 
 ### Community 15 - "Community 15"
-Cohesion: 0.56
-Nodes (8): _make_client(), _make_messaging(), _make_provider(), test_client_agent_instantiates(), test_orchestrator_instantiates(), test_orchestrator_routes_admin(), test_orchestrator_spawns_agent_for_client(), test_retire_agent()
+Cohesion: 0.09
+Nodes (29): Base, ConversationSummary, Session, ClientAgent, Another client needs something from this client. This agent asks its own client, The orchestrator reports on a request this agent made. Tell the own client., One LLM agent per client conversation: its own prompt, history and tool loop., History that reaches any prompt. Only entries owned by this agent's client. (+21 more)
 
 ### Community 19 - "Project README"
 Cohesion: 0.13
 Nodes (14): 1. Create the environment, 2. Start Redis, 3. Start an LLM, 4. Set environment variables, 5. Run it, 6. Seed test data, Architecture, Changelog (+6 more)
 
 ### Community 20 - "Community 20"
-Cohesion: 0.07
-Nodes (35): Any, Client, Base, engine, init_db(), get_async_redis(), get_redis(), ping_redis() (+27 more)
+Cohesion: 0.09
+Nodes (31): Any, Base, engine, MutationGuardError, _reject_writes_outside_mcp(), init_db(), CallerNotAllowed, _check() (+23 more)
 
 ### Community 22 - "Community 22"
 Cohesion: 0.09
-Nodes (38): Scheduling Conflict Resolution Strategy, load_business_config(), Load config/business.json once, cache in-process. Static file, no     conversati, SessionArchive, ConflictResult, datetime, resolve_slot(), cancel_day() (+30 more)
+Nodes (44): Decorator for async methods: run the whole method under a caller identity.     k, runs_as(), obj(), JSON schema for an object whose properties are all required., _client_id(), Phase 2 smoke tests. Requires: running Redis, seeded DB (provider + clients with, test_book_session_conflict_returns_error(), test_book_session_happy_path() (+36 more)
 
 ## Knowledge Gaps
-- **18 isolated node(s):** `Architecture`, `1. Create the environment`, `2. Start Redis`, `3. Start an LLM`, `4. Set environment variables` (+13 more)
+- **18 isolated node(s):** `Config`, `nuke.sh script`, `seed.sh script`, `Architecture`, `1. Create the environment` (+13 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **4 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `ConversationStore` connect `Community 5` to `Community 0`, `Admin Intent Dispatch`, `Community 2`, `Messaging Abstraction Layer`, `Community 20`, `Community 22`?**
-  _High betweenness centrality (0.159) - this node is a cross-community bridge._
-- **Why does `ClientStore` connect `Community 0` to `Admin Intent Dispatch`, `Community 2`, `Messaging Abstraction Layer`, `Community 5`, `Community 8`, `Community 20`, `Community 22`?**
-  _High betweenness centrality (0.089) - this node is a cross-community bridge._
-- **Why does `SessionStore` connect `Community 22` to `Community 0`, `Admin Intent Dispatch`, `Community 2`, `Community 5`?**
-  _High betweenness centrality (0.059) - this node is a cross-community bridge._
-- **Are the 7 inferred relationships involving `ConversationStore` (e.g. with `WebSocket` and `WebSocketConnectionManager`) actually correct?**
-  _`ConversationStore` has 7 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 7 inferred relationships involving `ClientStore` (e.g. with `ClientAgent` and `CentralOrchestrator`) actually correct?**
-  _`ClientStore` has 7 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 12 inferred relationships involving `Session` (e.g. with `ClientAgent` and `CentralOrchestrator`) actually correct?**
-  _`Session` has 12 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 7 inferred relationships involving `SessionStore` (e.g. with `ClientAgent` and `CentralOrchestrator`) actually correct?**
+- **Why does `ConversationStore` connect `Community 5` to `Community 0`, `Messaging Abstraction Layer`, `Community 7`, `Community 8`, `Community 15`, `Community 20`, `Community 22`?**
+  _High betweenness centrality (0.147) - this node is a cross-community bridge._
+- **Why does `ClientStore` connect `Admin Intent Dispatch` to `Community 0`, `Messaging Abstraction Layer`, `Community 6`, `Community 7`, `Community 8`, `Community 15`, `Community 20`, `Community 22`?**
+  _High betweenness centrality (0.078) - this node is a cross-community bridge._
+- **Why does `Session` connect `Community 15` to `Community 0`, `Admin Intent Dispatch`, `Community 5`, `Community 6`, `Community 7`, `Community 8`, `Community 20`?**
+  _High betweenness centrality (0.063) - this node is a cross-community bridge._
+- **Are the 8 inferred relationships involving `ConversationStore` (e.g. with `WebSocket` and `WebSocketConnectionManager`) actually correct?**
+  _`ConversationStore` has 8 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 8 inferred relationships involving `ClientStore` (e.g. with `Recorder` and `AdminAgent`) actually correct?**
+  _`ClientStore` has 8 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 15 inferred relationships involving `Session` (e.g. with `MutationGuardError` and `CallerNotAllowed`) actually correct?**
+  _`Session` has 15 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 7 inferred relationships involving `SessionStore` (e.g. with `AdminAgent` and `ClientAgent`) actually correct?**
   _`SessionStore` has 7 INFERRED edges - model-reasoned connections that need verification._
