@@ -63,6 +63,7 @@ async def run_agent(
     specs = tool_specs(tools)
 
     retried = False
+    confirmations: list[str] = []  # tool-authored text for state changes; the model never phrases these
     for _ in range(MAX_STEPS):
         msg = await call_llm_tools(messages, specs)
         calls = msg.get("tool_calls") or []
@@ -70,8 +71,9 @@ async def run_agent(
             text = (msg.get("content") or "").strip()
             if not text and not retried:  # reasoning models can spend the whole budget thinking
                 retried = True
+                messages.append({"role": "user", "content": "Reply now with your final text message."})
                 continue
-            return text
+            return " ".join(confirmations) or text
         messages.append({"role": "assistant", "content": msg.get("content") or "", "tool_calls": calls})
         for call in calls:
             name = call["function"]["name"]
@@ -79,6 +81,8 @@ async def run_agent(
             result, ok = await _call_tool(tools, name, raw)
             if ok and calls_made is not None:
                 calls_made.append(name)
+            if ok and isinstance(result, dict) and result.get("confirmation"):
+                confirmations.append(result["confirmation"])
             logger.info(f"agent.tool {name}({raw}) -> {json.dumps(result, default=str)[:300]}")
             messages.append({
                 "role": "tool",

@@ -76,6 +76,19 @@ class SessionStore:
             .all()
         )
 
+    def get_sessions_between(self, provider_id: int, start: datetime, end: datetime) -> list[SessionModel]:
+        return (
+            self.db.query(SessionModel)
+            .filter(
+                SessionModel.provider_id == provider_id,
+                SessionModel.status == "scheduled",
+                SessionModel.scheduled_at >= start,
+                SessionModel.scheduled_at < end,
+            )
+            .order_by(SessionModel.scheduled_at)
+            .all()
+        )
+
     def get_upcoming_for_client(self, client_id: int) -> list[SessionModel]:
         now = datetime.utcnow()
         return (

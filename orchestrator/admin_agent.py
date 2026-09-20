@@ -5,7 +5,7 @@ from datetime import date, datetime, timedelta
 
 from sqlalchemy.orm import Session
 
-from donna_mcp.guard import acting_as
+from donna_mcp.guard import runs_as
 from donna_mcp.tools.clients import create_client, update_client
 from donna_mcp.tools.scheduling import (
     book_session, cancel_session, reschedule_session, check_slot_conflict, get_sessions_for_date,
@@ -32,9 +32,9 @@ class AdminAgent:
         self._orchestrator = orchestrator
         self._business_config = business_config
 
+    @runs_as("admin")
     async def handle_message(self, text: str, db: Session) -> None:
-        with acting_as("admin"):
-            await self._handle(text, db)
+        await self._handle(text, db)
 
     async def _handle(self, text: str, db: Session) -> None:
         conv_store = ConversationStore(db)
@@ -137,13 +137,13 @@ class AdminAgent:
             return c, (None if c else {"error": f"No client named {name}"})
 
         def schedule(days: int = 7):
-            out = []
-            for i in range(days):
-                res = get_sessions_for_date((date.today() + timedelta(days=i)).isoformat())
-                for s in res.get("sessions", []):
-                    c = client_store.get(s["client_id"])
-                    out.append({"client": c.name if c else "Unknown", "when": s["scheduled_at"], "session_id": s["id"]})
-            return sorted(out, key=lambda s: s["when"]) or "No sessions scheduled."
+            start = datetime.combine(date.today(), datetime.min.time())
+            sessions = session_store.get_sessions_between(provider.id, start, start + timedelta(days=days))
+            names = {c.id: c.name for c in client_store.list_by_provider(provider.id)}
+            return [
+                {"client": names.get(s.client_id, "Unknown"), "when": s.scheduled_at.isoformat(), "session_id": s.id}
+                for s in sessions
+            ] or "No sessions scheduled."
 
         def client_info(client_name: str):
             c, err = need(client_name)
