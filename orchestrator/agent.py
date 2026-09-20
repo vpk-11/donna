@@ -21,7 +21,7 @@ from donna_mcp.tools.scheduling import (
 )
 from donna_mcp.tools.clients import create_client
 from donna_mcp.tools.conversation import save_conversation_summary
-from donna_mcp.guard import acting_as
+from donna_mcp.guard import runs_as
 from store.conversation_store import ConversationStore
 from store.client_store import ClientStore
 from store.session_store import SessionStore
@@ -74,10 +74,10 @@ class ClientAgent:
     def recent_history(self, n: int) -> list[dict]:
         return self.scoped_history()[-n:]
 
+    @runs_as("agent")
     async def handle_message(self, text: str, db: Session) -> None:
         try:
-            with acting_as("agent", self.phone):
-                await self._handle_message_inner(text, db)
+            await self._handle_message_inner(text, db)
         except Exception as e:
             logger.exception(f"agent.handle_message unhandled error for {self.phone}: {e}")
             try:
@@ -92,7 +92,9 @@ class ClientAgent:
         if self.client is None:
             self.client = client_store.get_by_phone(self.phone)
 
-        state = conv_store.get_by_phone(self.phone) or conv_store.get_or_create(self.phone, "client")
+        state = await asyncio.to_thread(
+            lambda: conv_store.get_by_phone(self.phone) or conv_store.get_or_create(self.phone, "client")
+        )
 
         # --- Input guard (clients only, admin is trusted) ---
         firewall_result = scan_input(message=text, phone=self.phone, is_admin=False)
@@ -119,7 +121,7 @@ class ClientAgent:
             return
 
         self._turn_count += 1
-        conv_store.update(self.phone, {"turn_count": self._turn_count})
+        await asyncio.to_thread(conv_store.update, self.phone, {"turn_count": self._turn_count})
 
         # --- The agent decides and acts ---
         self._last_tool_calls = []
@@ -226,6 +228,7 @@ class ClientAgent:
                 if "error" not in result:
                     self.client = ClientStore(db).get_by_phone(self.phone)
                     conv_store.update(self.phone, {"client_id": self.client.id})
+                    result["confirmation"] = f"Thanks {name}, you're registered. How can I help you today?"
                 return result
             tools["register_me"] = (
                 "Register this contact as a new lead. name is the person's own name (never Donna, that is you).",
@@ -266,7 +269,10 @@ class ClientAgent:
                 await self._messaging_client.send_to_admin(
                     f"{client.name} wants {slot.strftime('%A %b %d at %I:%M %p')}. Confirm to book."
                 )
-                return {"booked": False, "status": "sent to the admin for confirmation"}
+                return {
+                    "booked": False, "status": "sent to the admin for confirmation",
+                    "confirmation": f"I've sent your request for {slot.strftime('%A %b %d at %I:%M %p')} to the admin for confirmation.",
+                }
             result = await asyncio.to_thread(
                 book_session, client_id=client.id, scheduled_at=slot.isoformat(), duration_mins=duration,
             )
@@ -274,6 +280,7 @@ class ClientAgent:
                 await self._messaging_client.send_to_admin(
                     f"{client.name} booked {slot.strftime('%A %b %d at %I:%M %p')}. Added to your schedule."
                 )
+                result["confirmation"] = f"You're booked for {slot.strftime('%A %b %d at %I:%M %p')}."
             return result
 
         async def reschedule(session_id: int, date: str, time: str):
@@ -285,12 +292,14 @@ class ClientAgent:
                 await self._messaging_client.send_to_admin(
                     f"{client.name} moved a session to {new_slot.strftime('%A %b %d at %I:%M %p')}."
                 )
+                result["confirmation"] = f"Your session is moved to {new_slot.strftime('%A %b %d at %I:%M %p')}."
             return result
 
         async def cancel(session_id: int):
             result = await asyncio.to_thread(cancel_session, session_id=session_id)
             if "error" not in result:
                 await self._messaging_client.send_to_admin(f"{client.name} cancelled a session.")
+                result["confirmation"] = "Your session is cancelled."
             return result
 
         async def ask_human():
@@ -344,46 +353,46 @@ class ClientAgent:
     # Orchestrator-relayed requests (agent-to-agent goes only through the orchestrator)
     # -------------------------------------------------------------------------
 
+    @runs_as("agent")
     async def handle_orchestrator_request(self, request: str, db: Session) -> str:
         """Another client needs something from this client. This agent asks its own client and acts itself."""
-        with acting_as("agent", self.phone):
-            conv_store = ConversationStore(db)
-            conv_store.get_or_create(self.phone, "client")
-            message = await run_agent(
-                system=self._system_prompt(conv_store.get_by_phone(self.phone)),
-                history=self.scoped_history(),
-                user_text=(
-                    "Write the text message asking this client to shift their session to one of the alternative "
-                    "slots listed in the request, using only those slots, as plain weekday and time. Say 'something came up on our end'. Never mention any other "
-                    f"person. Request from the orchestrator: {request}"
-                ),
-                tools={},
-            )
-            if not message:
-                return "no response from agent"
-            conv_store.update_context(self.phone, {"pending_orchestrator_request": request})
-            await self._send(message, conv_store)
-            return "asked own client; awaiting their answer"
+        conv_store = ConversationStore(db)
+        conv_store.get_or_create(self.phone, "client")
+        message = await run_agent(
+            system=self._system_prompt(conv_store.get_by_phone(self.phone)),
+            history=self.scoped_history(),
+            user_text=(
+                "Write the text message asking this client to shift their session to one of the alternative "
+                "slots listed in the request, using only those slots, as plain weekday and time. Say 'something came up on our end'. Never mention any other "
+                f"person. Request from the orchestrator: {request}"
+            ),
+            tools={},
+        )
+        if not message:
+            return "no response from agent"
+        conv_store.update_context(self.phone, {"pending_orchestrator_request": request})
+        await self._send(message, conv_store)
+        return "asked own client; awaiting their answer"
 
+    @runs_as("agent")
     async def handle_orchestrator_update(self, update: str, db: Session) -> None:
         """The orchestrator reports on a request this agent made. Tell the own client."""
-        with acting_as("agent", self.phone):
-            conv_store = ConversationStore(db)
-            message = await run_agent(
-                system=self._system_prompt(conv_store.get_by_phone(self.phone)),
-                history=self.scoped_history(),
-                user_text=(
-                    "Write the text message telling this client the news below, and offer to book the slot "
-                    f"if it is now free. Never mention any other person. Update: {update}"
-                ),
-                tools={},
-            )
-            if message:
-                await self._send(message, conv_store)
+        conv_store = ConversationStore(db)
+        message = await run_agent(
+            system=self._system_prompt(conv_store.get_by_phone(self.phone)),
+            history=self.scoped_history(),
+            user_text=(
+                "Write the text message telling this client the news below, and offer to book the slot "
+                f"if it is now free. Never mention any other person. Update: {update}"
+            ),
+            tools={},
+        )
+        if message:
+            await self._send(message, conv_store)
 
     async def _send(self, text: str, conv_store: ConversationStore) -> None:
         await self._messaging_client.send_to_phone(self.phone, text)
-        conv_store.update_last_donna_message(self.phone, text)
+        await asyncio.to_thread(conv_store.update_last_donna_message, self.phone, text)
         try:
             get_redis().set(STATE_LAST_DONNA.format(phone=self.phone), text, ex=24 * 3600)
         except Exception as e:
