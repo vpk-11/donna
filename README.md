@@ -1,6 +1,6 @@
 # Donna
-<!-- version: v2.1.0 -->
-![Version](https://img.shields.io/badge/version-v2.1.0-blue)
+<!-- version: v2.1.1 -->
+![Version](https://img.shields.io/badge/version-v2.1.1-blue)
 
 AI business assistant that runs both sides of a service business over iMessage: the provider (admin) side and the client side. iMessage integration isn't built yet — a WebSocket mock stands in for it during development. Named after Donna Paulsen from Suits.
 
@@ -163,4 +163,5 @@ Python 3.12 · FastAPI (WebSocket) · SQLAlchemy (sync, SQLite) · Pydantic v2 �
 ---
 
 ## Changelog
+- **v2.1.1** (2026-09-24): patch bump
 - **v2.1.0** (2026-09-24): minor bump
