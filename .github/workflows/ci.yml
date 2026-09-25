@@ -25,4 +25,4 @@ jobs:
     with:
       python-version: '3.12'
       redis: true
-      test-cmd: 'pytest'
+      test-cmd: 'ADMIN_PHONE=+15550000000 ADMIN_NAME=ci pytest'
