@@ -25,4 +25,4 @@ jobs:
     with:
       python-version: '3.12'
       redis: true
-      test-cmd: 'pytest -m "not live"'
+      test-cmd: 'pytest'
