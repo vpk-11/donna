@@ -86,7 +86,7 @@ def inner(model: str, runs: int) -> None:
             asyncio.run(orch.startup(db)); db.close()
             script = [
                 ("+15559990001", f"Book me a session on {day:%A} at 10am"),
-                ("+15559990001", "Please cancel my next session"),
+                ("+15559990001", "Cancel my next session"),
                 ("+15559990003", "Hi, I'm interested in sessions"),
                 ("+15559990003", "My name is Charlie"),
             ]
