@@ -10,6 +10,8 @@ from donna_mcp.tools.clients import create_client, update_client
 from donna_mcp.tools.scheduling import (
     book_session, cancel_session, reschedule_session, check_slot_conflict, get_sessions_for_date,
 )
+from firewall.input_guard import scan_input
+from firewall.output_guard import scan_output
 from intelligence.prompts import ADMIN_AGENT_SYSTEM
 from orchestrator.handoff import set_agent_handoff_flag
 from orchestrator.llm_agent import DATE_TIME as _DT, NONE as _NONE, obj as _obj, run_agent
@@ -41,6 +43,11 @@ class AdminAgent:
         phone = self.provider.phone_number
         state = conv_store.get_or_create(phone, "admin")
 
+        verdict = scan_input(message=text, phone=phone, is_admin=True)
+        if verdict.action != "pass":
+            await self._messaging_client.send_to_admin(verdict.redirect_message or "I didn't catch that.")
+            return
+
         # Live handoff: the admin talks to a client through Donna
         if state.handoff_active and state.handoff_target_phone:
             await self._handoff_relay(text, state, db, conv_store)
@@ -68,7 +75,10 @@ class AdminAgent:
             tools=self._tools(db, conv_store),
         )
         if response:
-            await self._messaging_client.send_to_admin(response)
+            out = scan_output(response=response, phone=phone, tool_calls_made=[], is_admin=True)
+            await self._messaging_client.send_to_admin(
+                response if out.action == "pass" else (out.redirect_message or "I can't send that.")
+            )
 
     # --- handoff flow (unchanged behavior) ---
 

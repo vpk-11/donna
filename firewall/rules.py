@@ -8,6 +8,11 @@ SENSITIVE_ENTITY_TYPES = [
     "CREDIT_CARD_RE", "UUID", "EMAIL_ADDRESS_RE", "US_SSN_RE",
 ]
 
+ADMIN_SENSITIVE_ENTITY_TYPES = [
+    "CREDIT_CARD", "CRYPTO", "IBAN_CODE", "US_SSN", "US_BANK_NUMBER",
+    "CREDIT_CARD_RE", "US_SSN_RE",
+]
+
 BANNED_INPUT_TOPICS = [
     "workout programming",
     "nutrition advice",

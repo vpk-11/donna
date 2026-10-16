@@ -81,7 +81,7 @@ async def run_agent(
             result, ok = await _call_tool(tools, name, raw)
             if ok and calls_made is not None:
                 calls_made.append(name)
-            if ok and isinstance(result, dict) and result.get("confirmation"):
+            if isinstance(result, dict) and result.get("confirmation") and not result.get("error"):
                 confirmations.append(result["confirmation"])
             logger.info(f"agent.tool {name}({raw}) -> {json.dumps(result, default=str)[:300]}")
             messages.append({

@@ -370,6 +370,8 @@ class ClientAgent:
         )
         if not message:
             return "no response from agent"
+        if not self._relay_safe(message):
+            return "blocked by output firewall"
         conv_store.update_context(self.phone, {"pending_orchestrator_request": request})
         await self._send(message, conv_store)
         return "asked own client; awaiting their answer"
@@ -387,12 +389,19 @@ class ClientAgent:
             ),
             tools={},
         )
-        if message:
+        if message and self._relay_safe(message):
             await self._send(message, conv_store)
 
+    def _relay_safe(self, message: str) -> bool:
+        """Output firewall for orchestrator-relayed messages, which run with no tools."""
+        result = scan_output(
+            response=message, phone=self.phone, tool_calls_made=[],
+            exclude_name=self.client.name if self.client else None,
+        )
+        return result.action == "pass"
+
     async def _send(self, text: str, conv_store: ConversationStore) -> None:
-        await self._messaging_client.send_to_phone(self.phone, text)
-        await asyncio.to_thread(conv_store.update_last_donna_message, self.phone, text)
+        await self._messaging_client.send_to_phone(self.phone, text)  # records last_donna_message + history
         try:
             get_redis().set(STATE_LAST_DONNA.format(phone=self.phone), text, ex=24 * 3600)
         except Exception as e:

@@ -8,12 +8,14 @@ from firewall.rules import (
     REGISTRATION_CLAIM_PATTERNS,
     BLOCK_GENERIC_RESPONSE,
     SENSITIVE_ENTITY_TYPES,
+    ADMIN_SENSITIVE_ENTITY_TYPES,
 )
 from models.schemas import FirewallResult
 
 logger = logging.getLogger(__name__)
 
 _sensitive_scanner = Sensitive(entity_types=SENSITIVE_ENTITY_TYPES)
+_admin_sensitive_scanner = Sensitive(entity_types=ADMIN_SENSITIVE_ENTITY_TYPES)
 _topic_scanner = BanTopics(topics=BANNED_OUTPUT_TOPICS, threshold=BAN_TOPICS_THRESHOLD)
 _refusal_scanner = NoRefusal()
 _booking_patterns = [re.compile(p, re.IGNORECASE) for p in BOOKING_CONFIRMATION_PATTERNS]
@@ -27,10 +29,13 @@ def register_client_names(names: list[str]) -> None:
 
 
 def scan_output(
-    response: str, phone: str, tool_calls_made: list[str], exclude_name: str | None = None
+    response: str, phone: str, tool_calls_made: list[str], exclude_name: str | None = None,
+    is_admin: bool = False,
 ) -> FirewallResult:
+    # The admin legitimately sees client names, contacts and schedules: only secrets are scanned.
     try:
-        _, is_valid, _ = _sensitive_scanner.scan(prompt="", output=response)
+        scanner = _admin_sensitive_scanner if is_admin else _sensitive_scanner
+        _, is_valid, _ = scanner.scan(prompt="", output=response)
         if not is_valid:
             logger.warning("firewall.output.sensitive_data", extra={"phone": phone})
             return FirewallResult(
@@ -42,6 +47,9 @@ def scan_output(
             )
     except Exception as exc:
         logger.error("firewall.output.scanner_error sensitive: %s", exc, extra={"phone": phone})
+
+    if is_admin:
+        return FirewallResult(action="pass")
 
     try:
         _, is_valid, topics_meta = _topic_scanner.scan(prompt="", output=response)
