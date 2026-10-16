@@ -388,3 +388,16 @@ def test_restart_restores_agents_and_open_requests(clients):
 def test_admin_commands_are_not_false_blocked():
     for text in ("yes, confirm it", "list my clients", "show me this week's schedule"):
         assert input_guard.scan_input(text, "+15559990000", is_admin=True).action == "pass"
+
+
+def test_output_scanner_timeout_fails_closed(monkeypatch):
+    import time
+    from config import settings
+    from firewall import output_guard
+    monkeypatch.setattr(settings, "scanner_timeout_s", 0.1)
+    for scanner in (output_guard._sensitive_scanner, output_guard._topic_scanner):
+        monkeypatch.setattr(scanner, "scan", lambda **k: time.sleep(2))
+        r = output_guard.scan_output("Your session is Monday at 10.", PHONE_A, [])
+        assert r.action == "block" and r.threat == "ScannerFailClosed"
+        monkeypatch.undo()
+        monkeypatch.setattr(settings, "scanner_timeout_s", 0.1)

@@ -29,6 +29,18 @@ def register_client_names(names: list[str]) -> None:
     _known_client_names.update(n.lower() for n in names)
 
 
+def _timed_out(name: str, phone: str) -> FirewallResult:
+    """A hung scanner is not a clean scan: block instead of sending the reply unscanned."""
+    logger.error("firewall.output.fail_closed %s timed out", name, extra={"phone": phone})
+    return FirewallResult(
+        action="block",
+        threat="ScannerFailClosed",
+        severity="high",
+        redirect_message=BLOCK_GENERIC_RESPONSE,
+        log_entry={"phone": phone, "scanner": name, "error": "timeout"},
+    )
+
+
 def scan_output(
     response: str, phone: str, tool_calls_made: list[str], exclude_name: str | None = None,
     is_admin: bool = False,
@@ -46,6 +58,8 @@ def scan_output(
                 redirect_message=BLOCK_GENERIC_RESPONSE,
                 log_entry={"phone": phone, "response_preview": response[:100]},
             )
+    except TimeoutError:
+        return _timed_out("sensitive", phone)
     except Exception as exc:
         logger.error("firewall.output.scanner_error sensitive: %s", exc, extra={"phone": phone})
 
@@ -66,6 +80,8 @@ def scan_output(
                 redirect_message=BLOCK_GENERIC_RESPONSE,
                 log_entry={"phone": phone, "topics": topics_meta},
             )
+    except TimeoutError:
+        return _timed_out("ban_topics", phone)
     except Exception as exc:
         logger.error("firewall.output.scanner_error ban_topics: %s", exc, extra={"phone": phone})
 

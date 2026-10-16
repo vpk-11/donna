@@ -3,7 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 from config import settings
 
 # ponytail: a hung scan keeps its worker thread until it returns; the caller is unblocked at the timeout.
-_pool = ThreadPoolExecutor(max_workers=4)
+_pool = ThreadPoolExecutor(max_workers=8)
 
 
 def scan_with_timeout(scanner, **kwargs):
