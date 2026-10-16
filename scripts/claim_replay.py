@@ -18,6 +18,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
 PORT = os.environ.get("DONNA_EVAL_REDIS_PORT", "6391")
 load_dotenv(ROOT / ".env")
 
@@ -125,10 +126,12 @@ def main() -> None:
                        check=True, stdout=subprocess.PIPE, text=True,
                        env={**os.environ, "DONNA_REPLAY_INNER": "1", "REDIS_PORT": PORT, "ADMIN_PHONE": "+15559990000",
                             "LLM_MAX_TOKENS": os.environ.get("LLM_MAX_TOKENS", "2000")})
+        from config import settings
+        judge_model = settings.judge_model or "agent model"
         lines = [l for l in done.stdout.splitlines() if l.startswith("verifier=")]
         (ROOT / "results").mkdir(exist_ok=True)
         stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-        cond = (f"Conditions: LLM_MAX_TOKENS={os.environ.get('LLM_MAX_TOKENS', '2000')}, judge model = agent model, "
+        cond = (f"Conditions: LLM_MAX_TOKENS={os.environ.get('LLM_MAX_TOKENS', '2000')}, judge model = {judge_model}, "
                 f"scenarios: book, cancel, cold register (4 turns per run), local Ollama")
         (ROOT / "results" / f"claim-replay-{stamp}.md").write_text(f"{model}, {runs} runs\n{cond}\n\n" + "\n".join(lines) + "\n")
         print("\n".join(lines))

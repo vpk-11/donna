@@ -27,7 +27,7 @@ from intelligence.claim_judge import verify_reply  # noqa: E402
 
 
 async def run(model: str, cases: list[dict]) -> str:
-    settings.donna_model, settings.llm_max_tokens = model, 2000
+    settings.judge_model, settings.llm_max_tokens = model, 2000
     ok = fails = 0
     false_fail, false_pass, lat = [], [], []
     for c in cases:
@@ -58,7 +58,7 @@ def main() -> None:
     models = sys.argv[1:] or [settings.donna_model or settings.llm_model]
     head = [
         f"Judge eval {datetime.now():%Y-%m-%d %H:%M}, tests/data/judge_labeled.json ({len(cases)} of {total} cases reachable in production)",
-        f"Conditions: judge model = agent model, LLM_MAX_TOKENS=2000, judge_timeout_s={settings.judge_timeout_s}, "
+        f"Conditions: model under test is the judge (judge_model overridden), LLM_MAX_TOKENS=2000, judge_timeout_s={settings.judge_timeout_s}, "
         "errors and timeouts count as fail (fail-closed)",
         "",
         "| model | false fails (supported replies blocked) | false passes (unsupported replies sent) | median call s | max call s |",

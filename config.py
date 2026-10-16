@@ -26,7 +26,9 @@ class Settings(BaseSettings):
     send_timeout_s: float = 10.0  # one outbound message over the transport
     # Post-response claim verifier (intelligence/claim_judge.py). Empty model = same as the agent's.
     claim_verifier: bool = True
-    judge_model: str = ""
+    # Separate from the agent's model (default agent is qwen2.5:7b-instruct): best scorer on the labeled set.
+    # If the agent itself runs gpt-oss:20b, set JUDGE_MODEL to another model so the model does not grade itself.
+    judge_model: str = "ollama_chat/gpt-oss:20b"
     judge_timeout_s: float = 30.0  # gpt-oss:20b p95 turn is ~26s; the judge defaults to the agent's own model
 
     # Provider bootstrap

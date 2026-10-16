@@ -69,7 +69,7 @@ def main() -> None:
         shutil.rmtree(scratch, ignore_errors=True)
     table = "\n".join([
         f"Eval {datetime.now():%Y-%m-%d %H:%M}, tests/live",
-        f"Conditions: LLM_MAX_TOKENS={os.environ.get('LLM_MAX_TOKENS', '2000')}, claim_verifier={'on' if settings.claim_verifier else 'off'} (settings default), "
+        f"Conditions: LLM_MAX_TOKENS={os.environ.get('LLM_MAX_TOKENS', '2000')}, claim_verifier={'on' if settings.claim_verifier else 'off'} (settings default), judge_model={settings.judge_model or 'agent model'}, "
         "local Ollama, tool calls/turn counts every tool call in a handle_message turn",
         "",
         "| model | passed | tool calls/turn | median turn s | p95 turn s | failed |",
