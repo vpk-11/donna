@@ -523,3 +523,49 @@ def test_deadline_does_not_cancel_a_running_tool(monkeypatch):
         out = asyncio.run(run_agent("sys", [], "book me", tools))
     assert committed == [1]
     assert out == "You're booked for Monday."
+
+
+def test_stalled_socket_does_not_hang_send_and_queues(monkeypatch, clients):
+    from config import settings
+    from donna_mcp.tools.conversation import ensure_conversation_state
+    from messaging.websocket_client import WebSocketConnectionManager, WebSocketMessagingClient
+    from store.conversation_store import ConversationStore
+
+    class Stalled:
+        async def send_text(self, _):
+            await asyncio.sleep(5)
+
+    monkeypatch.setattr(settings, "send_timeout_s", 0.1)
+    manager = WebSocketConnectionManager()
+    manager._connections[PHONE_A] = Stalled()
+    with acting_as("orchestrator"):
+        ensure_conversation_state(PHONE_A, "client")
+    asyncio.run(WebSocketMessagingClient(manager, SessionLocal).send_to_phone(PHONE_A, "hello"))
+    db = SessionLocal()
+    try:
+        ctx = ConversationStore(db).get_by_phone(PHONE_A).context
+        assert ctx["pending_messages"] == ["[DONNA] hello"]
+    finally:
+        db.close()
+
+
+def test_handoff_relay_turn_records_activity(clients):
+    from db.redis_client import get_redis
+    from donna_mcp.tools.conversation import ensure_conversation_state
+    from orchestrator.channels import STATE_TIMEOUT
+    from store.conversation_store import ConversationStore
+
+    a, _ = clients
+    with acting_as("orchestrator"):
+        ensure_conversation_state(PHONE_A, "client")
+    db = SessionLocal()
+    try:
+        with acting_as("orchestrator"):
+            ConversationStore(db).update(PHONE_A, {"handoff_active": True})
+        m = _messaging()
+        agent = _agent(PHONE_A, a, m)
+        asyncio.run(agent.handle_message("hello owner", db))
+    finally:
+        db.close()
+    m.send_to_admin.assert_awaited_once()
+    assert get_redis().exists(STATE_TIMEOUT.format(phone=PHONE_A))

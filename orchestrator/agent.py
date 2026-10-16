@@ -107,6 +107,7 @@ class ClientAgent:
             )
             return
         sanitized = firewall_result.sanitized_input or text
+        self._touch_activity()  # any turn past the input firewall (incl. handoff relay); blocked input does not count
 
         # --- Handoff relay / triggers ---
         if state.handoff_active:
@@ -124,8 +125,6 @@ class ClientAgent:
 
         self._turn_count += 1
         await asyncio.to_thread(conv_store.update, self.phone, {"turn_count": self._turn_count})
-
-        self._touch_activity()  # on every handled turn, so a blocked or failed turn still counts as active
 
         # --- The agent decides and acts ---
         self._last_tool_calls = []

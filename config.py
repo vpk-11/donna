@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     turn_timeout_s: float = 180.0  # whole tool loop of one agent turn
     llm_retry_backoff_s: float = 1.0
     scanner_timeout_s: float = 30.0
+    send_timeout_s: float = 10.0  # one outbound message over the transport
     # Post-response claim verifier (intelligence/claim_judge.py). Empty model = same as the agent's.
     claim_verifier: bool = True
     judge_model: str = ""

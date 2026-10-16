@@ -51,9 +51,13 @@ async def run(model: str, cases: list[dict]) -> str:
 
 def main() -> None:
     cases = json.loads((ROOT / "tests" / "data" / "judge_labeled.json").read_text())
+    # Production skips the judge when a tool wrote the reply (ClientAgent: `authored`), so those cases are unreachable.
+    total = len(cases)
+    cases = [c for c in cases if not any(isinstance(t["result"], dict) and t["result"].get("confirmation")
+                                         for t in c["trace"])]
     models = sys.argv[1:] or [settings.donna_model or settings.llm_model]
     head = [
-        f"Judge eval {datetime.now():%Y-%m-%d %H:%M}, tests/data/judge_labeled.json ({len(cases)} cases)",
+        f"Judge eval {datetime.now():%Y-%m-%d %H:%M}, tests/data/judge_labeled.json ({len(cases)} of {total} cases reachable in production)",
         f"Conditions: judge model = agent model, LLM_MAX_TOKENS=2000, judge_timeout_s={settings.judge_timeout_s}, "
         "errors and timeouts count as fail (fail-closed)",
         "",

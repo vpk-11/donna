@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from fastapi import WebSocket
 from rich.console import Console
@@ -28,7 +29,7 @@ class WebSocketConnectionManager:
     async def send(self, phone: str, message: str) -> None:
         ws = self._connections.get(phone)
         if ws:
-            await ws.send_text(message)
+            await asyncio.wait_for(ws.send_text(message), settings.send_timeout_s)
 
 
 class WebSocketMessagingClient(MessagingClient):
@@ -44,11 +45,17 @@ class WebSocketMessagingClient(MessagingClient):
         db = self._db_factory()
         try:
             conv_store = ConversationStore(db)
+            delivered = False
             if self._manager.is_connected(phone):
-                await self._manager.send(phone, formatted)
-                console.print(f"[cyan][DONNA -> {phone}][/cyan] {message}")
-            else:
-                logger.warning(f"Phone {phone} not connected — queuing message")
+                try:
+                    await self._manager.send(phone, formatted)
+                    delivered = True
+                    console.print(f"[cyan][DONNA -> {phone}][/cyan] {message}")
+                except Exception as e:  # stalled or broken socket: queue instead of hanging the turn
+                    logger.warning(f"Send to {phone} failed ({e!r}) - queuing message")
+            if not delivered:
+                if not self._manager.is_connected(phone):
+                    logger.warning(f"Phone {phone} not connected — queuing message")
                 state = conv_store.get_by_phone(phone)
                 if state:
                     ctx = dict(state.context or {})
