@@ -381,7 +381,7 @@ def test_restart_restores_agents_history_and_open_requests(clients):
         asyncio.run(first._get_or_spawn_agent(PHONE_B, db))  # inactive: no timeout key, must be pruned
         get_redis().set(STATE_TIMEOUT.format(phone=PHONE_A), "1", ex=300)
         first._open_requests[PHONE_A] = PHONE_B
-        get_redis().hset("state:open_requests", PHONE_A, PHONE_B)
+        get_redis().hset("state:open_requests", PHONE_A, f"{PHONE_B}|{int(__import__('time').time())}")
 
         second = CentralOrchestrator(_messaging(), {})  # simulated restart: fresh in-memory state
         asyncio.run(second.startup(db))
@@ -670,3 +670,38 @@ def test_lazily_spawned_agent_gets_recent_turns_without_blocked_ones(clients):
         db.close()
     contents = [t["content"] for t in agent.scoped_history()]
     assert contents == ["Can I do Friday at 9?", "Friday 9 is free."]
+
+
+def test_hung_relay_is_bounded(clients, monkeypatch):
+    from config import settings
+    monkeypatch.setattr(settings, "relay_timeout_s", 0.1)
+    db = SessionLocal()
+    try:
+        orch = CentralOrchestrator(_messaging(), {})
+        asyncio.run(orch.startup(db))
+
+        async def hang(*a, **kw):
+            await asyncio.sleep(5)
+
+        monkeypatch.setattr(orch, "route_request", hang)
+        client = ClientStore(db).get(clients[0]["id"])
+        import datetime
+        out = asyncio.run(orch.request_slot_freed(PHONE_A, client, datetime.datetime.now(), db))
+    finally:
+        db.close()
+    assert "still being arranged" in out
+
+
+def test_open_request_without_timestamp_is_dropped_on_restore(clients):
+    from db.redis_client import get_redis
+    get_redis().hset("state:agent:registry", PHONE_A, "{}")
+    get_redis().set("state:timeout:" + PHONE_A, "1", ex=300)
+    get_redis().hset("state:open_requests", PHONE_A, PHONE_B)  # no timestamp
+    db = SessionLocal()
+    try:
+        orch = CentralOrchestrator(_messaging(), {})
+        asyncio.run(orch.startup(db))
+    finally:
+        db.close()
+    assert orch._open_requests == {}
+    assert not get_redis().hexists("state:open_requests", PHONE_A)

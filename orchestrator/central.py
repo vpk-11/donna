@@ -66,7 +66,10 @@ class CentralOrchestrator:
         self._open_requests, self._open_request_at = {}, {}
         for target, value in stored.items():
             requester, _, opened = value.partition("|")
-            opened_at = float(opened) if opened else time.time()  # legacy value without a timestamp
+            try:
+                opened_at = float(opened)
+            except ValueError:  # no timestamp, or garbage: treat as expired
+                opened_at = 0.0
             if target in self._agents and time.time() - opened_at < settings.open_request_ttl_s:
                 self._open_requests[target], self._open_request_at[target] = requester, opened_at
             else:  # target not restored, or the request expired
@@ -157,7 +160,20 @@ class CentralOrchestrator:
     # Agent-to-agent: requests come here, this agent decides whom to relay to
     # -------------------------------------------------------------------------
 
+    async def _bounded(self, coro, fallback: str) -> str:
+        """Cap a relay step at relay_timeout_s. Relays only message and ask; no booking is written inside
+        them, so cutting one off is safe (the open request, if opened, expires by itself)."""
+        try:
+            return await asyncio.wait_for(coro, settings.relay_timeout_s)
+        except asyncio.TimeoutError:
+            logger.error(f"relay timed out after {settings.relay_timeout_s}s")
+            return fallback
+
     async def request_slot_freed(self, requester_phone: str, client, slot, db: Session) -> str:
+        return await self._bounded(self._request_slot_freed(requester_phone, client, slot, db),
+                                   "still being arranged, no answer yet; tell the client you will update them")
+
+    async def _request_slot_freed(self, requester_phone: str, client, slot, db: Session) -> str:
         return await self.route_request(
             requester_phone,
             f"Client {client.name} (id {client.id}) needs the {slot.isoformat()} slot freed. "
@@ -226,6 +242,9 @@ class CentralOrchestrator:
             ) or "no outcome"
 
     async def report_outcome(self, from_phone: str, outcome: str, db: Session) -> str:
+        return await self._bounded(self._report_outcome(from_phone, outcome, db), "forwarding is delayed")
+
+    async def _report_outcome(self, from_phone: str, outcome: str, db: Session) -> str:
         """A client agent finished a relayed request. Forward to the requester's agent, or the admin."""
         requester = self._open_requests.pop(from_phone, None)
         opened_at = self._open_request_at.pop(from_phone, None)
