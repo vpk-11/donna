@@ -32,6 +32,8 @@ def run_model(model: str, scratch: Path) -> list[dict]:
         **os.environ, "DONNA_LIVE": "1", "DONNA_MODEL": model, "DONNA_EVAL_OUT": str(out),
         "REDIS_PORT": REDIS_PORT, "ADMIN_PHONE": "+15559990000", "LLM_MAX_TOKENS": os.environ.get("LLM_MAX_TOKENS", "2000"),
     }
+    if not model.startswith("ollama"):  # hosted provider: LiteLLM routes by prefix, the Ollama base URL must go
+        env["LLM_API_BASE"] = ""
     subprocess.run([sys.executable, "-m", "pytest", "tests/live", "-q", "-p", "no:cacheprovider"],
                    cwd=scratch / "repo", env=env, check=False)
     return [json.loads(line) for line in out.read_text().splitlines()] if out.exists() else []
