@@ -9,7 +9,7 @@ from orchestrator.channels import (
 )
 from orchestrator.llm_agent import DATE_TIME, NONE, obj, run_agent
 from config import settings
-from intelligence.claim_judge import FALLBACK, needs_check, verify_reply
+from intelligence.claim_judge import FALLBACK, verify_reply
 from intelligence.judge_rules import NEW_CLIENT_STATUSES
 from intelligence.prompts import CLIENT_AGENT_SYSTEM
 from intelligence.context_manager import (
@@ -144,10 +144,9 @@ class ClientAgent:
 
         # --- Claim verifier (tool-authored confirmations are already true by construction) ---
         authored = any(isinstance(t["result"], dict) and t["result"].get("confirmation") for t in trace)
-        if settings.claim_verifier and not authored and needs_check(response, trace):
-            if not await verify_reply(response, trace):
-                await self._send(FALLBACK, conv_store)
-                return
+        if settings.claim_verifier and not authored and not await verify_reply(response, trace):
+            await self._send_blocked(FALLBACK, sanitized, conv_store)
+            return
 
         # --- Output guard ---
         out_result = scan_output(
@@ -157,9 +156,9 @@ class ClientAgent:
             exclude_name=self.client.name if self.client else None,
         )
         if out_result.action != "pass":
-            await self._send(
+            await self._send_blocked(
                 out_result.redirect_message or "Let me double-check on that and get back to you.",
-                conv_store,
+                sanitized, conv_store,
             )
             return
 
@@ -382,6 +381,9 @@ class ClientAgent:
         if not message:
             return "no response from agent"
         if not self._relay_safe(message):
+            await self._messaging_client.send_to_admin(
+                f"A relayed request to {self.client.name if self.client else self.phone} was blocked by the output firewall."
+            )
             return "blocked by output firewall"
         conv_store.update_context(self.phone, {"pending_orchestrator_request": request})
         await self._send(message, conv_store)
@@ -402,6 +404,19 @@ class ClientAgent:
         )
         if message and self._relay_safe(message):
             await self._send(message, conv_store)
+        elif message:
+            await self._messaging_client.send_to_admin(
+                f"An update to {self.client.name if self.client else self.phone} was blocked by the output firewall."
+            )
+
+    async def _send_blocked(self, text: str, user_text: str, conv_store: ConversationStore) -> None:
+        """Send a fallback and keep the exchange in history, so the agent knows what the client saw
+        (a tool may have acted even though the model's reply was withheld)."""
+        await self._send(text, conv_store)
+        self._history += self._own([
+            {"role": "user", "content": user_text},
+            {"role": "donna", "content": text},
+        ])
 
     def _relay_safe(self, message: str) -> bool:
         """Output firewall for orchestrator-relayed messages, which run with no tools."""

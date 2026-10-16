@@ -8,7 +8,7 @@ from config import settings
 from db.database import SessionLocal
 from donna_mcp.tools.clients import create_client
 from intelligence import claim_judge
-from intelligence.claim_judge import FALLBACK, needs_check, verify_reply
+from intelligence.claim_judge import FALLBACK, verify_reply
 from orchestrator.agent import ClientAgent
 from store.client_store import ClientStore
 from store.provider_store import ProviderStore
@@ -56,12 +56,6 @@ def test_timeout_fails_closed(monkeypatch):
         assert not run(verify_reply("You're booked.", SUCCESS))
 
 
-def test_gate():
-    assert not needs_check("Happy to help, what would you like?", [])
-    assert needs_check("See you Monday!", [])
-    assert needs_check("Sure.", SUCCESS)
-
-
 def _agent_turn(reply, trace, verdict):
     """One ClientAgent turn with a canned model reply; returns what was sent to the client."""
     client = create_client(name="Alice", phone_number=PHONE)
@@ -101,7 +95,21 @@ def test_verifier_error_in_turn_fails_closed(monkeypatch):
     assert _agent_turn("See you Monday!", SUCCESS, "garbage") == [FALLBACK]
 
 
-def test_chitchat_skips_judge(monkeypatch):
+def test_vague_claim_without_tool_calls_is_still_verified(monkeypatch):
     monkeypatch.setattr(settings, "claim_verifier", True)
-    with patch("orchestrator.agent.verify_reply", AsyncMock(side_effect=AssertionError("called"))):
-        assert _agent_turn("Happy to help, what do you need?", [], "fail") == ["Happy to help, what do you need?"]
+    assert _agent_turn("You're all set!", [], "fail") == [FALLBACK]
+
+
+def test_blocked_reply_stays_in_history(monkeypatch):
+    from store.conversation_store import ConversationStore
+    monkeypatch.setattr(settings, "claim_verifier", True)
+    captured = {}
+    real = ClientAgent._send_blocked
+
+    async def spy(self, text, user_text, conv_store):
+        await real(self, text, user_text, conv_store)
+        captured["history"] = self.scoped_history()
+
+    monkeypatch.setattr(ClientAgent, "_send_blocked", spy)
+    _agent_turn("Done, sorted!", [], "fail")
+    assert [t["content"] for t in captured["history"]] == ["hi", FALLBACK]

@@ -12,6 +12,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from datetime import datetime
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -24,6 +25,7 @@ CLAIMS = {
     "cancel": re.compile(r"\b(cancel(l)?ed)\b", re.I),
     "register": re.compile(r"\b(registered|signed you up|added you)\b", re.I),
 }
+FALLBACKS = ("Let me double-check on that", "Sorry, could you tell me your name", "I didn't quite get that")
 TOOLS = {"book": {"book_session"}, "cancel": {"cancel_session"}, "register": {"register_me"}}
 
 
@@ -51,8 +53,10 @@ def inner(model: str, runs: int) -> None:
     last_calls: list[str] = []
 
     async def spy(*a, **kw):
-        kw["calls_made"] = last_calls
-        return await real_run_agent(*a, **kw)
+        out = await real_run_agent(*a, **kw)
+        if kw.get("calls_made") is not None:
+            last_calls[:] = kw["calls_made"]  # mirror, never replace: the agent's own list feeds the output guard
+        return out
 
     agent_mod.run_agent = spy
 
@@ -64,7 +68,7 @@ def inner(model: str, runs: int) -> None:
     for verifier in (False, True):
         settings.claim_verifier = verifier
         counts = {k: 0 for k in CLAIMS}
-        turns = 0
+        turns = fallbacks = 0
         for _ in range(runs):
             Base.metadata.drop_all(bind=engine); Base.metadata.create_all(bind=engine)
             with acting_as("system"):
@@ -93,13 +97,15 @@ def inner(model: str, runs: int) -> None:
                     asyncio.run(orch.handle_message(phone, text, db))
                 db.close()
                 turns += 1
+                fallbacks += sum(any(f in m for f in FALLBACKS) for m in rec.sent)
                 for kind, rx in CLAIMS.items():
                     claimed = any(rx.search(m) for m in rec.sent)
                     if claimed and not (TOOLS[kind] & set(last_calls)):
                         counts[kind] += 1
-        results[verifier] = (turns, counts)
-    for verifier, (turns, counts) in results.items():
-        print(f"verifier={'on ' if verifier else 'off'} turns={turns} false_claims={sum(counts.values())} {counts}")
+        results[verifier] = (turns, counts, fallbacks)
+    for verifier, (turns, counts, fallbacks) in results.items():
+        print(f"verifier={'on ' if verifier else 'off'} turns={turns} false_claims={sum(counts.values())} "
+              f"{counts} fallback_replies={fallbacks}")
 
 
 def main() -> None:
@@ -112,9 +118,15 @@ def main() -> None:
         ".git", "donna.db", "graphify-out", "__pycache__", "results"))
     redis = subprocess.Popen(["redis-server", "--port", "6391", "--save", ""], stdout=subprocess.DEVNULL)
     try:
-        subprocess.run([sys.executable, "scripts/claim_replay.py", model, str(runs)], cwd=scratch / "repo", check=True,
+        done = subprocess.run([sys.executable, "scripts/claim_replay.py", model, str(runs)], cwd=scratch / "repo",
+                       check=True, stdout=subprocess.PIPE, text=True,
                        env={**os.environ, "DONNA_REPLAY_INNER": "1", "REDIS_PORT": "6391", "ADMIN_PHONE": "+15559990000",
                             "LLM_MAX_TOKENS": os.environ.get("LLM_MAX_TOKENS", "2000")})
+        lines = [l for l in done.stdout.splitlines() if l.startswith("verifier=")]
+        (ROOT / "results").mkdir(exist_ok=True)
+        stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        (ROOT / "results" / f"claim-replay-{stamp}.md").write_text(f"{model}, {runs} runs\n\n" + "\n".join(lines) + "\n")
+        print("\n".join(lines))
     finally:
         redis.terminate()
         shutil.rmtree(scratch, ignore_errors=True)

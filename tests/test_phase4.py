@@ -362,27 +362,65 @@ def test_llm_retry_recovers_after_transient_error(monkeypatch):
 
 # --- Redis-persisted agents and open requests ---
 
-def test_restart_restores_agents_and_open_requests(clients):
+def test_restart_restores_agents_history_and_open_requests(clients):
     from db.redis_client import get_redis
-    from orchestrator.channels import STATE_SESSION
+    from orchestrator.channels import STATE_SESSION, STATE_TIMEOUT
+    from store.conversation_store import ConversationStore
 
     db = SessionLocal()
     try:
+        with acting_as("orchestrator"):
+            ConversationStore(db).get_or_create(PHONE_A, "client")
+            ConversationStore(db).append_history(PHONE_A, "user", "Can I do Friday at 9?")
+            ConversationStore(db).append_history(PHONE_A, "donna", "Friday 9 is free.")
         first = CentralOrchestrator(_messaging(), {})
         asyncio.run(first.startup(db))
         get_redis().set(STATE_SESSION.format(phone=PHONE_A), "Alice asked about Friday slots.")
-        agent = asyncio.run(first._get_or_spawn_agent(PHONE_A, db))
+        asyncio.run(first._get_or_spawn_agent(PHONE_A, db))
+        asyncio.run(first._get_or_spawn_agent(PHONE_B, db))  # inactive: no timeout key, must be pruned
+        get_redis().set(STATE_TIMEOUT.format(phone=PHONE_A), "1", ex=300)
         first._open_requests[PHONE_A] = PHONE_B
         get_redis().hset("state:open_requests", PHONE_A, PHONE_B)
-        assert agent.phone == PHONE_A
 
         second = CentralOrchestrator(_messaging(), {})  # simulated restart: fresh in-memory state
         asyncio.run(second.startup(db))
         assert set(second._agents) == {PHONE_A}
-        assert "Friday slots" in second._agents[PHONE_A].scoped_history()[0]["content"]
+        assert not get_redis().hexists("state:agent:registry", PHONE_B)
+        contents = [t["content"] for t in second._agents[PHONE_A].scoped_history()]
+        assert any("Friday slots" in c for c in contents)
+        assert contents[-2:] == ["Can I do Friday at 9?", "Friday 9 is free."]
         assert second._open_requests == {PHONE_A: PHONE_B}
     finally:
         db.close()
+
+
+def test_turn_deadline_returns_empty(monkeypatch):
+    from config import settings
+    from orchestrator.llm_agent import run_agent
+    monkeypatch.setattr(settings, "turn_timeout_s", 0.05)
+
+    async def slow(messages, tools, **kw):
+        await asyncio.sleep(5)
+
+    with patch("orchestrator.llm_agent.call_llm_tools", slow):
+        assert asyncio.run(run_agent("sys", [], "hi", {})) == ""
+
+
+def test_blocked_relay_message_notifies_admin(clients):
+    from firewall.output_guard import register_client_names
+    register_client_names(["Alice", "Bob"])
+    a, b = clients
+    m = _messaging()
+    agent = _agent(PHONE_B, b, m)
+    db = SessionLocal()
+    try:
+        with patch("orchestrator.agent.run_agent", AsyncMock(return_value="Alice needs your slot, please move.")):
+            out = asyncio.run(agent.handle_orchestrator_request("free the 10:00 slot", db))
+    finally:
+        db.close()
+    assert out == "blocked by output firewall"
+    m.send_to_admin.assert_awaited_once()
+    m.send_to_phone.assert_not_awaited()
 
 
 def test_admin_commands_are_not_false_blocked():

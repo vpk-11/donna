@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     # Per-attempt LLM timeout, bounded retries with exponential backoff, scanner timeout.
     llm_timeout_s: float = 120.0
     llm_max_attempts: int = 3
+    turn_timeout_s: float = 180.0  # whole tool loop of one agent turn
     llm_retry_backoff_s: float = 1.0
     scanner_timeout_s: float = 30.0
     # Post-response claim verifier (intelligence/claim_judge.py). Empty model = same as the agent's.

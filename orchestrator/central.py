@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 from models.orm import Provider
 from db.redis_client import get_redis
-from orchestrator.channels import STATE_AGENT_REGISTRY, STATE_OPEN_REQUESTS, STATE_SESSION
+from orchestrator.channels import STATE_AGENT_REGISTRY, STATE_OPEN_REQUESTS, STATE_SESSION, STATE_TIMEOUT
 from orchestrator.admin_agent import AdminAgent
 from orchestrator.agent import ClientAgent
 from orchestrator.llm_agent import run_agent
@@ -47,10 +47,17 @@ class CentralOrchestrator:
         except Exception as e:
             logger.warning(f"Could not restore agents: {e}")
             return
+        conv_store = ConversationStore(db)
+        restored = 0
         for phone, entry in registry.items():
-            await self._get_or_spawn_agent(phone, db)
+            if not r.exists(STATE_TIMEOUT.format(phone=phone)):  # inactive past the timeout: drop, respawns on next message
+                r.hdel(STATE_AGENT_REGISTRY, phone)
+                continue
+            agent = await self._get_or_spawn_agent(phone, db)
+            agent._history += agent._own(conv_store.get_history(phone))  # recent turns since the last summary
             r.hset(STATE_AGENT_REGISTRY, phone, entry)  # keep the original started_at/handoff flags
-        logger.info(f"Restored {len(registry)} agents, {len(self._open_requests)} open requests")
+            restored += 1
+        logger.info(f"Restored {restored} agents, {len(self._open_requests)} open requests")
 
     @runs_as("orchestrator")
     async def handle_message(self, phone: str, text: str, db: Session) -> None:

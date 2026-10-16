@@ -1,8 +1,10 @@
+import asyncio
 import inspect
 import json
 import logging
 from typing import Callable
 
+from config import settings
 from intelligence.llm_client import call_llm_tools
 
 logger = logging.getLogger(__name__)
@@ -47,7 +49,7 @@ async def _call_tool(tools: dict, name: str, raw) -> tuple[object, bool]:
     return result, not failed
 
 
-async def run_agent(
+async def _run_loop(
     system: str,
     history: list[dict],
     user_text: str,
@@ -93,3 +95,12 @@ async def run_agent(
                 "content": json.dumps(result, default=str),
             })
     return ""
+
+
+async def run_agent(*args, **kwargs) -> str:
+    """Tool-use loop with a whole-turn deadline. A timed-out turn returns "" (callers send their fallback)."""
+    try:
+        return await asyncio.wait_for(_run_loop(*args, **kwargs), settings.turn_timeout_s)
+    except asyncio.TimeoutError:
+        logger.error(f"agent turn exceeded {settings.turn_timeout_s}s")
+        return ""
