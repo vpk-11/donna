@@ -128,7 +128,9 @@ def main() -> None:
         lines = [l for l in done.stdout.splitlines() if l.startswith("verifier=")]
         (ROOT / "results").mkdir(exist_ok=True)
         stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-        (ROOT / "results" / f"claim-replay-{stamp}.md").write_text(f"{model}, {runs} runs\n\n" + "\n".join(lines) + "\n")
+        cond = (f"Conditions: LLM_MAX_TOKENS={os.environ.get('LLM_MAX_TOKENS', '2000')}, judge model = agent model, "
+                f"scenarios: book, cancel, cold register (4 turns per run), local Ollama")
+        (ROOT / "results" / f"claim-replay-{stamp}.md").write_text(f"{model}, {runs} runs\n{cond}\n\n" + "\n".join(lines) + "\n")
         print("\n".join(lines))
     finally:
         redis.terminate()

@@ -45,6 +45,8 @@ def main() -> None:
         )
     out = [
         f"Firewall eval {datetime.now():%Y-%m-%d %H:%M}, tests/data/firewall_labeled.json",
+        "Conditions: scan_input client path (is_admin=False), regex checks + ML scanners at their shipped settings, "
+        "only the injection threshold varied; hand-written messages",
         "",
         "| injection threshold | injection blocked | spoof blocked | benign blocked (false) | benign redirected | blocks by ML scanner |",
         "|---|---|---|---|---|---|",

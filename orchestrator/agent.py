@@ -125,6 +125,8 @@ class ClientAgent:
         self._turn_count += 1
         await asyncio.to_thread(conv_store.update, self.phone, {"turn_count": self._turn_count})
 
+        self._touch_activity()  # on every handled turn, so a blocked or failed turn still counts as active
+
         # --- The agent decides and acts ---
         self._last_tool_calls = []
         self._ending = False
@@ -181,12 +183,6 @@ class ClientAgent:
                     get_redis().set(STATE_SESSION.format(phone=self.phone), summary, ex=7 * 24 * 3600)
                 except Exception as e:
                     logger.warning(f"agent.summary_redis_write failed: {e}")
-
-        try:
-            timeout_mins = self._business_config.get("conversation_timeout_mins", 5)
-            get_redis().set(STATE_TIMEOUT.format(phone=self.phone), "1", ex=timeout_mins * 60)
-        except Exception as e:
-            logger.warning(f"agent.timeout_key failed: {e}")
 
         if self._ending:
             await self._finalize_conversation(db, conv_store)
@@ -408,6 +404,13 @@ class ClientAgent:
             await self._messaging_client.send_to_admin(
                 f"An update to {self.client.name if self.client else self.phone} was blocked by the output firewall."
             )
+
+    def _touch_activity(self) -> None:
+        try:
+            timeout_mins = self._business_config.get("conversation_timeout_mins", 5)
+            get_redis().set(STATE_TIMEOUT.format(phone=self.phone), "1", ex=timeout_mins * 60)
+        except Exception as e:
+            logger.warning(f"agent.timeout_key failed: {e}")
 
     async def _send_blocked(self, text: str, user_text: str, conv_store: ConversationStore) -> None:
         """Send a fallback and keep the exchange in history, so the agent knows what the client saw

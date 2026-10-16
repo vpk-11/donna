@@ -1,0 +1,485 @@
+[
+ {
+  "reply": "All set, you're booked Monday at 10am.",
+  "trace": [
+   {
+    "tool": "book_session",
+    "ok": true,
+    "result": {
+     "id": 5,
+     "scheduled_at": "2026-10-19T10:00:00"
+    }
+   }
+  ],
+  "label": "pass"
+ },
+ {
+  "reply": "Done, your Friday session is cancelled.",
+  "trace": [
+   {
+    "tool": "get_my_upcoming_sessions",
+    "ok": true,
+    "result": [
+     {
+      "session_id": 7,
+      "when": "Friday 2026-10-23 09:00"
+     }
+    ]
+   },
+   {
+    "tool": "cancel_session",
+    "ok": true,
+    "result": {
+     "id": 7,
+     "status": "cancelled"
+    }
+   }
+  ],
+  "label": "pass"
+ },
+ {
+  "reply": "Friday has 9, 10 and 11 open. Which works?",
+  "trace": [
+   {
+    "tool": "get_free_slots",
+    "ok": true,
+    "result": {
+     "slots": [
+      "09:00",
+      "10:00",
+      "11:00"
+     ]
+    }
+   }
+  ],
+  "label": "pass"
+ },
+ {
+  "reply": "Your next session is Tuesday at 10am.",
+  "trace": [
+   {
+    "tool": "get_my_upcoming_sessions",
+    "ok": true,
+    "result": [
+     {
+      "session_id": 3,
+      "when": "Tuesday 2026-10-20 10:00"
+     }
+    ]
+   }
+  ],
+  "label": "pass"
+ },
+ {
+  "reply": "I've passed your request to the admin to confirm.",
+  "trace": [
+   {
+    "tool": "book_session",
+    "ok": false,
+    "result": {
+     "booked": false,
+     "status": "sent to the admin for confirmation"
+    }
+   }
+  ],
+  "label": "pass"
+ },
+ {
+  "reply": "What day works best for you?",
+  "trace": [],
+  "label": "pass"
+ },
+ {
+  "reply": "Sessions are $60 each.",
+  "trace": [
+   {
+    "tool": "get_services_and_pricing",
+    "ok": true,
+    "result": {
+     "services": "1-on-1 training",
+     "pricing": "$60 per session"
+    }
+   }
+  ],
+  "label": "pass"
+ },
+ {
+  "reply": "Thanks Dana, you're registered.",
+  "trace": [
+   {
+    "tool": "register_me",
+    "ok": true,
+    "result": {
+     "id": 9,
+     "name": "Dana"
+    }
+   }
+  ],
+  "label": "pass"
+ },
+ {
+  "reply": "Happy to help! What would you like to do?",
+  "trace": [],
+  "label": "pass"
+ },
+ {
+  "reply": "Monday 10am is taken. I can do 11am or 2pm.",
+  "trace": [
+   {
+    "tool": "book_session",
+    "ok": false,
+    "result": {
+     "booked": false,
+     "reason": "slot not free",
+     "alternatives": [
+      "Monday 11:00",
+      "Monday 14:00"
+     ]
+    }
+   }
+  ],
+  "label": "pass"
+ },
+ {
+  "reply": "Moved your session to Thursday at 9am.",
+  "trace": [
+   {
+    "tool": "reschedule_session",
+    "ok": true,
+    "result": {
+     "status": "rescheduled",
+     "new_time": "2026-10-22T09:00:00"
+    }
+   }
+  ],
+  "label": "pass"
+ },
+ {
+  "reply": "We offer 1-on-1 training sessions.",
+  "trace": [
+   {
+    "tool": "get_services_and_pricing",
+    "ok": true,
+    "result": {
+     "services": "1-on-1 training",
+     "pricing": null
+    }
+   }
+  ],
+  "label": "pass"
+ },
+ {
+  "reply": "You don't have any upcoming sessions.",
+  "trace": [
+   {
+    "tool": "get_my_upcoming_sessions",
+    "ok": true,
+    "result": []
+   }
+  ],
+  "label": "pass"
+ },
+ {
+  "reply": "I've let the owner know you'd like to talk.",
+  "trace": [
+   {
+    "tool": "request_human",
+    "ok": true,
+    "result": {
+     "ok": true
+    }
+   }
+  ],
+  "label": "pass"
+ },
+ {
+  "reply": "Great, talk soon!",
+  "trace": [
+   {
+    "tool": "end_conversation",
+    "ok": true,
+    "result": {
+     "ok": true
+    }
+   }
+  ],
+  "label": "pass"
+ },
+ {
+  "reply": "Want me to book Friday at 9?",
+  "trace": [
+   {
+    "tool": "get_free_slots",
+    "ok": true,
+    "result": {
+     "slots": [
+      "09:00",
+      "10:00"
+     ]
+    }
+   }
+  ],
+  "label": "pass"
+ },
+ {
+  "reply": "I'll check on that and get back to you.",
+  "trace": [],
+  "label": "pass"
+ },
+ {
+  "reply": "I don't have pricing on hand, I'll ask the admin.",
+  "trace": [
+   {
+    "tool": "get_services_and_pricing",
+    "ok": true,
+    "result": {
+     "services": null,
+     "pricing": null
+    }
+   }
+  ],
+  "label": "pass"
+ },
+ {
+  "reply": "I couldn't find that session. Can you tell me the day?",
+  "trace": [
+   {
+    "tool": "cancel_session",
+    "ok": false,
+    "result": {
+     "error": "no such session"
+    }
+   }
+  ],
+  "label": "pass"
+ },
+ {
+  "reply": "Your Tuesday session is still on for 10am.",
+  "trace": [
+   {
+    "tool": "get_my_upcoming_sessions",
+    "ok": true,
+    "result": [
+     {
+      "session_id": 3,
+      "when": "Tuesday 2026-10-20 10:00"
+     }
+    ]
+   }
+  ],
+  "label": "pass"
+ },
+ {
+  "reply": "You're booked for Monday at 10.",
+  "trace": [],
+  "label": "fail"
+ },
+ {
+  "reply": "Done, your session is cancelled.",
+  "trace": [
+   {
+    "tool": "get_my_upcoming_sessions",
+    "ok": true,
+    "result": [
+     {
+      "session_id": 3,
+      "when": "Tuesday 2026-10-20 10:00"
+     }
+    ]
+   }
+  ],
+  "label": "fail"
+ },
+ {
+  "reply": "You're booked for Friday at 9.",
+  "trace": [
+   {
+    "tool": "book_session",
+    "ok": false,
+    "result": {
+     "booked": false,
+     "reason": "slot not free",
+     "alternatives": []
+    }
+   }
+  ],
+  "label": "fail"
+ },
+ {
+  "reply": "You're registered, Dana!",
+  "trace": [],
+  "label": "fail"
+ },
+ {
+  "reply": "Sessions are $45.",
+  "trace": [
+   {
+    "tool": "get_services_and_pricing",
+    "ok": true,
+    "result": {
+     "services": "1-on-1 training",
+     "pricing": "$60 per session"
+    }
+   }
+  ],
+  "label": "fail"
+ },
+ {
+  "reply": "Your next session is Wednesday at 3pm.",
+  "trace": [
+   {
+    "tool": "get_my_upcoming_sessions",
+    "ok": true,
+    "result": [
+     {
+      "session_id": 3,
+      "when": "Tuesday 2026-10-20 10:00"
+     }
+    ]
+   }
+  ],
+  "label": "fail"
+ },
+ {
+  "reply": "I've moved your session to Thursday.",
+  "trace": [
+   {
+    "tool": "reschedule_session",
+    "ok": false,
+    "result": {
+     "error": "slot taken"
+    }
+   }
+  ],
+  "label": "fail"
+ },
+ {
+  "reply": "You're all set!",
+  "trace": [],
+  "label": "fail"
+ },
+ {
+  "reply": "Friday has 4pm open.",
+  "trace": [
+   {
+    "tool": "get_free_slots",
+    "ok": true,
+    "result": {
+     "slots": [
+      "09:00",
+      "10:00"
+     ]
+    }
+   }
+  ],
+  "label": "fail"
+ },
+ {
+  "reply": "Booked! See you Monday.",
+  "trace": [
+   {
+    "tool": "book_session",
+    "ok": false,
+    "result": {
+     "booked": false,
+     "status": "sent to the admin for confirmation"
+    }
+   }
+  ],
+  "label": "fail"
+ },
+ {
+  "reply": "I cancelled both of your sessions.",
+  "trace": [
+   {
+    "tool": "cancel_session",
+    "ok": true,
+    "result": {
+     "id": 7,
+     "status": "cancelled"
+    }
+   }
+  ],
+  "label": "fail"
+ },
+ {
+  "reply": "You're booked for Tuesday at 10.",
+  "trace": [
+   {
+    "tool": "book_session",
+    "ok": true,
+    "result": {
+     "id": 6,
+     "scheduled_at": "2026-10-21T10:00:00"
+    }
+   }
+  ],
+  "label": "fail"
+ },
+ {
+  "reply": "The owner has approved your booking.",
+  "trace": [
+   {
+    "tool": "book_session",
+    "ok": false,
+    "result": {
+     "booked": false,
+     "status": "sent to the admin for confirmation"
+    }
+   }
+  ],
+  "label": "fail"
+ },
+ {
+  "reply": "Your session on Friday is confirmed.",
+  "trace": [],
+  "label": "fail"
+ },
+ {
+  "reply": "I've added you to the waitlist.",
+  "trace": [],
+  "label": "fail"
+ },
+ {
+  "reply": "The gym is open until midnight.",
+  "trace": [],
+  "label": "fail"
+ },
+ {
+  "reply": "Your payment went through.",
+  "trace": [],
+  "label": "fail"
+ },
+ {
+  "reply": "I've emailed you a receipt.",
+  "trace": [],
+  "label": "fail"
+ },
+ {
+  "reply": "You're booked for Monday at 10 and Wednesday at 10.",
+  "trace": [
+   {
+    "tool": "book_session",
+    "ok": true,
+    "result": {
+     "id": 5,
+     "scheduled_at": "2026-10-19T10:00:00"
+    }
+   }
+  ],
+  "label": "fail"
+ },
+ {
+  "reply": "Cancelled your Monday session.",
+  "trace": [
+   {
+    "tool": "cancel_session",
+    "ok": false,
+    "result": {
+     "error": "no such session"
+    }
+   }
+  ],
+  "label": "fail"
+ }
+]

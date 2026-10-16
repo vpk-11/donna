@@ -20,6 +20,8 @@ from dotenv import load_dotenv
 
 ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(ROOT / ".env")
+sys.path.insert(0, str(ROOT))
+from config import settings  # noqa: E402
 REDIS_PORT = os.environ.get("DONNA_EVAL_REDIS_PORT", "6390")
 
 
@@ -67,7 +69,7 @@ def main() -> None:
         shutil.rmtree(scratch, ignore_errors=True)
     table = "\n".join([
         f"Eval {datetime.now():%Y-%m-%d %H:%M}, tests/live",
-        f"Conditions: LLM_MAX_TOKENS={os.environ.get('LLM_MAX_TOKENS', '2000')}, claim_verifier=on (settings default), "
+        f"Conditions: LLM_MAX_TOKENS={os.environ.get('LLM_MAX_TOKENS', '2000')}, claim_verifier={'on' if settings.claim_verifier else 'off'} (settings default), "
         "local Ollama, tool calls/turn counts every tool call in a handle_message turn",
         "",
         "| model | passed | tool calls/turn | median turn s | p95 turn s | failed |",

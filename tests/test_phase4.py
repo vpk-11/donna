@@ -502,3 +502,24 @@ def test_restore_drops_open_request_for_unrestored_target(clients):
         db.close()
     assert orch._open_requests == {}
     assert not get_redis().hexists("state:open_requests", PHONE_A)
+
+
+def test_deadline_does_not_cancel_a_running_tool(monkeypatch):
+    from config import settings
+    from orchestrator.llm_agent import run_agent
+    monkeypatch.setattr(settings, "turn_timeout_s", 0.1)
+    committed = []
+
+    async def slow_book():
+        await asyncio.sleep(0.4)  # commits after the deadline has passed
+        committed.append(1)
+        return {"booked": True, "confirmation": "You're booked for Monday."}
+
+    async def fake_llm(messages, tools, **kw):
+        return {"content": "", "tool_calls": [{"id": "1", "function": {"name": "book", "arguments": "{}"}}]}
+
+    tools = {"book": ("books", {"type": "object", "properties": {}}, slow_book)}
+    with patch("orchestrator.llm_agent.call_llm_tools", fake_llm):
+        out = asyncio.run(run_agent("sys", [], "book me", tools))
+    assert committed == [1]
+    assert out == "You're booked for Monday."
