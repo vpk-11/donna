@@ -97,6 +97,8 @@ def inner(model: str, runs: int) -> None:
                     asyncio.run(orch.handle_message(phone, text, db))
                 db.close()
                 turns += 1
+                if os.environ.get("DONNA_REPLAY_DEBUG"):
+                    print(f"TURN {phone[-4:]} {text!r} -> {rec.sent} calls={last_calls}", file=sys.stderr)
                 fallbacks += sum(any(f in m for f in FALLBACKS) for m in rec.sent)
                 for kind, rx in CLAIMS.items():
                     claimed = any(rx.search(m) for m in rec.sent)
