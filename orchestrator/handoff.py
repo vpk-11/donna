@@ -3,6 +3,7 @@ import logging
 from sqlalchemy.orm import Session
 from models.orm import Client, Provider
 from store.conversation_store import ConversationStore
+from firewall.output_guard import scan_output
 from intelligence.response_generator import generate_response
 from db.redis_client import get_redis
 from orchestrator.channels import STATE_AGENT_REGISTRY
@@ -51,6 +52,8 @@ async def trigger_dynamic_handoff(
         provider_name=provider.name,
         business_type=provider.business_type,
     )
+    if scan_output(client_response, client.phone_number, [], exclude_name=client.name).action != "pass":
+        client_response = f"I'm getting you some extra help from {provider.name}'s side, one moment."
     await messaging_client.send_to_phone(client.phone_number, client_response)
 
 

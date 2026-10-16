@@ -92,6 +92,9 @@ class AdminAgent:
             await self._messaging_client.send_to_admin("Got it - I'm back in control.")
             await self._summarize_handoff(target, db, conv_store)
         else:
+            if scan_output(text, phone, [], is_admin=True).action != "pass":
+                await self._messaging_client.send_to_admin("Not sent: that message was flagged by the output firewall.")
+                return
             await self._messaging_client.send_to_phone(
                 state.handoff_target_phone, f"[{self.provider.name}] {text}"
             )
@@ -129,6 +132,8 @@ class AdminAgent:
                 "action items. If booking was discussed, ask whether to go ahead and book it."
             )},
         ])
+        if scan_output(summary, self.provider.phone_number, [], is_admin=True).action != "pass":
+            summary = "The handoff summary was withheld by the output firewall."
         await self._messaging_client.send_to_admin(summary)
 
     # --- tools ---
