@@ -18,6 +18,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 ROOT = Path(__file__).resolve().parent.parent
+PORT = os.environ.get("DONNA_EVAL_REDIS_PORT", "6391")
 load_dotenv(ROOT / ".env")
 
 CLAIMS = {
@@ -118,11 +119,11 @@ def main() -> None:
     scratch = Path(tempfile.mkdtemp(prefix="donna-replay-"))
     shutil.copytree(ROOT, scratch / "repo", ignore=shutil.ignore_patterns(
         ".git", "donna.db", "graphify-out", "__pycache__", "results"))
-    redis = subprocess.Popen(["redis-server", "--port", "6391", "--save", ""], stdout=subprocess.DEVNULL)
+    redis = subprocess.Popen(["redis-server", "--port", PORT, "--save", ""], stdout=subprocess.DEVNULL)
     try:
         done = subprocess.run([sys.executable, "scripts/claim_replay.py", model, str(runs)], cwd=scratch / "repo",
                        check=True, stdout=subprocess.PIPE, text=True,
-                       env={**os.environ, "DONNA_REPLAY_INNER": "1", "REDIS_PORT": "6391", "ADMIN_PHONE": "+15559990000",
+                       env={**os.environ, "DONNA_REPLAY_INNER": "1", "REDIS_PORT": PORT, "ADMIN_PHONE": "+15559990000",
                             "LLM_MAX_TOKENS": os.environ.get("LLM_MAX_TOKENS", "2000")})
         lines = [l for l in done.stdout.splitlines() if l.startswith("verifier=")]
         (ROOT / "results").mkdir(exist_ok=True)

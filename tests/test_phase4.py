@@ -441,3 +441,64 @@ def test_output_scanner_timeout_fails_closed(monkeypatch):
         assert r.action == "block" and r.threat == "ScannerFailClosed"
         monkeypatch.undo()
         monkeypatch.setattr(settings, "scanner_timeout_s", 0.1)
+
+
+# --- review fixes: step cap, deadline, open request expiry ---
+
+def _booking_tool_loop(pending_calls):
+    """fake LLM that calls `book` every step (never produces text) plus the tool it calls."""
+    async def fake_llm(messages, tools, **kw):
+        return {"content": "", "tool_calls": [{"id": "1", "function": {"name": "book", "arguments": "{}"}}]}
+
+    tools = {"book": ("books", {"type": "object", "properties": {}},
+                      lambda: {"booked": True, "confirmation": "You're booked for Monday."})}
+    return fake_llm, tools
+
+
+def test_step_cap_keeps_earned_confirmation():
+    from orchestrator.llm_agent import run_agent
+    fake_llm, tools = _booking_tool_loop(None)
+    with patch("orchestrator.llm_agent.call_llm_tools", fake_llm):
+        out = asyncio.run(run_agent("sys", [], "book me", tools))
+    assert out.startswith("You're booked for Monday.")
+
+
+def test_turn_deadline_keeps_earned_confirmation(monkeypatch):
+    from config import settings
+    from orchestrator.llm_agent import run_agent
+    monkeypatch.setattr(settings, "turn_timeout_s", 0.3)
+    calls = {"n": 0}
+
+    async def fake_llm(messages, tools, **kw):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            return {"content": "", "tool_calls": [{"id": "1", "function": {"name": "book", "arguments": "{}"}}]}
+        await asyncio.sleep(5)
+
+    tools = {"book": ("books", {"type": "object", "properties": {}},
+                      lambda: {"booked": True, "confirmation": "You're booked for Monday."})}
+    with patch("orchestrator.llm_agent.call_llm_tools", fake_llm):
+        assert asyncio.run(run_agent("sys", [], "book me", tools)) == "You're booked for Monday."
+
+
+def test_retire_agent_clears_open_request(clients):
+    from db.redis_client import get_redis
+    orch = CentralOrchestrator(_messaging(), {})
+    orch._open_requests[PHONE_A] = PHONE_B
+    get_redis().hset("state:open_requests", PHONE_A, PHONE_B)
+    orch.retire_agent(PHONE_A)
+    assert PHONE_A not in orch._open_requests
+    assert not get_redis().hexists("state:open_requests", PHONE_A)
+
+
+def test_restore_drops_open_request_for_unrestored_target(clients):
+    from db.redis_client import get_redis
+    get_redis().hset("state:open_requests", PHONE_A, PHONE_B)  # PHONE_A has no registered agent
+    db = SessionLocal()
+    try:
+        orch = CentralOrchestrator(_messaging(), {})
+        asyncio.run(orch.startup(db))
+    finally:
+        db.close()
+    assert orch._open_requests == {}
+    assert not get_redis().hexists("state:open_requests", PHONE_A)

@@ -56,6 +56,7 @@ async def _run_loop(
     tools: dict[str, tuple[str, dict, Callable]],
     calls_made: list[str] | None = None,
     trace: list[dict] | None = None,
+    confirmations: list[str] | None = None,
 ) -> str:
     """Tool-use loop for one LLM agent. tools: name -> (description, json-schema params, callable)."""
     messages = [{"role": "system", "content": system}]
@@ -66,7 +67,7 @@ async def _run_loop(
     specs = tool_specs(tools)
 
     retried = False
-    confirmations: list[str] = []  # tool-authored text for state changes; the model never phrases these
+    confirmations = [] if confirmations is None else confirmations  # tool-authored text for state changes
     for _ in range(MAX_STEPS):
         msg = await call_llm_tools(messages, specs)
         calls = msg.get("tool_calls") or []
@@ -94,13 +95,15 @@ async def _run_loop(
                 "tool_call_id": call.get("id", name),
                 "content": json.dumps(result, default=str),
             })
-    return ""
+    return " ".join(confirmations)  # step cap: a state change that already happened must still reach the client
 
 
 async def run_agent(*args, **kwargs) -> str:
-    """Tool-use loop with a whole-turn deadline. A timed-out turn returns "" (callers send their fallback)."""
+    """Tool-use loop with a whole-turn deadline. On timeout, return any tool-authored confirmations
+    already earned (a booking may have happened), else "" so callers send their fallback."""
+    confirmations: list[str] = []
     try:
-        return await asyncio.wait_for(_run_loop(*args, **kwargs), settings.turn_timeout_s)
+        return await asyncio.wait_for(_run_loop(*args, confirmations=confirmations, **kwargs), settings.turn_timeout_s)
     except asyncio.TimeoutError:
         logger.error(f"agent turn exceeded {settings.turn_timeout_s}s")
-        return ""
+        return " ".join(confirmations)

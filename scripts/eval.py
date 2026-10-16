@@ -6,6 +6,7 @@ throwaway Redis on port 6390, because the suite drops tables and flushes Redis.
 Writes results/eval-<timestamp>.md and prints it.
 """
 import json
+import math
 import os
 import shutil
 import statistics
@@ -19,7 +20,7 @@ from dotenv import load_dotenv
 
 ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(ROOT / ".env")
-REDIS_PORT = "6390"
+REDIS_PORT = os.environ.get("DONNA_EVAL_REDIS_PORT", "6390")
 
 
 def run_model(model: str, scratch: Path) -> list[dict]:
@@ -35,8 +36,9 @@ def run_model(model: str, scratch: Path) -> list[dict]:
 
 
 def p95(xs: list[float]) -> float:
+    """Nearest-rank 95th percentile."""
     xs = sorted(xs)
-    return xs[min(len(xs) - 1, int(0.95 * len(xs)))]
+    return xs[max(0, math.ceil(0.95 * len(xs)) - 1)]
 
 
 def row(model: str, results: list[dict]) -> str:
@@ -65,6 +67,8 @@ def main() -> None:
         shutil.rmtree(scratch, ignore_errors=True)
     table = "\n".join([
         f"Eval {datetime.now():%Y-%m-%d %H:%M}, tests/live",
+        f"Conditions: LLM_MAX_TOKENS={os.environ.get('LLM_MAX_TOKENS', '2000')}, claim_verifier=on (settings default), "
+        "local Ollama, tool calls/turn counts every tool call in a handle_message turn",
         "",
         "| model | passed | tool calls/turn | median turn s | p95 turn s | failed |",
         "|---|---|---|---|---|---|",

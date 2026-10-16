@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     # Post-response claim verifier (intelligence/claim_judge.py). Empty model = same as the agent's.
     claim_verifier: bool = True
     judge_model: str = ""
-    judge_timeout_s: float = 8.0
+    judge_timeout_s: float = 30.0  # gpt-oss:20b p95 turn is ~26s; the judge defaults to the agent's own model
 
     # Provider bootstrap
     admin_phone: str

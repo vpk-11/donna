@@ -62,6 +62,9 @@ class CentralOrchestrator:
             agent._history += agent._own(turns)
             r.hset(STATE_AGENT_REGISTRY, phone, entry)  # keep the original started_at/handoff flags
             restored += 1
+        for target in [t for t in self._open_requests if t not in self._agents]:  # stale: target not restored
+            self._open_requests.pop(target)
+            r.hdel(STATE_OPEN_REQUESTS, target)
         logger.info(f"Restored {restored} agents, {len(self._open_requests)} open requests")
 
     @runs_as("orchestrator")
@@ -125,6 +128,11 @@ class CentralOrchestrator:
 
     def retire_agent(self, phone: str) -> None:
         self._agents.pop(phone, None)
+        self._open_requests.pop(phone, None)  # a finished conversation must not route a later report
+        try:
+            get_redis().hdel(STATE_OPEN_REQUESTS, phone)
+        except Exception as e:
+            logger.warning(f"Could not clear open request: {e}")
 
     # -------------------------------------------------------------------------
     # Agent-to-agent: requests come here, this agent decides whom to relay to

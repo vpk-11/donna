@@ -40,5 +40,7 @@ def default_caller():
 @pytest.fixture(autouse=True)
 def verifier_off(monkeypatch):
     """The claim verifier makes an LLM call; tests that want it turn it on explicitly."""
+    import os
     from config import settings
-    monkeypatch.setattr(settings, "claim_verifier", False)
+    if not os.environ.get("DONNA_LIVE"):  # live runs measure the production configuration
+        monkeypatch.setattr(settings, "claim_verifier", False)
