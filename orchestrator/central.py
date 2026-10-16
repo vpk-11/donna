@@ -6,6 +6,7 @@ from models.orm import Provider
 from db.redis_client import get_redis
 from orchestrator.channels import STATE_AGENT_REGISTRY, STATE_OPEN_REQUESTS, STATE_SESSION, STATE_TIMEOUT
 from orchestrator.admin_agent import AdminAgent
+from firewall.input_guard import scan_input
 from orchestrator.agent import ClientAgent
 from orchestrator.llm_agent import run_agent
 from donna_mcp.guard import acting_as, runs_as
@@ -54,7 +55,11 @@ class CentralOrchestrator:
                 r.hdel(STATE_AGENT_REGISTRY, phone)
                 continue
             agent = await self._get_or_spawn_agent(phone, db)
-            agent._history += agent._own(conv_store.get_history(phone))  # recent turns since the last summary
+            # Recent turns since the last summary. Stored user text is raw (written before the agent's
+            # input scan), so re-scan it and drop anything that would have been blocked.
+            turns = [t for t in conv_store.get_history(phone)
+                     if t["role"] != "user" or scan_input(t["content"], phone, is_admin=False).action == "pass"]
+            agent._history += agent._own(turns)
             r.hset(STATE_AGENT_REGISTRY, phone, entry)  # keep the original started_at/handoff flags
             restored += 1
         logger.info(f"Restored {restored} agents, {len(self._open_requests)} open requests")
