@@ -2,7 +2,7 @@
 <!-- version: v2.3.0 -->
 ![Version](https://img.shields.io/badge/version-v2.3.0-blue)
 
-AI business assistant that runs both sides of a service business over iMessage: the provider (admin) side and the client side. iMessage integration isn't built yet — a WebSocket mock stands in for it during development. Named after Donna Paulsen from Suits.
+Scheduling assistant that runs both sides of a service business over iMessage: the provider (admin) side and the client side. iMessage integration isn't built yet, so a WebSocket mock stands in for it during development. Named after Donna Paulsen from Suits.
 
 **One-line pitch:** Your business, running itself. On iMessage.
 
@@ -12,26 +12,23 @@ Currently scoped to a single-provider, fixed-location, 1:1-session business (the
 
 ## Architecture
 
-One `CentralOrchestrator` handles every admin-side message. Each active client conversation gets its own `ClientAgent`, spawned on first contact and kept isolated from every other client's conversation — no shared state, no context bleed between clients.
-
-Every message goes through the same pipeline in both directions:
+One `CentralOrchestrator` routes every inbound message. The provider's phone goes to the `AdminAgent`; every other phone gets its own `ClientAgent`, spawned on first contact and kept isolated from every other client's conversation (separate prompt, separate history, no shared state). Each agent is a tool-calling LLM loop (`orchestrator/llm_agent.py`): the model picks tools, the tools act, and the reply is built from what the tools returned.
 
 ```
-inbound message
-  -> firewall (input scan: prompt injection, banned topics, PII)
-  -> intent parser (LLM, structured JSON output)
-  -> judge (rule-based first, LLM fallback only when genuinely ambiguous)
-  -> MCP tool layer (the only path allowed to mutate the database)
-  -> response generator (LLM)
-  -> firewall (output scan: cross-client leak prevention, banned topics)
+client message
+  -> input firewall (prompt injection, identity spoofing, banned topics, token limit)
+  -> ClientAgent tool loop (book, cancel, reschedule, free slots, hand off to the owner)
+  -> claim verifier (reply must follow from this turn's tool results)
+  -> output firewall (sensitive data, cross-client leak, booking and registration claims)
   -> outbound message
 ```
 
-- **Store mutations are typed and gated.** Every write to the database (book, cancel, reschedule, create/update client) goes through a typed tool in `donna_mcp/`, never a raw database call from the orchestration layer. Reads may bypass this.
-- **The judge decides autonomy.** Simple, unambiguous requests are handled without involving the admin. Anything uncertain notifies or escalates to the admin rather than guessing.
-- **The firewall runs on every message, both directions.** General-purpose scanning (prompt injection, banned topics, PII leakage) plus business-specific checks (one client's name or schedule never leaking into another client's conversation).
-- **State is SQLite-primary.** Conversation context, turn count, and handoff state live in SQLite, read and written every turn. Redis holds a narrower set of things: a last-message cache, 7-day conversation summaries, and an in-memory agent registry for bookkeeping — not the primary state store.
-- **LLM calls are async-only, all routed through one client.** Defaults to a local model via Ollama; swappable to any LiteLLM-supported provider (OpenAI, Anthropic, Groq, etc.) with an env var change, no code change.
+- **Writes only happen through MCP tools.** Every database mutation (book, cancel, reschedule, create or update client, conversation state) is a typed tool in `donna_mcp/`. A SQLAlchemy flush guard rejects any write made outside a tool, and each tool checks the caller's identity and scope (`admin`, `agent` for its own client only, `orchestrator`, `system`). Reads go through `store/` directly.
+- **Tool-authored confirmations.** When a tool changes state, its own confirmation text is what the client sees. The model never phrases "you're booked", so it cannot claim a booking that did not happen. A booking that needs admin approval says so, in the tool's words.
+- **Agents never talk to each other.** When a client wants a slot another client holds, the request goes to the orchestrator, which finds the holder and relays a neutral request to that client's own agent. Names never cross between clients.
+- **The firewall is fail-closed where it matters.** Prompt injection and identity spoofing scanners block the message if the scanner errors or times out. The admin path and orchestrator relay messages are scanned too.
+- **State is SQLite-primary.** Conversation context, turn count and handoff state live in SQLite. Redis holds the agent registry, open agent-to-agent requests, conversation summaries and a last-message cache, so a restart rebuilds the active agents.
+- **LLM calls are async-only, one client, bounded.** Everything goes through `intelligence/llm_client.py` with a per-call timeout and bounded retries. Defaults to a local model via Ollama; swappable to any LiteLLM provider with an env var change. Agents need a tool-calling model (`gpt-oss:20b` is the verified one).
 
 ---
 
@@ -131,6 +128,19 @@ Connect as any of them with `python main.py --client-name <name> --client-phone 
 
 - **Provider identity** (`ADMIN_PHONE`, `ADMIN_NAME`, `BUSINESS_TYPE`, `LOCATION_TYPE`, `WORKING_HOURS`, `AUTO_BOOK`) — env vars, set once at bootstrap.
 - **Scheduling policy and business content** (`config/business.json`) — session duration, buffer between sessions, max sessions per client per day, which days the business is open, and the services/pricing text Donna uses when a client asks. Static, no conversational onboarding — edit the file directly.
+
+---
+
+## Tests
+
+```bash
+pytest -q --ignore=tests/live                 # offline suite, no LLM needed
+DONNA_LIVE=1 pytest tests/live -q             # live scenarios against a local Ollama model
+python scripts/eval.py ollama_chat/gpt-oss:20b ollama_chat/qwen2.5:7b-instruct   # pass rate and latency per model
+python scripts/claim_replay.py [model] [runs] # false-claim rate with the claim verifier on and off
+```
+
+The test suite drops all tables and flushes Redis before every test. Run it from a scratch copy of the repo with `REDIS_PORT` pointed at a throwaway Redis, never against your working `donna.db`. `scripts/eval.py` and `scripts/claim_replay.py` do this for you.
 
 ---
 
