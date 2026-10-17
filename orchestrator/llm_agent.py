@@ -53,6 +53,7 @@ async def run_agent(
     user_text: str,
     tools: dict[str, tuple[str, dict, Callable]],
     calls_made: list[str] | None = None,
+    trace: list[dict] | None = None,
 ) -> str:
     """Tool-use loop for one LLM agent. tools: name -> (description, json-schema params, callable)."""
     messages = [{"role": "system", "content": system}]
@@ -81,6 +82,8 @@ async def run_agent(
             result, ok = await _call_tool(tools, name, raw)
             if ok and calls_made is not None:
                 calls_made.append(name)
+            if trace is not None:
+                trace.append({"tool": name, "ok": ok, "result": result})
             if isinstance(result, dict) and result.get("confirmation") and not result.get("error"):
                 confirmations.append(result["confirmation"])
             logger.info(f"agent.tool {name}({raw}) -> {json.dumps(result, default=str)[:300]}")

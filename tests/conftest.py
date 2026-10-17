@@ -35,3 +35,10 @@ def default_caller():
     """Tests invoke MCP tools directly as the admin unless they set another caller."""
     with acting_as("admin"):
         yield
+
+
+@pytest.fixture(autouse=True)
+def verifier_off(monkeypatch):
+    """The claim verifier makes an LLM call; tests that want it turn it on explicitly."""
+    from config import settings
+    monkeypatch.setattr(settings, "claim_verifier", False)

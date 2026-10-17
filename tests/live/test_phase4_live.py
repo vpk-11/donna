@@ -15,6 +15,7 @@ from donna_mcp.tools.clients import create_client
 from donna_mcp.tools.scheduling import book_session
 from models.orm import ConversationState, Session as SessionModel
 from orchestrator.central import CentralOrchestrator
+from store.conversation_store import ConversationStore
 from store.provider_store import ProviderStore
 from config import load_business_config
 
@@ -33,6 +34,11 @@ class Recorder:
 
     async def send_to_phone(self, phone, message):
         self.to_phone.setdefault(phone, []).append(message)
+        db = SessionLocal()  # like WebSocketMessagingClient: the sender records last_donna_message
+        try:
+            ConversationStore(db).update_last_donna_message(phone, message)
+        finally:
+            db.close()
 
 
 @pytest.fixture

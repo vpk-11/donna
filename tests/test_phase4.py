@@ -312,3 +312,79 @@ def test_relay_message_naming_another_client_is_blocked(clients):
     agent = _agent(PHONE_B, b)
     assert agent._relay_safe("Something came up on our end, can you shift to Tuesday at 10:00?")
     assert not agent._relay_safe("Alice needs your slot, can you move to Tuesday?")
+
+
+# --- timeouts and retries ---
+
+def test_hung_scanner_times_out_and_fails_closed(monkeypatch):
+    import time
+    from config import settings
+    monkeypatch.setattr(settings, "scanner_timeout_s", 0.1)
+    monkeypatch.setattr(input_guard._injection_scanner, "scan", lambda **k: time.sleep(2))
+    r = input_guard.scan_input("Can I move my session to Friday?", PHONE_A, is_admin=False)
+    assert r.action == "block" and r.threat == "ScannerFailClosed"
+
+
+def test_hung_llm_times_out_and_stops_at_max_attempts(monkeypatch):
+    from config import settings
+    from intelligence import llm_client
+    monkeypatch.setattr(settings, "llm_timeout_s", 0.05)
+    monkeypatch.setattr(settings, "llm_max_attempts", 3)
+    monkeypatch.setattr(settings, "llm_retry_backoff_s", 0.0)
+    calls = []
+
+    async def hang(**kw):
+        calls.append(1)
+        await asyncio.sleep(5)
+
+    monkeypatch.setattr(llm_client.litellm, "acompletion", hang)
+    with pytest.raises(llm_client.LLMCallError):
+        asyncio.run(llm_client.call_llm([{"role": "user", "content": "hi"}]))
+    assert len(calls) == 3
+
+
+def test_llm_retry_recovers_after_transient_error(monkeypatch):
+    from config import settings
+    from intelligence import llm_client
+    monkeypatch.setattr(settings, "llm_retry_backoff_s", 0.0)
+    attempts = []
+
+    async def flaky(**kw):
+        attempts.append(1)
+        if len(attempts) < 2:
+            raise RuntimeError("boom")
+        return MagicMock(choices=[MagicMock(message=MagicMock(content=" ok "))])
+
+    monkeypatch.setattr(llm_client.litellm, "acompletion", flaky)
+    assert asyncio.run(llm_client.call_llm([{"role": "user", "content": "hi"}])) == "ok"
+    assert len(attempts) == 2
+
+
+# --- Redis-persisted agents and open requests ---
+
+def test_restart_restores_agents_and_open_requests(clients):
+    from db.redis_client import get_redis
+    from orchestrator.channels import STATE_SESSION
+
+    db = SessionLocal()
+    try:
+        first = CentralOrchestrator(_messaging(), {})
+        asyncio.run(first.startup(db))
+        get_redis().set(STATE_SESSION.format(phone=PHONE_A), "Alice asked about Friday slots.")
+        agent = asyncio.run(first._get_or_spawn_agent(PHONE_A, db))
+        first._open_requests[PHONE_A] = PHONE_B
+        get_redis().hset("state:open_requests", PHONE_A, PHONE_B)
+        assert agent.phone == PHONE_A
+
+        second = CentralOrchestrator(_messaging(), {})  # simulated restart: fresh in-memory state
+        asyncio.run(second.startup(db))
+        assert set(second._agents) == {PHONE_A}
+        assert "Friday slots" in second._agents[PHONE_A].scoped_history()[0]["content"]
+        assert second._open_requests == {PHONE_A: PHONE_B}
+    finally:
+        db.close()
+
+
+def test_admin_commands_are_not_false_blocked():
+    for text in ("yes, confirm it", "list my clients", "show me this week's schedule"):
+        assert input_guard.scan_input(text, "+15559990000", is_admin=True).action == "pass"

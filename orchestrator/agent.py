@@ -8,6 +8,8 @@ from orchestrator.channels import (
     STATE_AGENT_REGISTRY, STATE_SESSION, STATE_LAST_DONNA, STATE_TIMEOUT,
 )
 from orchestrator.llm_agent import DATE_TIME, NONE, obj, run_agent
+from config import settings
+from intelligence.claim_judge import FALLBACK, needs_check, verify_reply
 from intelligence.judge_rules import NEW_CLIENT_STATUSES
 from intelligence.prompts import CLIENT_AGENT_SYSTEM
 from intelligence.context_manager import (
@@ -126,17 +128,26 @@ class ClientAgent:
         # --- The agent decides and acts ---
         self._last_tool_calls = []
         self._ending = False
+        trace: list[dict] = []
         response = await run_agent(
             system=self._system_prompt(state),
             history=self.scoped_history(),
             user_text=sanitized,
             tools=self._tools(db, conv_store),
             calls_made=self._last_tool_calls,
+            trace=trace,
         )
         if not response:
             logger.warning(f"agent.empty_response for {self.phone}")
             await self._send("Sorry, I couldn't work that out. Could you say that again?", conv_store)
             return
+
+        # --- Claim verifier (tool-authored confirmations are already true by construction) ---
+        authored = any(isinstance(t["result"], dict) and t["result"].get("confirmation") for t in trace)
+        if settings.claim_verifier and not authored and needs_check(response, trace):
+            if not await verify_reply(response, trace):
+                await self._send(FALLBACK, conv_store)
+                return
 
         # --- Output guard ---
         out_result = scan_output(
