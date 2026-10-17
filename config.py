@@ -27,8 +27,9 @@ class Settings(BaseSettings):
     # Post-response claim verifier (intelligence/claim_judge.py). Empty model = same as the agent's.
     claim_verifier: bool = True
     # Separate from the agent's model (default agent is qwen2.5:7b-instruct): best scorer on the labeled set.
-    # If the agent itself runs gpt-oss:20b, set JUDGE_MODEL to another model so the model does not grade itself.
-    judge_api_base: str = "http://localhost:11434"  # the judge model's own endpoint, never the agent's
+    # If the agent itself runs gpt-oss:20b, set JUDGE_MODEL to another model so the model does not grade itself,
+    # and set JUDGE_API_BASE (and JUDGE_API_KEY if hosted) when that model is not a local Ollama one.
+    judge_api_base: str = ""  # the judge model's own endpoint, never the agent's; empty = Ollama default for ollama models
     judge_api_key: str = ""
     judge_model: str = "ollama_chat/gpt-oss:20b"
     judge_timeout_s: float = 30.0  # gpt-oss:20b p95 turn is ~26s

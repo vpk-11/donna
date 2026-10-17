@@ -800,7 +800,10 @@ def test_judge_uses_its_own_endpoint(monkeypatch):
     monkeypatch.setattr(settings, "llm_api_base", "https://hosted.example")
     monkeypatch.setattr(settings, "judge_model", "ollama_chat/gpt-oss:20b")
     asyncio.run(cj.verify_reply("ok", []))
-    assert seen["endpoint"] == (settings.judge_api_base, settings.judge_api_key)
+    assert seen["endpoint"] == ("http://localhost:11434", "")
+    monkeypatch.setattr(settings, "judge_model", "groq/openai/gpt-oss-120b")
+    asyncio.run(cj.verify_reply("ok", []))
+    assert seen["endpoint"] == ("", "")
     monkeypatch.setattr(settings, "judge_model", "")
     asyncio.run(cj.verify_reply("ok", []))
     assert seen["endpoint"] is None

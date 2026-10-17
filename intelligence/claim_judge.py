@@ -8,6 +8,14 @@ from intelligence.llm_client import call_llm
 
 logger = logging.getLogger(__name__)
 
+def _endpoint() -> tuple[str, str] | None:
+    """The judge model's own (api_base, api_key); None means the agent's."""
+    if not settings.judge_model:
+        return None
+    local = "http://localhost:11434" if settings.judge_model.startswith("ollama") else ""
+    return settings.judge_api_base or local, settings.judge_api_key
+
+
 FALLBACK = "Let me double-check on that and get back to you."
 
 _SYSTEM = """\
@@ -29,7 +37,7 @@ async def verify_reply(reply: str, trace: list[dict]) -> bool:
                 [{"role": "system", "content": _SYSTEM}, {"role": "user", "content": payload}],
                 response_format={"type": "json_object"},
                 model=settings.judge_model or None,
-                endpoint=(settings.judge_api_base, settings.judge_api_key) if settings.judge_model else None,
+                endpoint=_endpoint(),
             ),
             settings.judge_timeout_s,
         )
