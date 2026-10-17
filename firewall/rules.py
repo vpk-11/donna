@@ -133,14 +133,14 @@ BLOCK_GENERIC_RESPONSE = (
 # set (and it is short), so no instruction-override or exfiltration sentence can qualify. All regex checks
 # still run first.
 SCHEDULING_VOCAB = frozenset("""
-please kindly can could would will you i id i'd we us me my mine the a an it is are am be to of for on at in from by
-and or if so but also then next this that last first second third usual same other another one two option options
+please kindly can could would will you i id i'd we me my the a an it is are am be to of for on at in from by
+and or if so but also then next this that last first second third usual same one two option options
 session sessions appointment appointments booking bookings time times slot slots class classes visit
 cancel confirm confirmed reschedule rescheduled move book change add switch keep skip
 monday tuesday wednesday thursday friday saturday sunday morning afternoon evening noon tonight tomorrow today
 tomorrow's week weekend day days month january february march april may june july august september october
-november december am pm free available open anything something after before around about instead again still now
+november december am pm free available open after before around about instead again still now
 later sooner earlier yes no ok okay thanks thank works work good great fine sure go ahead do don't not need want
-wanted like have has there any how what when does did sorry late early soon back up out with
+wanted like have has there how what when does did sorry late early soon back up out with
 """.split())
 MAX_PLAIN_REQUEST_WORDS = 25

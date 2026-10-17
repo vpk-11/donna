@@ -38,11 +38,16 @@ if _provider_first:
 _exfiltration_patterns = [re.compile(p, re.IGNORECASE) for p in EXFILTRATION_PATTERNS]
 
 
+_PLAIN_CHARS = re.compile(r"[A-Za-z0-9:'.,!?\- ]+")  # spaces only: no newlines or other whitespace
 _TIME_TOKEN = re.compile(r"\d{1,2}(:\d{2})?(am|pm|st|nd|rd|th)?")
 
 
 def is_plain_scheduling_request(message: str) -> bool:
-    """True if every word is ordinary scheduling vocabulary or a day/time number."""
+    """True if the message is plain ASCII text whose every word is scheduling vocabulary or a day/time number.
+    Any other character (non-ASCII letters, CJK, emoji, symbols, newlines) disqualifies it, so nothing the
+    tokenizer would skip over can carry a payload."""
+    if not _PLAIN_CHARS.fullmatch(message):
+        return False
     words = re.findall(r"[a-z0-9:']+", message.lower())
     return 0 < len(words) <= MAX_PLAIN_REQUEST_WORDS and all(
         w in SCHEDULING_VOCAB or _TIME_TOKEN.fullmatch(w) for w in words
