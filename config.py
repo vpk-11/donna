@@ -15,6 +15,15 @@ class Settings(BaseSettings):
     # Was an undocumented os.environ.get("DONNA_MODEL") read in llm_client.py;
     # now a real Settings field, still read from the DONNA_MODEL env var.
     donna_model: str = ""
+    # Per-attempt LLM timeout, bounded retries with exponential backoff, scanner timeout.
+    llm_timeout_s: float = 120.0
+    llm_max_attempts: int = 3
+    llm_retry_backoff_s: float = 1.0
+    scanner_timeout_s: float = 30.0
+    # Post-response claim verifier (intelligence/claim_judge.py). Empty model = same as the agent's.
+    claim_verifier: bool = True
+    judge_model: str = ""
+    judge_timeout_s: float = 8.0
 
     # Provider bootstrap
     admin_phone: str

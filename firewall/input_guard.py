@@ -14,6 +14,7 @@ from firewall.rules import (
     REDIRECT_MEDICAL,
     BLOCK_GENERIC_RESPONSE,
 )
+from firewall.timeout import scan_with_timeout
 from models.schemas import FirewallResult
 
 logger = logging.getLogger(__name__)
@@ -43,7 +44,7 @@ def _scanner_failed(name: str, exc: Exception, phone: str) -> FirewallResult | N
 
 def scan_input(message: str, phone: str, is_admin: bool) -> FirewallResult:
     try:
-        _, is_valid, _ = _token_scanner.scan(prompt=message)
+        _, is_valid, _ = scan_with_timeout(_token_scanner, prompt=message)
         if not is_valid:
             logger.warning("firewall.input.token_limit", extra={"phone": phone})
             return FirewallResult(
@@ -68,6 +69,11 @@ def scan_input(message: str, phone: str, is_admin: bool) -> FirewallResult:
                 log_entry={"phone": phone, "message_preview": message[:100]},
             )
 
+    # The admin is the authenticated owner: the ML injection, topic and exfiltration checks
+    # false-positive on ordinary commands ("yes, confirm it", "list my clients").
+    if is_admin:
+        return FirewallResult(action="pass")
+
     # Run specific identity spoof check before generic injection ML so that
     # more precise threat label wins when both would fire.
     if not is_admin:
@@ -88,7 +94,7 @@ def scan_input(message: str, phone: str, is_admin: bool) -> FirewallResult:
                 )
 
     try:
-        _, is_valid, risk_score = _injection_scanner.scan(prompt=message)
+        _, is_valid, risk_score = scan_with_timeout(_injection_scanner, prompt=message)
         if not is_valid:
             logger.warning(
                 "firewall.input.prompt_injection",
@@ -106,7 +112,7 @@ def scan_input(message: str, phone: str, is_admin: bool) -> FirewallResult:
             return failed
 
     try:
-        _, is_valid, topics_meta = _topic_scanner.scan(prompt=message)
+        _, is_valid, topics_meta = scan_with_timeout(_topic_scanner, prompt=message)
         if not is_valid:
             topic_list = topics_meta if isinstance(topics_meta, list) else []
             redirect_msg = (

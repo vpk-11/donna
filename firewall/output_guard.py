@@ -10,6 +10,7 @@ from firewall.rules import (
     SENSITIVE_ENTITY_TYPES,
     ADMIN_SENSITIVE_ENTITY_TYPES,
 )
+from firewall.timeout import scan_with_timeout
 from models.schemas import FirewallResult
 
 logger = logging.getLogger(__name__)
@@ -35,7 +36,7 @@ def scan_output(
     # The admin legitimately sees client names, contacts and schedules: only secrets are scanned.
     try:
         scanner = _admin_sensitive_scanner if is_admin else _sensitive_scanner
-        _, is_valid, _ = scanner.scan(prompt="", output=response)
+        _, is_valid, _ = scan_with_timeout(scanner, prompt="", output=response)
         if not is_valid:
             logger.warning("firewall.output.sensitive_data", extra={"phone": phone})
             return FirewallResult(
@@ -52,7 +53,7 @@ def scan_output(
         return FirewallResult(action="pass")
 
     try:
-        _, is_valid, topics_meta = _topic_scanner.scan(prompt="", output=response)
+        _, is_valid, topics_meta = scan_with_timeout(_topic_scanner, prompt="", output=response)
         if not is_valid:
             logger.warning(
                 "firewall.output.banned_topic",

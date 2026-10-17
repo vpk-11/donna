@@ -1,5 +1,11 @@
+import asyncio
+import logging
+
 import litellm
 from config import settings
+
+
+logger = logging.getLogger(__name__)
 
 
 class LLMCallError(Exception):
@@ -7,18 +13,27 @@ class LLMCallError(Exception):
 
 
 async def _complete(messages: list[dict], model: str | None, **extra):
-    try:
-        return await litellm.acompletion(
-            model=model or settings.donna_model or settings.llm_model,
-            messages=messages,
-            api_base=settings.llm_api_base or None,
-            api_key=settings.llm_api_key or None,
-            temperature=settings.llm_temperature,
-            max_tokens=settings.llm_max_tokens,
-            **extra,
-        )
-    except Exception as e:
-        raise LLMCallError(f"LLM call failed: {e}") from e
+    """One completion with a per-attempt timeout and a bounded number of attempts."""
+    for attempt in range(1, settings.llm_max_attempts + 1):
+        try:
+            return await asyncio.wait_for(
+                litellm.acompletion(
+                    model=model or settings.donna_model or settings.llm_model,
+                    messages=messages,
+                    api_base=settings.llm_api_base or None,
+                    api_key=settings.llm_api_key or None,
+                    temperature=settings.llm_temperature,
+                    max_tokens=settings.llm_max_tokens,
+                    timeout=settings.llm_timeout_s,
+                    **extra,
+                ),
+                settings.llm_timeout_s,
+            )
+        except Exception as e:
+            if attempt == settings.llm_max_attempts:
+                raise LLMCallError(f"LLM call failed after {attempt} attempts: {e!r}") from e
+            logger.warning(f"llm attempt {attempt} failed: {e!r}")
+            await asyncio.sleep(settings.llm_retry_backoff_s * 2 ** (attempt - 1))
 
 
 async def call_llm(
