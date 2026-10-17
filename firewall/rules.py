@@ -62,12 +62,11 @@ IDENTITY_SPOOF_PATTERNS = [
     r"this is (the trainer|the admin|the owner)",
     r"speaking as (your boss|your employer|the manager)",
     r"\b(admin|owner|trainer|coach|manager|administrator) (here|speaking)\b",
-    r"\b(i'?m|i am|this is|it'?s) (the |a |his |her |your |\w+'s )?(head |gym )?"
+    r"\b(i'?m|i am|this is|it'?s) (the |his |her |your |\w+'s )?(head |gym )?"
     r"(coach|trainer|owner|admin|administrator|manager|assistant|boss)\b",
     r"\b(message|instructions?|word) from (the |your )?(owner|admin|trainer|boss|manager)\b",
-    r"\b(your|the) (boss|owner|trainer|manager) (told|said|asked|wants)\b",
     r"\b(owner|admin|trainer|coach|manager|boss) (said|says|told|asked) (me |you |that )?"
-    r"(i can|i may|i'm allowed|you can|you should|to (give|show|share|send|cancel|delete))",
+    r"(i can|i may|i'm allowed|you can|you should|to (give|show|share|send|delete))",
     r"\bi (work|am working) for (the )?(gym |business )?(owner|trainer|manager|admin)\b",
 ]
 

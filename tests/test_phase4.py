@@ -755,3 +755,30 @@ def test_added_spoof_and_injection_patterns_block(text):
 ])
 def test_non_ascii_or_multiline_text_is_never_a_plain_request(text):
     assert not input_guard.is_plain_scheduling_request(text)
+
+
+def test_first_message_after_spawn_is_in_prompt_once(clients, monkeypatch):
+    seen = []
+
+    async def fake(self, text, db):
+        seen.append([t["content"] for t in self.scoped_history()])
+
+    monkeypatch.setattr(ClientAgent, "handle_message", fake)
+    db = SessionLocal()
+    try:
+        orch = CentralOrchestrator(_messaging(), {})
+        asyncio.run(orch.startup(db))
+        asyncio.run(orch.handle_message(PHONE_A, "Hello there", db))
+        assert "Hello there" not in seen[0]
+    finally:
+        db.close()
+
+
+@pytest.mark.parametrize("msg", [
+    "I'm a manager at Google, can I book 6pm?",
+    "The trainer said to come at 5",
+    "The trainer told me to cancel Friday",
+])
+def test_ordinary_job_and_trainer_mentions_are_not_spoofs(msg):
+    from firewall.input_guard import _identity_spoof_patterns
+    assert not any(p.search(msg) for p in _identity_spoof_patterns)

@@ -89,17 +89,15 @@ class CentralOrchestrator:
             return
 
         conv_store = ConversationStore(db)
-        state = conv_store.get_by_phone(phone)
-        if state:
-            conv_store.append_history(phone, "user", text)
-
         if phone == self._provider.phone_number:
+            if conv_store.get_by_phone(phone):
+                conv_store.append_history(phone, "user", text)
             await self._admin_agent.handle_message(text, db)
         else:
-            if not state:
+            if not conv_store.get_by_phone(phone):
                 conv_store.get_or_create(phone, "client")
-                conv_store.append_history(phone, "user", text)
-            agent = await self._get_or_spawn_agent(phone, db)
+            agent = await self._get_or_spawn_agent(phone, db)  # before storing: a new agent seeds from history
+            conv_store.append_history(phone, "user", text)
             await agent.handle_message(text, db)
 
     async def _get_or_spawn_agent(self, phone: str, db: Session) -> ClientAgent:
