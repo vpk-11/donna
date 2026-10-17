@@ -34,6 +34,7 @@ def run_model(model: str, scratch: Path) -> list[dict]:
     }
     if not model.startswith("ollama"):  # hosted provider: LiteLLM routes by prefix, the Ollama base URL must go
         env["LLM_API_BASE"] = ""
+        env["LLM_API_KEY"] = ""  # an explicit key would shadow the provider's own variable (e.g. GROQ_API_KEY)
     subprocess.run([sys.executable, "-m", "pytest", "tests/live", "-q", "-p", "no:cacheprovider"],
                    cwd=scratch / "repo", env=env, check=False)
     return [json.loads(line) for line in out.read_text().splitlines()] if out.exists() else []
