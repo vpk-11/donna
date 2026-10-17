@@ -1,6 +1,6 @@
 # Donna
-<!-- version: v2.3.0 -->
-![Version](https://img.shields.io/badge/version-v2.3.0-blue)
+<!-- version: v2.4.0 -->
+![Version](https://img.shields.io/badge/version-v2.4.0-blue)
 
 Scheduling assistant that runs both sides of a service business over iMessage: the provider (admin) side and the client side. iMessage integration isn't built yet, so a WebSocket mock stands in for it during development. Named after Donna Paulsen from Suits.
 
@@ -173,6 +173,7 @@ Python 3.12 · FastAPI (WebSocket) · SQLAlchemy (sync, SQLite) · Pydantic v2 �
 ---
 
 ## Changelog
+- **v2.4.0** (2026-10-17): minor bump
 - **v2.3.0** (2026-09-28): minor bump
 - **v2.2.3** (2026-09-25): patch bump
 - **v2.2.2** (2026-09-25): patch bump
