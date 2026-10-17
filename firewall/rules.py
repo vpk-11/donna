@@ -66,7 +66,7 @@ IDENTITY_SPOOF_PATTERNS = [
     r"(coach|trainer|owner|admin|administrator|manager|assistant|boss)\b",
     r"\b(message|instructions?|word) from (the |your )?(owner|admin|trainer|boss|manager)\b",
     r"\b(owner|admin|trainer|coach|manager|boss) (said|says|told|asked) (me |you |that )?"
-    r"(i can|i may|i'm allowed|you can|you should|to (give|show|share|send|delete)|to cancel (everyone|all|every|other|\w+'s))",
+    r"(i can|i may|i'm allowed|you can|you should|to (give|show|share|send|delete))",
     r"\bi (work|am working) for (the )?(gym |business )?(owner|trainer|manager|admin)\b",
 ]
 

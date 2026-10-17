@@ -29,6 +29,7 @@ async def verify_reply(reply: str, trace: list[dict]) -> bool:
                 [{"role": "system", "content": _SYSTEM}, {"role": "user", "content": payload}],
                 response_format={"type": "json_object"},
                 model=settings.judge_model or None,
+                endpoint=(settings.judge_api_base, settings.judge_api_key) if settings.judge_model else None,
             ),
             settings.judge_timeout_s,
         )

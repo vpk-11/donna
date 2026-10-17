@@ -12,16 +12,17 @@ class LLMCallError(Exception):
     pass
 
 
-async def _complete(messages: list[dict], model: str | None, **extra):
+async def _complete(messages: list[dict], model: str | None, endpoint: tuple[str, str] | None = None, **extra):
     """One completion with a per-attempt timeout and a bounded number of attempts."""
+    api_base, api_key = endpoint or (settings.llm_api_base, settings.llm_api_key)
     for attempt in range(1, settings.llm_max_attempts + 1):
         try:
             return await asyncio.wait_for(
                 litellm.acompletion(
                     model=model or settings.donna_model or settings.llm_model,
                     messages=messages,
-                    api_base=settings.llm_api_base or None,
-                    api_key=settings.llm_api_key or None,
+                    api_base=api_base or None,
+                    api_key=api_key or None,
                     temperature=settings.llm_temperature,
                     max_tokens=settings.llm_max_tokens,
                     timeout=settings.llm_timeout_s,
@@ -40,9 +41,11 @@ async def call_llm(
     messages: list[dict],
     response_format: dict | None = None,
     model: str | None = None,
+    endpoint: tuple[str, str] | None = None,
 ) -> str:
+    """endpoint = (api_base, api_key) for a model that does not run on the agent's provider."""
     response = await _complete(
-        messages, model, **({"response_format": response_format} if response_format else {}),
+        messages, model, endpoint, **({"response_format": response_format} if response_format else {}),
     )
     return response.choices[0].message.content.strip()
 
