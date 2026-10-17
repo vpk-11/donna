@@ -11,10 +11,13 @@ from firewall.rules import (
     SYSTEM_PROMPT_PATTERNS,
     EXFILTRATION_PATTERNS,
     REDIRECT_OUT_OF_SCOPE,
+    SCHEDULING_VOCAB,
+    MAX_PLAIN_REQUEST_WORDS,
     REDIRECT_MEDICAL,
     BLOCK_GENERIC_RESPONSE,
 )
 from firewall.timeout import scan_with_timeout
+from config import settings
 from models.schemas import FirewallResult
 
 logger = logging.getLogger(__name__)
@@ -24,7 +27,26 @@ _topic_scanner = BanTopics(topics=BANNED_INPUT_TOPICS, threshold=BAN_TOPICS_THRE
 _token_scanner = TokenLimit(limit=TOKEN_LIMIT)
 _system_prompt_patterns = [re.compile(p, re.IGNORECASE) for p in SYSTEM_PROMPT_PATTERNS]
 _identity_spoof_patterns = [re.compile(p, re.IGNORECASE) for p in IDENTITY_SPOOF_PATTERNS]
+# Impersonating the provider by name ("It's <name> here", "this is <name>").
+_provider_first = (settings.admin_name.split() or [""])[0]
+if _provider_first:
+    _name = re.escape(_provider_first)
+    _identity_spoof_patterns += [
+        re.compile(rf"\b(i'?m|i am|this is|it'?s) {_name}\b", re.IGNORECASE),
+        re.compile(rf"\b{_name} (here|speaking)\b", re.IGNORECASE),
+    ]
 _exfiltration_patterns = [re.compile(p, re.IGNORECASE) for p in EXFILTRATION_PATTERNS]
+
+
+_TIME_TOKEN = re.compile(r"\d{1,2}(:\d{2})?(am|pm|st|nd|rd|th)?")
+
+
+def is_plain_scheduling_request(message: str) -> bool:
+    """True if every word is ordinary scheduling vocabulary or a day/time number."""
+    words = re.findall(r"[a-z0-9:']+", message.lower())
+    return 0 < len(words) <= MAX_PLAIN_REQUEST_WORDS and all(
+        w in SCHEDULING_VOCAB or _TIME_TOKEN.fullmatch(w) for w in words
+    )
 
 
 def _scanner_failed(name: str, exc: Exception, phone: str) -> FirewallResult | None:
@@ -94,19 +116,20 @@ def scan_input(message: str, phone: str, is_admin: bool) -> FirewallResult:
                 )
 
     try:
-        _, is_valid, risk_score = scan_with_timeout(_injection_scanner, prompt=message)
-        if not is_valid:
-            logger.warning(
-                "firewall.input.prompt_injection",
-                extra={"phone": phone, "risk_score": risk_score},
-            )
-            return FirewallResult(
-                action="block",
-                threat="PromptInjection",
-                severity="high",
-                redirect_message=BLOCK_GENERIC_RESPONSE,
-                log_entry={"phone": phone, "risk_score": risk_score, "message_preview": message[:100]},
-            )
+        if not is_plain_scheduling_request(message):  # see SCHEDULING_VOCAB in rules.py
+            _, is_valid, risk_score = scan_with_timeout(_injection_scanner, prompt=message)
+            if not is_valid:
+                logger.warning(
+                    "firewall.input.prompt_injection",
+                    extra={"phone": phone, "risk_score": risk_score},
+                )
+                return FirewallResult(
+                    action="block",
+                    threat="PromptInjection",
+                    severity="high",
+                    redirect_message=BLOCK_GENERIC_RESPONSE,
+                    log_entry={"phone": phone, "risk_score": risk_score, "message_preview": message[:100]},
+                )
     except Exception as exc:
         if failed := _scanner_failed("prompt_injection", exc, phone):
             return failed

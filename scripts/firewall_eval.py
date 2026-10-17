@@ -29,8 +29,12 @@ THRESHOLDS = [0.5, 0.8, 0.92, 0.95, 0.98, 0.99, 0.995, 0.999]
 
 
 def main() -> None:
-    data = json.loads((ROOT / "tests" / "data" / "firewall_labeled.json").read_text())
-    thresholds = [float(t) for t in sys.argv[1:]] or THRESHOLDS
+    args = sys.argv[1:]
+    name = "firewall_labeled"
+    if args and args[0].startswith("--set="):  # e.g. --set=firewall_heldout
+        name, args = args[0].split("=", 1)[1], args[1:]
+    data = json.loads((ROOT / "tests" / "data" / f"{name}.json").read_text())
+    thresholds = [float(t) for t in args] or THRESHOLDS
     rows, benign_detail = [], {}
     for th in thresholds:
         input_guard._injection_scanner = PromptInjection(threshold=th, match_type=MatchType.FULL)
@@ -44,7 +48,7 @@ def main() -> None:
             f"| {blocked['benign']}/{len(data['benign'])} | {redirected} | {ml_only} |"
         )
     out = [
-        f"Firewall eval {datetime.now():%Y-%m-%d %H:%M}, tests/data/firewall_labeled.json",
+        f"Firewall eval {datetime.now():%Y-%m-%d %H:%M}, tests/data/{name}.json",
         "Conditions: scan_input client path (is_admin=False), regex checks + ML scanners at their shipped settings, "
         "only the injection threshold varied; hand-written messages",
         "",

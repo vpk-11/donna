@@ -61,6 +61,14 @@ IDENTITY_SPOOF_PATTERNS = [
     r"as the (trainer|admin|owner|coach|manager)",
     r"this is (the trainer|the admin|the owner)",
     r"speaking as (your boss|your employer|the manager)",
+    r"\b(admin|owner|trainer|coach|manager|administrator) (here|speaking)\b",
+    r"\b(i'?m|i am|this is|it'?s) (the |a |his |her |your |\w+'s )?(head |gym )?"
+    r"(coach|trainer|owner|admin|administrator|manager|assistant|boss)\b",
+    r"\b(message|instructions?|word) from (the |your )?(owner|admin|trainer|boss|manager)\b",
+    r"\b(your|the) (boss|owner|trainer|manager) (told|said|asked|wants)\b",
+    r"\b(owner|admin|trainer|coach|manager|boss) (said|says|told|asked) (me |you |that )?"
+    r"(i can|i may|i'm allowed|you can|you should|to (give|show|share|send|cancel|delete))",
+    r"\bi (work|am working) for (the )?(gym |business )?(owner|trainer|manager|admin)\b",
 ]
 
 SYSTEM_PROMPT_PATTERNS = [
@@ -76,6 +84,9 @@ SYSTEM_PROMPT_PATTERNS = [
     r"jailbreak",
     r"dan mode",
     r"do anything now",
+    r"\byour new (role|instructions?|task|persona)\b",
+    r"\bact as (a |an )?(terminal|shell|root|sudo|database|sql|unrestricted|different)\b",
+    r"\b(dump|export|print|output) (the |all )?(raw )?(database|db|table|rows|records)\b",
 ]
 
 EXFILTRATION_PATTERNS = [
@@ -115,3 +126,21 @@ BLOCK_GENERIC_RESPONSE = (
     "I didn't quite get that. Want to try rephrasing, or is there something "
     "I can help you with regarding your sessions?"
 )
+
+
+# Words a plain booking request is built from. The ML injection scanner false-blocks polite requests made only
+# of these ("Please cancel my next session"). A message skips that one scanner only if EVERY word is in this
+# set (and it is short), so no instruction-override or exfiltration sentence can qualify. All regex checks
+# still run first.
+SCHEDULING_VOCAB = frozenset("""
+please kindly can could would will you i id i'd we us me my mine the a an it is are am be to of for on at in from by
+and or if so but also then next this that last first second third usual same other another one two option options
+session sessions appointment appointments booking bookings time times slot slots class classes visit
+cancel confirm confirmed reschedule rescheduled move book change add switch keep skip
+monday tuesday wednesday thursday friday saturday sunday morning afternoon evening noon tonight tomorrow today
+tomorrow's week weekend day days month january february march april may june july august september october
+november december am pm free available open anything something after before around about instead again still now
+later sooner earlier yes no ok okay thanks thank works work good great fine sure go ahead do don't not need want
+wanted like have has there any how what when does did sorry late early soon back up out with
+""".split())
+MAX_PLAIN_REQUEST_WORDS = 25
