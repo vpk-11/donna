@@ -9,11 +9,3 @@ class FirewallResult(BaseModel):
     sanitized_input: str | None = None
     redirect_message: str | None = None
     log_entry: dict = {}
-
-
-class MessageEnvelope(BaseModel):
-    event: str
-    phone: str
-    payload: dict
-    timestamp: str
-    source: str

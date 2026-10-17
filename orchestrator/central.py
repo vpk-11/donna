@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 from models.orm import Provider
 from db.redis_client import get_redis
-from orchestrator.channels import STATE_AGENT_REGISTRY, STATE_SESSION
+from orchestrator.channels import STATE_AGENT_REGISTRY, STATE_OPEN_REQUESTS, STATE_SESSION
 from orchestrator.admin_agent import AdminAgent
 from orchestrator.agent import ClientAgent
 from orchestrator.llm_agent import run_agent
@@ -36,6 +36,21 @@ class CentralOrchestrator:
             raise RuntimeError("No provider configured. Run seed.sh first.")
         self._admin_agent = AdminAgent(self._provider, self._messaging_client, self, self._business_config)
         logger.info(f"Orchestrator started for provider: {self._provider.name}")
+        await self._restore(db)
+
+    async def _restore(self, db: Session) -> None:
+        """Rebuild agents and open requests from Redis after a restart. Conversation state is in SQLite."""
+        try:
+            r = get_redis()
+            registry = r.hgetall(STATE_AGENT_REGISTRY)
+            self._open_requests = dict(r.hgetall(STATE_OPEN_REQUESTS))
+        except Exception as e:
+            logger.warning(f"Could not restore agents: {e}")
+            return
+        for phone, entry in registry.items():
+            await self._get_or_spawn_agent(phone, db)
+            r.hset(STATE_AGENT_REGISTRY, phone, entry)  # keep the original started_at/handoff flags
+        logger.info(f"Restored {len(registry)} agents, {len(self._open_requests)} open requests")
 
     @runs_as("orchestrator")
     async def handle_message(self, phone: str, text: str, db: Session) -> None:
@@ -138,6 +153,10 @@ class CentralOrchestrator:
             if not target:
                 return {"error": "unknown client"}
             self._open_requests[target.phone_number] = requester_phone
+            try:
+                get_redis().hset(STATE_OPEN_REQUESTS, target.phone_number, requester_phone)
+            except Exception as e:
+                logger.warning(f"Could not persist open request: {e}")
             logger.info(f"relay: orchestrator -> agent({target.phone_number})")
             agent = await self._get_or_spawn_agent(target.phone_number, db)
             outcome = await agent.handle_orchestrator_request(request_text, db)
@@ -169,6 +188,10 @@ class CentralOrchestrator:
     async def report_outcome(self, from_phone: str, outcome: str, db: Session) -> str:
         """A client agent finished a relayed request. Forward to the requester's agent, or the admin."""
         requester = self._open_requests.pop(from_phone, None)
+        try:
+            get_redis().hdel(STATE_OPEN_REQUESTS, from_phone)
+        except Exception as e:
+            logger.warning(f"Could not clear open request: {e}")
         logger.info(f"relay: agent({from_phone}) -> orchestrator: outcome '{outcome}'")
         if requester is None:
             return "no open request"
